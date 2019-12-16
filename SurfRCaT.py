@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Oct 27 13:48:21 2019
+This code contains the main functions utilizied by the Surfcamera Remote
+Calibration Tool. These functions are called by the front-end user interface.
 
-@author: conli
+Created by Matt Conlin, University of Florida
+12/2019
+
 """
 
 #============================================================================#

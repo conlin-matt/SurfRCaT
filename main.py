@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Nov 25 18:20:12 2019
+This code creates and runs the user interface of the Surfcamera Remote
+Calibration Tool. Most of the logic behind the tool is contained within the
+functions in the SurfRCaT.py file. The UI is created with PyQt.
 
-@author: conli
+Created by Matt Conlin, University of Florida
+12/2019
+
 """
+
 import pptk
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
 from PyQt5.QtWidgets import *
