@@ -2,7 +2,7 @@
 
 ## What is it?
 
-The surf-camera remote calibration tool (SurfRCaT) allows for the rectification of imagery from any coastal camera that views structures identifiable in lidar data.
+The surf-camera remote calibration tool (SurfRCaT) allows for the rectification of imagery from any U.S. coastal camera that views structures identifiable in lidar data.
 
 ## How do I use it?
 1) Obtain imagery from your desired camera and seperate into images.  
