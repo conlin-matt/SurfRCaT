@@ -6,12 +6,11 @@ The surf-camera remote calibration tool (SurfRCaT) allows for the rectification 
 
 ## How do I use it?
 1) Obtain imagery from your desired camera and seperate into images.  
-Note: The Southeastern Coastal Ocean Observing Regional Association has deployed a network of 7 surfcams (called WebCAT) and has made their imagery openly accessible ([see here](https://secoora.org/webcat/)). If you want to use one of these cameras, SurfRCaT will get the imagery for you! Just follow the onscreen instructions to use a WebCAT camera.
+Note: The Southeastern Coastal Ocean Observing Regional Association has deployed a network of 7 surfcams (called WebCAT) and has made their imagery openly accessible ([see here](https://secoora.org/webcat/)). If you want to use one of these cameras, SurfRCaT will get the imagery for you! Just proceed to Step 2 and follow the onscreen instructions to use a WebCAT camera.
 2) Click on the link in the above description and download the zip file. 
-3) Extract the zip file.
-4) Enter "cmd" in the Windows search bar and open the Command Prompt app.
-5) Click and drag the file SurfRCaT.exe from the extracted zip file into the command prompt and press enter.
-6) Follow the onscreen instructions. 
+3) Click on "Extract All" in the resulting window, and extract the zip file to a desired location.
+4) Go to the extracted folder and find the file "SurfRCaT" (it is of type "application"). Double click on it to launch.
+5) Follow the onscreen instructions. 
 
 ## FAQ
 1) How do I use the lidar point cloud viewer window to identify points?    
