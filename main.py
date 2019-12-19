@@ -25,6 +25,10 @@ from matplotlib.figure import Figure
 import numpy as np
 import time
 
+pth = os.path.dirname(os.path.realpath(__file__))
+print(pth)
+pth = os.path.join(str(pth),'')
+print(os.path.dirname(os.path.dirname(pth)))
 
 class WelcomeWindow(QWidget):
     ''' 
@@ -62,11 +66,10 @@ class WelcomeWindow(QWidget):
         ########################    
             
         # Right contents box setup #      
-        txt = QLabel('Welcome to the Surfcamera Remote Calibration Tool (SurfR-CaT)!')
-        txt2 = QLabel('Developed in partnership with the Southeastern Coastal Ocean Observing Regional Association (SECOORA), '
-                      +'the United States Geological Survey (USGS), and the National Oceanic and Atmospheric administration (NOAA), this tool allows you to calibrate any coastal camera of  '
-                      +'known location with accessible video footage. For documentation on the methods employed by the tool, please refer to the GitHub readme (link here). If you have an '
-                      +'issue, please post it on the GitHib issues page.')      
+        txt = QLabel('Welcome to the Surfcamera Remote Calibration Tool (SurfRCaT)!')
+        txt2 = QLabel('SurfRCaT has been developed in partnership with the Southeastern Coastal Ocean Observing Regional Association (SECOORA; https://secoora.org/), '
+                      +'the United States Geological Survey (USGS), and the National Oceanic and Atmospheric Administration (NOAA). This tool allows you to calibrate any coastal camera in the U.S. of '
+                      +'generally known location with accessible video footage. If you have an issue, please post it on the GitHub issues page (https://github.com/conlin-matt/SurfRCaT/issues).')      
         txt2.setWordWrap(True)
         txt3 = QLabel('Press Continue to start calibrating a camera!')
         contBut = QPushButton('Continue >')
@@ -290,9 +293,9 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
        cameraLocation = WebCATdict[cams[item]]
        cameraName = cams[item]
        # Save the WebCAT camera location and name #
-       with open('CameraLocation.pkl','wb') as f:
+       with open(pth+'CameraLocation.pkl','wb') as f:
            pickle.dump(cameraLocation,f)
-       with open('CameraName.pkl','wb') as f:
+       with open(pth+'CameraName.pkl','wb') as f:
            pickle.dump(cameraName,f)
        
        if cameraName == 'follypiersouthcam': # Need 1 erosion iter for Folly Pier South, 2 for other cams # 
@@ -383,8 +386,8 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
         
        # Right contents box setup #
        self.rightGroupBox = QGroupBox()
-       f1 = open('viewDF.pkl','rb')
-       f2 = open('vidFile.pkl','rb')
+       f1 = open(pth+'viewDF.pkl','rb')
+       f2 = open(pth+'vidFile.pkl','rb')
        self.viewDF = pickle.load(f1)
        vidFile = pickle.load(f2)
        vidPth = vidFile
@@ -406,9 +409,9 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
        # Display image from each view #
        for i in range(0,numViews):
            im = self.frameDF['Image'][i]
-           cv2.imwrite('frame.png', im)
+           cv2.imwrite(pth+'frame.png', im)
            
-           img = mpimg.imread('frame.png')
+           img = mpimg.imread(pth+'frame.png')
            self.canvas = FigureCanvas(Figure())
            self.ax = self.canvas.figure.subplots()
            self.ax.imshow(img)
@@ -451,7 +454,7 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
        '''
        viewSel = item-1
        im = self.frameDF['Image'][viewSel]
-       cv2.imwrite('frameUse.png', im)
+       cv2.imwrite(pth+'frameUse.png', im)
        
        self.close()
        self.lidar = getLidar_StartSearchWindow()
@@ -552,7 +555,7 @@ class getWebCATImagery_ChooseNewDateWindow(QWidget):
        # Instantiate worker threads #
        self.worker = DownloadVidThread(yr,mo,day)
        
-       f = open('CameraName.pkl','rb')
+       f = open(pth+'CameraName.pkl','rb')
        cameraName = pickle.load(f)
        if cameraName == 'follypiersouthcam': # Need 1 erosion iter for Folly Pier South, 2 for other cams # 
            self.worker2 = CheckPTZThread(1)
@@ -686,13 +689,13 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
        cameraLocation = [float(self.bxLat.text()),float(self.bxLon.text())]
        pthToImage = self.bxPth.text()
        # Save the camera name and location #
-       with open('CameraLocation.pkl','wb') as f:
+       with open(pth+'CameraLocation.pkl','wb') as f:
            pickle.dump(cameraLocation,f)
-       with open('CameraName.pkl','wb') as f:
+       with open(pth+'CameraName.pkl','wb') as f:
            pickle.dump(cameraName,f)
        
        im = cv2.imread(pthToImage) 
-       cv2.imwrite('frameUse.png',im)
+       cv2.imwrite(pth+'frameUse.png',im)
        
        self.close()
        self.ls = getLidar_StartSearchWindow()
@@ -764,7 +767,7 @@ class getLidar_StartSearchWindow(QWidget):
        ############################
        
        # Instantiate worker threads #
-       f = open('CameraLocation.pkl','rb')
+       f = open(pth+'CameraLocation.pkl','rb')
        cameraLocation = pickle.load(f)
        
        self.worker = getLidar_SearchThread(cameraLocation[0],cameraLocation[1])
@@ -803,7 +806,7 @@ class getLidar_StartSearchWindow(QWidget):
          '''
          self.close()
          
-         f = open('lidarTable.pkl','rb')
+         f = open(pth+'lidarTable.pkl','rb')
          lidarTable = pickle.load(f)
          
          self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
@@ -896,7 +899,7 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         ############################
         
         # Instantiate worker threads #
-        f = open('CameraLocation.pkl','rb')
+        f = open(pth+'CameraLocation.pkl','rb')
         cameraLocation = pickle.load(f)
         
         self.worker = getLidar_PrepChosenSetThread(cameraLocation[0],cameraLocation[1])
@@ -912,7 +915,7 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         print(str(item.text())) 
         
         num = int(item.text())
-        with open('chosenLidarID.pkl','wb') as f:
+        with open(pth+'chosenLidarID.pkl','wb') as f:
             pickle.dump(num,f)
     
     def downloadCorrectData(self):   
@@ -949,7 +952,7 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         self.pb2.setValue(perDone*100)
         
     def on_closeSignal2(self):
-        f = open('lidarDat.pkl','rb')
+        f = open(pth+'lidarDat.pkl','rb')
         ld = pickle.load(f)
         if len(ld>0):
         
@@ -970,7 +973,7 @@ class getLidar_ChooseLidarSetWindow(QWidget):
     def chooseOtherSet(self):
         self.close()
         
-        f = open('lidarTable.pkl','rb')
+        f = open(pth+'lidarTable.pkl','rb')
         lidarTable = pickle.load(f)
          
         self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
@@ -1036,7 +1039,7 @@ class PickGCPsWindow(QWidget):
         ########################  
         
         # Right contents box setup #
-        img = mpimg.imread('frameUse.png')
+        img = mpimg.imread(pth+'frameUse.png')
         self.canvas = FigureCanvas(Figure())
         self.ax = self.canvas.figure.subplots()
         self.ax.imshow(img)
@@ -1134,7 +1137,7 @@ class PickGCPsWindow(QWidget):
        self.doneBut.setParent(None)
        self.helpBut.setParent(None)       
     
-       with open('GCPs_im.pkl','rb') as f:
+       with open(pth+'GCPs_im.pkl','rb') as f:
            gcpS_im = pickle.load(f)
        self.ax.plot(gcpS_im[:,0],gcpS_im[:,1],'ro')
        
@@ -1197,7 +1200,7 @@ class calibrate_FinalInputs_Welcome(QWidget):
         ########################  
 
         # Right contents box setup #
-        img = mpimg.imread('frameUse.png')
+        img = mpimg.imread(pth+'frameUse.png')
         self.canvas = FigureCanvas(Figure())
         self.ax = self.canvas.figure.subplots()
         self.ax.imshow(img)
@@ -1268,7 +1271,7 @@ class calibrate_FinalInputs(QWidget):
         ########################  
 
         # Right contents box setup #
-        img = mpimg.imread('frameUse.png')
+        img = mpimg.imread(pth+'frameUse.png')
         self.canvas = FigureCanvas(Figure())
         self.ax = self.canvas.figure.subplots()
         self.ax.imshow(img)
@@ -1323,9 +1326,9 @@ class calibrate_FinalInputs(QWidget):
         self.az= float(self.azBx.text())     
         self.ZL = float(self.elevBx.text())
         
-        with open('az.pkl','wb') as f:
+        with open(pth+'az.pkl','wb') as f:
             pickle.dump(self.az,f)
-        with open('ZL.pkl','wb') as f:
+        with open(pth+'ZL.pkl','wb') as f:
             pickle.dump(self.ZL,f)
         
         self.calibrate()
@@ -1397,16 +1400,16 @@ class calibrate_ShowCalibResultsWindow(QWidget):
         ########################  
         
         # Right contents box setup #
-        img = mpimg.imread('frameUse.png')
+        img = mpimg.imread(pth+'frameUse.png')
         self.canvas = FigureCanvas(Figure())
         self.ax = self.canvas.figure.subplots()
         self.ax.imshow(img)
         self.canvas.draw()
         
         # Plot the GCPs and reprojected positions #
-        f1 = open('GCPs_im.pkl','rb') 
-        f2 = open('GCPs_lidar.pkl','rb') 
-        f3 = open('calibVals.pkl','rb') 
+        f1 = open(pth+'GCPs_im.pkl','rb') 
+        f2 = open(pth+'GCPs_lidar.pkl','rb') 
+        f3 = open(pth+'calibVals.pkl','rb') 
        
         GCPs_im = pickle.load(f1)
         GCPs_lidar = pickle.load(f2)
@@ -1428,7 +1431,7 @@ class calibrate_ShowCalibResultsWindow(QWidget):
         # Calculate the re-projection error of the GCPs #
         uv = np.hstack([uProj,vProj])
         allResid = np.subtract(GCPs_im,uv)
-        np.savetxt('calibResid.txt',allResid,fmt='%6f')
+        np.savetxt(pth+'calibResid.txt',allResid,fmt='%6f')
         RMSresid = np.sqrt(np.mean(np.reshape(np.subtract(GCPs_im,uv),[np.size(np.subtract(GCPs_im,uv)),1])**2))
         
         self.introLab = QLabel('The reprojection of each picked GCP based on the calibration is shown below. The Xs should align with the Os if the calibration was accurate.')
@@ -1496,7 +1499,7 @@ class DownloadVidThread(QThread):
         
        print('Thread Started')
        
-       f = open('CameraName.pkl','rb')      
+       f = open(pth+'CameraName.pkl','rb')      
        camToInput = pickle.load(f)
        
        if self.year and self.month and self.day:
@@ -1510,7 +1513,7 @@ class DownloadVidThread(QThread):
            vidFile = SurfRCaT.getImagery_GetVideo('buxtonnorthcam')
        #######################################
        
-       with open('vidFile.pkl','wb') as f:
+       with open(pth+'vidFile.pkl','wb') as f:
            pickle.dump(vidFile,f)
            
        self.finishSignal.emit(1)   
@@ -1532,14 +1535,14 @@ class CheckPTZThread(QThread):
         
        print('Thread Started')
        
-       f = open('vidFile.pkl','rb')      
+       f = open(pth+'vidFile.pkl','rb')      
        vidFile = pickle.load(f)
        
        # Check if PTZ #       
        fullVidPth = vidFile           
        viewDF,frameVec = SurfRCaT.getImagery_CheckPTZ(fullVidPth,self.numIters)
        
-       with open('viewDF.pkl','wb') as f:
+       with open(pth+'viewDF.pkl','wb') as f:
            pickle.dump(viewDF,f)
            
        self.finishSignal.emit(1) 
@@ -1587,7 +1590,7 @@ class getLidar_SearchThread(QThread):
           
         print('Thread Done')   
 
-        with open('lidarTable.pkl','wb') as f:
+        with open(pth+'lidarTable.pkl','wb') as f:
             pickle.dump(matchingTable,f)
 
         self.finishSignal.emit(1)  
@@ -1607,7 +1610,7 @@ class getLidar_PrepChosenSetThread(QThread):
         
         print('Thread Started')
                 
-        f = open('chosenLidarID.pkl','rb')
+        f = open(pth+'chosenLidarID.pkl','rb')
         IDToDownload = pickle.load(f)
         sf = SurfRCaT.getLidar_GetShapefile(IDToDownload)
         
@@ -1624,7 +1627,7 @@ class getLidar_PrepChosenSetThread(QThread):
                 tilesKeep.append(out)
         
 
-        with open('tilesKeep.pkl','wb') as f:
+        with open(pth+'tilesKeep.pkl','wb') as f:
             pickle.dump(tilesKeep,f)
             
         self.finishSignal.emit(1)
@@ -1646,10 +1649,10 @@ class getLidar_DownloadChosenSetThread(QThread):
     def run(self):
         print('Thread Started')
         
-        f = open('tilesKeep.pkl','rb')
+        f = open(pth+'tilesKeep.pkl','rb')
         tilesKeep = pickle.load(f)
         
-        f = open('chosenLidarID.pkl','rb')
+        f = open(pth+'chosenLidarID.pkl','rb')
         IDToDownload = pickle.load(f)
         
         i = 0
@@ -1665,7 +1668,7 @@ class getLidar_DownloadChosenSetThread(QThread):
             lidarDat = np.append(lidarDat,lidarXYZsmall,axis=0)
 
             
-        with open('lidarDat.pkl','wb') as f:
+        with open(pth+'lidarDat.pkl','wb') as f:
             pickle.dump(lidarDat,f)
             
         self.finishSignal.emit(1)   
@@ -1685,12 +1688,12 @@ class getLidar_FormatChosenSetThread(QThread):
         
     def run(self):
         
-        f = open('lidarDat.pkl','rb')
+        f = open(pth+'lidarDat.pkl','rb')
         lidarDat = pickle.load(f)
 
         pc = SurfRCaT.getLidar_CreatePC(lidarDat,self.cameraLoc_lat,self.cameraLoc_lon)
           
-        with open('lidarPC.pkl','wb') as f:
+        with open(pth+'lidarPC.pkl','wb') as f:
             pickle.dump(pc,f)
             
         self.finishSignal.emit(1)    
@@ -1710,17 +1713,18 @@ class pptkWindowWorker(QThread):
         print('Thread Started')
 
         # Load the point cloud #        
-        f = open('lidarPC.pkl','rb')
+        f = open(pth+'lidarPC.pkl','rb')
         pc = pickle.load(f)
 
         # Call the viewer and let the user identify points (subprocess saves the output to file #
-        command = "python LaunchPPTKwin.py"
+        command = 'cmd.exe /C '+pth+'LaunchPPTKwin\LaunchPPTKwin.exe'
+        print(command)
         self.child = QProcess()
-        self.child.start("cmd.exe /C python LaunchPPTKwin.py")
+        self.child.start(command)
         self.child.waitForFinished(-1)
 
         # Load the output and create the GCPs from it #
-        f = open('Testing.txt','r')
+        f = open(pth+'Testing.txt','r')
         iGCPs1 = f.read()
         iGCPs2 = iGCPs1[1:len(iGCPs1)-2]
         
@@ -1741,9 +1745,9 @@ class pptkWindowWorker(QThread):
 ##            pass
         
         print(GCPs_lidar)
-        np.savetxt('GCPS_lidar.txt',GCPs_lidar)
+        np.savetxt(pth+'GCPS_lidar.txt',GCPs_lidar)
 
-        with open('GCPs_lidar.pkl','wb') as f:
+        with open(pth+'GCPs_lidar.pkl','wb') as f:
             pickle.dump(GCPs_lidar,f)
 
         self.finishSignal.emit(1)    
@@ -1785,10 +1789,10 @@ class pickGCPs_Image(QThread):
 ##           gcps_im2 = gcps_im2[sorted(uid[1]),:]
            print(gcps_im2)
             
-           with open('GCPs_im.pkl','wb') as f:
+           with open(pth+'GCPs_im.pkl','wb') as f:
                pickle.dump(gcps_im2,f)
 
-           np.savetxt('GCPS_im.txt',gcps_im2)
+           np.savetxt(pth+'GCPS_im.txt',gcps_im2)
 
            return
  
@@ -1815,12 +1819,12 @@ class calibrate_CalibrateThread(QThread):
         print('Thread Started')
         
         # Load everything that we already have: GCPs, image, azimuth, and ZL #
-        f1 = open('GCPs_im.pkl','rb')
-        f2 =  open('GCPs_lidar.pkl','rb')     
-        f_az = open('az.pkl','rb')
-        f_ZL = open('ZL.pkl','rb')
+        f1 = open(pth+'GCPs_im.pkl','rb')
+        f2 =  open(pth+'GCPs_lidar.pkl','rb')     
+        f_az = open(pth+'az.pkl','rb')
+        f_ZL = open(pth+'ZL.pkl','rb')
         
-        img = cv2.imread('frameUse.png')
+        img = cv2.imread(pth+'frameUse.png')
         gcps_im = pickle.load(f1)
         gcps_lidar = pickle.load(f2)
         az = pickle.load(f_az)
@@ -1839,10 +1843,10 @@ class calibrate_CalibrateThread(QThread):
         updatedApprox = calibVals1
         calibVals,So = SurfRCaT.calibrate_performCalibration(np.array([updatedApprox[0],updatedApprox[1],updatedApprox[2],initApprox[3],initApprox[4],initApprox[5],updatedApprox[6],updatedApprox[7],updatedApprox[8]]),np.array([1,1,1,0,0,0,1,1,1]),gcps_im,gcps_lidar)
         
-        with open('calibVals.pkl','wb') as f:
+        with open(pth+'calibVals.pkl','wb') as f:
             pickle.dump(calibVals,f)
             
-        np.savetxt('calibVals.txt',calibVals,fmt='%6f')
+        np.savetxt(pth+'calibVals.txt',calibVals,fmt='%6f')
             
       
         self.finishSignal.emit(1)    
