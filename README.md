@@ -8,7 +8,7 @@ The surf-camera remote calibration tool (SurfRCaT) allows for the calibration of
 
 SurfRCaT can be obtained and used in one of two ways: via the pre-compiled application or by building it from the source code. Either way, you must first have images from your camera to feed to the program. This is with the exception of the WebCAT surfcam array deployed by the Southeastern Coastal Ocean Observing Regional Association ([see here](https://secoora.org/webcat/)). If you want to use one of these cameras, SurfRCaT will get the imagery for you. 
 
-#### 1. SurfRCaT via precompiled app
+### 1. SurfRCaT via precompiled app
 
 SurfRCaT has been bundled into a (mostly) standalone application. You won't need to do any coding to use it. However, the application is quite bulky and can take some time to download and install. DISCLAIMER: The app can only be run on computers running Windows. Additionally, while the app has been tested to run well on a number of different machines, I cannot guarentee that it will run without error on all Windows machines. Any issues should be reported to the Issues page, and I will do my best to ammend them.
 
@@ -22,7 +22,7 @@ Steps for obtaining the SurfRCaT app:
 
 Note: In some cases, the program can encounter an issue after the GCPs are identified in the lidar data. In this case, please download [this]() folder, extract it, and copy it into the "LaunchPPTKwin" folder within the SurfRCaT folder.
 
-#### 2. SurfRCaT from source
+### 2. SurfRCaT from source
 
 
 ## FAQ
