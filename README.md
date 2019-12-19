@@ -24,6 +24,24 @@ Note: In some cases, the program can encounter an issue after the GCPs are ident
 
 ### 2. SurfRCaT from source
 
+If you want a bit more control over the code, are not running Windows, or don't want to deal with a clunky executable, you can create SurfRCaT via the source code provided in this repo. While you will likely need to do some (pip) installations to make it work, the GUI tool will work the same as in the app once created. 
+
+Steps for building SurfRCaT from source:
+1) If you don'e already have it, download the appropriate Anaconda distribution for your machine from [here](https://www.anaconda.com/distribution/). Anaconda is an all-in-one package and environment manager, and makes downloading and dealing with Python packages relatively painless.
+2) Create a new environment called SurfRCaT_env containing Python 3.6 by running the following two commands in a terminal window (with an 'Enter' press between the commands):
+```bash
+conda create -n SurfRCaT_env python=3.6
+conda activate SurfRCaT_env
+```
+3) Pip install the following packages (in order): xx,yy,xx,ss,xx,ss,ff,nn,ff,dd,ss,ss,ss. Each package can be pip installed by running the following command in the terminal window:
+```bash
+pip install <package>
+```
+e.g.
+```bash
+pip install numpy
+```
+
 
 ## FAQ
 1) How do I use the lidar point cloud viewer window to identify points?    
