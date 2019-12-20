@@ -1,4 +1,4 @@
-# SurfRCaT
+# SurfRCaT Documentation
 
 ## What is it?
 
