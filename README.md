@@ -27,22 +27,19 @@ Note: In some cases, the program can encounter an issue after the GCPs are ident
 If you want a bit more control over the code, are not running Windows, or don't want to deal with a clunky executable, you can create SurfRCaT via the source code provided in this repo. While you will likely need to do some (pip) installations to make it work, the GUI tool will work the same as in the app once created. 
 
 Steps for building SurfRCaT from source:
-1) If you don'e already have it, download the appropriate Anaconda distribution for your machine from [here](https://www.anaconda.com/distribution/). Use the Python 3.7 64-bit version. Anaconda is an all-in-one package and environment manager, and makes downloading and dealing with Python packages relatively painless.
-2) Open an Anconda prompt by searcing for 'Anaconda' in the Windows search bar and selecting the prompt. On a Mac, open a terminal window.
-3) Create a new environment called SurfRCaT_env containing Python 3.6 by running the following two commands in the Anaconda prompt (with an 'Enter' press between the commands):
+1) Clone or download the SurfRCaT repository into a folder of your choosing.
+2) If you don'e already have it, download the appropriate Anaconda distribution for your machine from [here](https://www.anaconda.com/distribution/). Use the Python 3.7 64-bit version. Anaconda is an all-in-one package and environment manager, and makes downloading and dealing with Python packages relatively painless.
+3) Open an Anconda prompt by searcing for 'Anaconda' in the Windows search bar and selecting the prompt. On a Mac, open a terminal window.
+4) Create a new environment called SurfRCaT_env containing Python 3.6 and the pdal package by running the following two commands in the Anaconda prompt (with an 'Enter' press between the commands):
 ```bash
-conda create -n SurfRCaT_env python=3.6
+conda create -n SurfRCaT_env -c conda-forge python=3.6 python-pdal
 conda activate SurfRCaT_env
 ```
-4) Install the pdal package from the conda-forge channel by executing the following command:
-```bash
-conda install -c conda-forge pdal python-pdal gdal
-```
-5) Pip install PyQt5, the Python binding for the QT GUI package, as well as fbs, the package for running the GUI, by executing:
+6) Pip install PyQt5, the Python binding for the QT GUI package, as well as fbs, the package for running the GUI, by executing:
 ```bash
 pip install fbs PyQt5==5.9.2
 ```
-6) Pip install the following packages (in order): numpy, pandas, matplotlib, opencv, pickle, pptk, requests, ftplib, pyshp, utm, json. Each package can be pip installed by running the following command in the terminal window:
+7) Pip install the following packages (in order): numpy, pandas, matplotlib, opencv, pickle, pptk, requests, ftplib, pyshp, utm, json. Each package can be pip installed by running the following command in the terminal window:
 ```bash
 pip install <package>
 ```
@@ -50,7 +47,16 @@ e.g.
 ```bash
 pip install numpy
 ```
-7) Clone or download the SurfRCaT repository into a folder of your choosing.
+8) Download [this](https://drive.google.com/open?id=1Pm4rXlXWJM-hBGHD12g2SBL67E5K2new) compressed folder, and copy the folder into the directory containing the contents of this repository.
+9) Create a new fbs project by executing the following (you can use defaults for all options):
+```bash
+fbs startproject 
+```
+10) Copy the main.py file, SurfRCaT.py file, and LaunchPPTKwin folder into the newly created src/main/python directory within the directory containing the contents of this repository. 
+11) You're all set up to run the tool! Execute the following to run the tool:
+```bash
+fbs run 
+```
 
 ## FAQ
 1) How do I use the lidar point cloud viewer window to identify points?    
