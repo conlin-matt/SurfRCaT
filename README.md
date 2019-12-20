@@ -34,11 +34,15 @@ Steps for building SurfRCaT from source:
 conda create -n SurfRCaT_env python=3.6
 conda activate SurfRCaT_env
 ```
-3) Install the pdal package from the conda-forge package by executing the following command:
+4) Install the pdal package from the conda-forge channel by executing the following command:
 ```bash
 conda install -c conda-forge pdal python-pdal gdal
 ```
-4)Pip install the following packages (in order):numpy,yy,xx,ss,xx,ss,ff,nn,ff,dd,ss,ss,ss. Each package can be pip installed by running the following command in the terminal window:
+5) Pip install PyQt5, the Python binding for the QT GUI package, as well as fbs, the package for running the GUI, by executing:
+```bash
+pip install fbs PyQt5==5.9.2
+```
+6) Pip install the following packages (in order): numpy, pandas, matplotlib, opencv, pickle, pptk, requests, ftplib, pyshp, utm, json. Each package can be pip installed by running the following command in the terminal window:
 ```bash
 pip install <package>
 ```
@@ -46,7 +50,7 @@ e.g.
 ```bash
 pip install numpy
 ```
-
+7) Clone or download the SurfRCaT repository into a folder of your choosing.
 
 ## FAQ
 1) How do I use the lidar point cloud viewer window to identify points?    
