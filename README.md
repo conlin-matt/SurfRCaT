@@ -48,7 +48,11 @@ e.g.
 pip install numpy
 ```
 8) Download [this](https://drive.google.com/open?id=1Pm4rXlXWJM-hBGHD12g2SBL67E5K2new) compressed folder, and copy the folder into the directory containing the contents of this repository.
-9) Create a new fbs project by executing the following (you can use defaults for all options):
+9) cd to the directory containing the contents of this rpository by exeecuting:
+```bash
+cd <your directory>
+```
+Create a new fbs project by executing the following (you can use defaults for all options):
 ```bash
 fbs startproject 
 ```
