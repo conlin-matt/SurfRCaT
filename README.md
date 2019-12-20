@@ -10,7 +10,7 @@ SurfRCaT can be obtained and used in one of two ways: via the pre-compiled appli
 
 ### 1. SurfRCaT via precompiled app
 
-SurfRCaT has been bundled into a (mostly) standalone application. You won't need to do any coding to use it. However, the application is quite bulky and can take some time to download and install. DISCLAIMER: The app can only be run on computers running Windows. Additionally, while the app has been tested to run well on a number of different machines, I cannot guarentee that it will run without error on all Windows machines. Any issues should be reported to the Issues page, and I will do my best to ammend them.
+SurfRCaT has been bundled into a (mostly) standalone application. You won't need to do any coding to use it. However, the application is quite bulky and can take some time to download and install. DISCLAIMER: The app can only be run on computers running Windows. Additionally, while the app has been tested to run well on a number of different machines, I cannot guarantee that it will run without error on all Windows machines. Any issues should be reported to the Issues page, and I will do my best to amend them.
 
 Steps for obtaining the SurfRCaT app:
 1) Go to [this](https://drive.google.com/open?id=1os126s7bYrGzTo3P4jyUQcrrfWirl70l) link and click on the 'Download' button in the top right corner of the screen. 
@@ -28,8 +28,8 @@ If you want a bit more control over the code, are not running Windows, or don't 
 
 Steps for building SurfRCaT from source:
 1) Clone or download the SurfRCaT repository into a folder of your choosing.
-2) If you don'e already have it, download the appropriate Anaconda distribution for your machine from [here](https://www.anaconda.com/distribution/). Use the Python 3.7 64-bit version. Anaconda is an all-in-one package and environment manager, and makes downloading and dealing with Python packages relatively painless.
-3) Open an Anconda prompt by searcing for 'Anaconda' in the Windows search bar and selecting the prompt. On a Mac, open a terminal window.
+2) If you don't already have it, download the appropriate Anaconda distribution for your machine from [here](https://www.anaconda.com/distribution/). Use the Python 3.7 64-bit version. Anaconda is an all-in-one package and environment manager, and makes downloading and dealing with Python packages relatively painless.
+3) Open an Anaconda prompt by searching for 'Anaconda' in the Windows search bar and selecting the prompt. On a Mac, open a terminal window.
 4) Create a new environment called SurfRCaT_env containing Python 3.6 and the pdal package by running the following two commands in the Anaconda prompt (with an 'Enter' press between the commands):
 ```bash
 conda create -n SurfRCaT_env -c conda-forge python=3.6 python-pdal
@@ -39,20 +39,16 @@ conda activate SurfRCaT_env
 ```bash
 pip install fbs PyQt5==5.9.2
 ```
-7) Conda install the following packages: numpy, pandas, matplotlib, opencv. Packages can be conda installed by running:
+7) Conda install some necessary packages by executing:
 ```bash
-conda install <package>
+conda install numpy pandas matplotlib opencv
 ```
-7) Pip install the other necessary packages by running: numpy, pandas, matplotlib, opencv, pickle, pptk, requests, ftplib, pyshp, utm, json. Each package can be pip installed by running the following command in the terminal window:
+8) Pip install the other necessary packages by executing:
 ```bash
-pip install pptk ftplib pyshp utm json
+pip install pptk pickle requests ftplib pyshp utm json
 ```
-e.g.
-```bash
-pip install numpy
-```
-8) Download [this](https://drive.google.com/open?id=1Pm4rXlXWJM-hBGHD12g2SBL67E5K2new) compressed folder, and copy the folder into the directory containing the contents of this repository.
-9) cd to the directory containing the contents of this rpository by exeecuting:
+9) Download [this](https://drive.google.com/open?id=1Pm4rXlXWJM-hBGHD12g2SBL67E5K2new) compressed folder, and copy the folder into the directory containing the contents of this repository.
+9) cd to the directory containing the contents of this repository by executing:
 ```bash
 cd <your directory>
 ```
