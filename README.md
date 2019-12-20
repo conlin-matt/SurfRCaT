@@ -22,7 +22,7 @@ Steps for obtaining the SurfRCaT app:
 5) Scroll down until you find the file called SurfRCaT or SurfRCaT.exe (it is of type "application").
 6) Double click on this file to launch SurfRCaT. Follow the onscreen instructions. 
 
-Note: In some cases, the program can encounter an issue after the GCPs are identified in the lidar data. In this case, please download [this]() folder, extract it, and copy it into the "LaunchPPTKwin" folder within the SurfRCaT folder.
+Note: In some cases, the program can encounter an issue after the GCPs are identified in the lidar data. In this case, please download [this](https://drive.google.com/open?id=1Pm4rXlXWJM-hBGHD12g2SBL67E5K2new) folder, extract it, and copy it into the "LaunchPPTKwin" folder within the SurfRCaT folder.
 
 ### 2. SurfRCaT from source
 
