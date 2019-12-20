@@ -39,9 +39,13 @@ conda activate SurfRCaT_env
 ```bash
 pip install fbs PyQt5==5.9.2
 ```
-7) Pip install the following packages (in order): numpy, pandas, matplotlib, opencv, pickle, pptk, requests, ftplib, pyshp, utm, json. Each package can be pip installed by running the following command in the terminal window:
+7) Conda install the following packages: numpy, pandas, matplotlib, opencv. Packages can be conda installed by running:
 ```bash
-pip install <package>
+conda install <package>
+```
+7) Pip install the other necessary packages by running: numpy, pandas, matplotlib, opencv, pickle, pptk, requests, ftplib, pyshp, utm, json. Each package can be pip installed by running the following command in the terminal window:
+```bash
+pip install pptk ftplib pyshp utm json
 ```
 e.g.
 ```bash
