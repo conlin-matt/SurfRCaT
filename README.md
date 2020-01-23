@@ -15,14 +15,9 @@ SurfRCaT can be obtained and used in one of two ways: via the pre-compiled appli
 SurfRCaT has been bundled into a (mostly) standalone application. You won't need to do any coding to use it. However, the application is quite bulky and can take some time to download and install. DISCLAIMER: The app can only be run on computers running Windows. Additionally, while the app has been tested to run well on a number of different machines, I cannot guarantee that it will run without error on all Windows machines. Any issues should be reported to the Issues page, and I will do my best to amend them.
 
 Steps for obtaining the SurfRCaT app:
-1) Download the compressed tool at the link in the repo description (above).
-2) If using Microsoft Edge/Internet Explorer, select 'Open' on the bottom of the screen to open the application folder after it downloads. If using Chrome, click on the folder in the lower-left corner of the screen when it finishes downloading.
-3) In the Explorer window that opens, select 'Extract all', and choose a location to extract the folder too. The location must already exist. Click 'Extract'.
-4) Go to the extracted SurfRCaT folder, and double click to see its contents.
-5) Scroll down until you find the file called SurfRCaT or SurfRCaT.exe (it is of type "application").
-6) Double click on this file to launch SurfRCaT. Follow the onscreen instructions. 
-
-Note: In some cases, the program can encounter an issue after the GCPs are identified in the lidar data. In this case, please download [this](https://drive.google.com/open?id=1jfgaj8OynIGW962KY6lCjmSjyyGYRAoo) folder, extract it, and copy it into the "LaunchPPTKwin" folder within the SurfRCaT folder.
+1) [Download](https://www.dropbox.com/s/kg7c3kzon0zl96p/SurfRCaT_V2_1.exe?dl=1) the tool.
+2) When the tool has finished downloading, click on it (Chrome) or select Run (Edge) to launch the installer.
+3) Follow the prompts to install SurfRCaT. Note- you should install the tool to an easy-to-find directory, because output files will be saved to the same location as the tool itself. 
 
 ### 2. SurfRCaT from source
 
