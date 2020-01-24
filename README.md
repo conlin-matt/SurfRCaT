@@ -15,7 +15,7 @@ SurfRCaT can be obtained and used in one of two ways: via the pre-compiled appli
 SurfRCaT has been bundled into a (mostly) standalone application. You won't need to do any coding to use it. However, the application is quite bulky and can take some time to download and install. DISCLAIMER: The app can only be run on computers running Windows. Additionally, while the app has been tested to run well on a number of different machines, I cannot guarantee that it will run without error on all Windows machines. Any issues should be reported to the Issues page, and I will do my best to amend them.
 
 Steps for obtaining the SurfRCaT app:
-1) [Download](https://www.dropbox.com/s/kg7c3kzon0zl96p/SurfRCaT_V2_1.exe?dl=1) the tool.
+1) [Download](https://www.dropbox.com/s/xhh5aji6kcg705v/SurfRCaT_V2_2.exe?dl=1) the tool.
 2) When the tool has finished downloading, click on it (Chrome) or select Run (Edge) to launch the installer.
 3) Follow the prompts to install SurfRCaT. Note- you should install the tool to an easy-to-find directory, because output files will be saved to the same location as the tool itself. 
 
