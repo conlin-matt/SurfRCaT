@@ -12,7 +12,7 @@ Created by Matt Conlin, University of Florida
 import pptk
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont,QMovie
 from PyQt5.QtCore import QThread, pyqtSignal, Qt, QAbstractTableModel,QProcess
 import sys 
 import pickle
@@ -24,6 +24,8 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
 import time
+import ftplib
+
 
 pth = os.path.dirname(os.path.realpath(__file__))
 print(pth)
@@ -317,28 +319,44 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
        '''
        lab1 = QLabel('Downloading Video...')
        self.grd.addWidget(lab1,3,0,1,1)
+
+       self.loadlab = QLabel()
+       self.loadmovie = QMovie(pth+'loading.gif')
+       self.loadlab.setMovie(self.loadmovie)
        
        self.worker.start()
+       self.grd.addWidget(self.loadlab,3,1,1,1)
+       self.loadmovie.start()
        self.worker.finishSignal.connect(self.on_closeSignal)
 
     def on_closeSignal(self):
        '''
        When download video thread is done, function shows a done label and starts the PTZ check worker thread
        '''
+       self.loadlab.setParent(None)
+       self.loadmovie.stop()
        labDone = QLabel('Done.')
        self.grd.addWidget(labDone,3,1,1,1)
        
        lab2 = QLabel('Checking different views...')
        self.grd.addWidget(lab2,4,0,1,1)
        
+       self.loadlab = QLabel()
+       self.loadmovie = QMovie(pth+'loading.gif')
+       self.loadlab.setMovie(self.loadmovie)
+       
        self.worker2.start()
-       self.worker2.finishSignal.connect(self.on_closeSignal2)       
+       self.grd.addWidget(self.loadlab,4,1,1,1)
+       self.loadmovie.start()
+       self.worker2.finishSignal.connect(self.on_closeSignal2)
+       
     
     def on_closeSignal2(self):
        ''' 
        After PTZ is checked, take user to view choice window.
        '''
-        
+       self.loadlab.setParent(None)
+       self.loadmovie.stop()        
        labDone = QLabel('Done.')
        self.grd.addWidget(labDone,4,1,1,1)
        
@@ -455,10 +473,21 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
        viewSel = item-1
        im = self.frameDF['Image'][viewSel]
        cv2.imwrite(pth+'frameUse.png', im)
-       
-       self.close()
-       self.lidar = getLidar_StartSearchWindow()
-       self.lidar.show()
+
+       # Get the saved lidar dataset IDs for the camera #
+       self.worker = getLidar_WebCATThread()
+       self.worker.finishSignal.connect(self.on_closeSignal)
+       self.worker.start()
+
+    def on_closeSignal(self):
+
+        f = open(pth+'lidarTable.pkl','rb')
+        lidarTable = pickle.load(f)
+
+        self.close()
+        self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
+        self.lw.resize(900,350)
+        self.lw.show()
        
         
     def chooseNewDate(self):
@@ -565,27 +594,44 @@ class getWebCATImagery_ChooseNewDateWindow(QWidget):
        
        lab1 = QLabel('Downloading Video...')
        self.grd.addWidget(lab1,5,0,1,2)
+
+       self.loadlab = QLabel()
+       self.loadmovie = QMovie(pth+'loading.gif')
+       self.loadlab.setMovie(self.loadmovie)
        
        self.worker.start()
+       self.grd.addWidget(self.loadlab,5,3,1,1)
+       self.loadmovie.start()
        self.worker.finishSignal.connect(self.on_closeSignal)
 
     def on_closeSignal(self):
        '''
        When download video thread is done, function shows a done label and starts the video decimation worker thread
        '''
+       self.loadlab.setParent(None)
+       self.loadmovie.stop()
        labDone = QLabel('Done.')
        self.grd.addWidget(labDone,5,3,1,1)
        
        lab2 = QLabel('Checking different views...')
        self.grd.addWidget(lab2,6,0,1,2)
+
+       self.loadlab = QLabel()
+       self.loadmovie = QMovie(pth+'loading.gif')
+       self.loadlab.setMovie(self.loadmovie)
        
        self.worker2.start()
+       self.grd.addWidget(self.loadlab,6,3,1,1)
+       self.loadmovie.start()
        self.worker2.finishSignal.connect(self.on_closeSignal2)       
     
     def on_closeSignal2(self):
        '''
        When PTZ check thread is complete, function shows a Done label and moves to the next window
        '''
+       self.loadlab.setParent(None)
+       self.loadmovie.stop()
+
        self.close()
        self.cv = getWebCATImagery_ChooseViewWindow()
        self.cv.show()
@@ -698,7 +744,7 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
        cv2.imwrite(pth+'frameUse.png',im)
        
        self.close()
-       self.ls = getLidar_StartSearchWindow()
+       self.ls = getLidar_FindUseableDatasetsWindow()
        self.ls.show()
 
 
@@ -707,7 +753,7 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
 # Get lidar module #
 ##============================================================================##
 
-class getLidar_StartSearchWindow(QWidget):    
+class getLidar_FindUseableDatasetsWindow(QWidget):    
      def __init__(self):
         super().__init__()    
         
@@ -743,14 +789,18 @@ class getLidar_StartSearchWindow(QWidget):
        
        # Right contents box setup #
        self.pb = QProgressBar()
-       info = QLabel('Finding lidar datasets that cover this region:')
-       self.val = QLabel('0%')
+       self.lab1 = QLabel('Looking for nearby datasets:')
+##       info = QLabel('Finding lidar datasets that cover this region:')
+##       self.val = QLabel('0%')
         
        rightGroupBox = QGroupBox()
        self.grd = QGridLayout()
-       self.grd.addWidget(info,0,0,1,6)
-       self.grd.addWidget(self.val,1,0,1,1)
-       self.grd.addWidget(self.pb,1,1,1,5)
+       self.grd.addWidget(self.lab1,0,0,1,4)
+       
+       
+##       self.grd.addWidget(info,0,0,1,6)
+##       self.grd.addWidget(self.val,1,0,1,1)
+##       self.grd.addWidget(self.pb,1,0,1,5)
        self.grd.setAlignment(Qt.AlignCenter)
        rightGroupBox.setLayout(self.grd)
        ##############################
@@ -769,25 +819,60 @@ class getLidar_StartSearchWindow(QWidget):
        # Instantiate worker threads #
        f = open(pth+'CameraLocation.pkl','rb')
        cameraLocation = pickle.load(f)
-       
-       self.worker = getLidar_SearchThread(cameraLocation[0],cameraLocation[1])
+
+       self.worker1 = getLidar_FindCloseDatasetIDsThread(cameraLocation[0],cameraLocation[1])
+       self.worker1.finishSignal.connect(self.on_closeSignal1)
+       self.worker = getLidar_FindCoveringDatasetsThread(cameraLocation[0],cameraLocation[1])
        self.worker.threadSignal.connect(self.on_threadSignal)
        self.worker.finishSignal.connect(self.on_closeSignal)
-       self.worker.start()
+       self.worker.badSignal.connect(self.on_badSignal)
+
+       self.loadlab = QLabel()
+       self.loadmovie = QMovie(pth+'loading.gif')
+       self.loadlab.setMovie(self.loadmovie)
+       
+       self.worker1.start()
+       self.grd.addWidget(self.loadlab,0,4,1,4)
+       self.loadmovie.start()
+       
        ##############################
+
+     def on_closeSignal1(self):
+         self.loadlab.setParent(None)
+         self.loadmovie.stop()
+         
+         labDone = QLabel('Done.')
+         self.grd.addWidget(labDone,0,4,1,4)
+         self.lab2 = QLabel('Checking nearby datasets:')
+         self.grd.addWidget(self.lab2,1,0,1,4)
+         self.grd.addWidget(self.pb,1,4,1,4)
+
+         self.worker.start()
+         ##############################
                      
 
      def on_threadSignal(self,perDone):
          '''
-         Update progress bar value each time getLidar_SearchThread sends a signal (which is every time it finishes looking at a particular dataset)
+         Update progress bar value each time getLidar_FindCoveringDatasetsThread sends a signal (which is every time it finishes looking at a particular dataset)
          '''
          self.pb.setValue(perDone*100)
-         self.val.setText(str(round(perDone*100))+'%')
         
+     def on_badSignal(self):
+         
+         doneInfo = QLabel('No lidar datasets were found near your camera. Select the Back button to try another camera.')
+         doneInfo.setWordWrap(True)
+         backBut = QPushButton('< Back')
+         
+         backBut.clicked.connect(self.GoBack)
+         
+         self.grd.addWidget(doneInfo,2,0,1,8)
+         self.grd.addWidget(backBut,3,0,1,3)
+
      def on_closeSignal(self):
          '''
          When sorting of lidar datasets is completed, show that it is done and allow the user to click Continue to choose the dataset they want to use.
          '''
+
          doneInfo = QLabel('Lidar datasets found! Press continue to select the dataset you want to use for remote GCP extraction:')
          doneInfo.setWordWrap(True)
          contBut = QPushButton('Continue >')
@@ -796,9 +881,9 @@ class getLidar_StartSearchWindow(QWidget):
          contBut.clicked.connect(self.GoToChooseLidarSet)
          backBut.clicked.connect(self.GoBack)
          
-         self.grd.addWidget(doneInfo,4,0,3,6)
-         self.grd.addWidget(contBut,7,4,1,2)
-         self.grd.addWidget(backBut,7,0,1,2)
+         self.grd.addWidget(doneInfo,2,0,1,8)
+         self.grd.addWidget(contBut,3,5,1,3)
+         self.grd.addWidget(backBut,3,0,1,3)
          
      def GoToChooseLidarSet(self):
          '''
@@ -959,8 +1044,14 @@ class getLidar_ChooseLidarSetWindow(QWidget):
             lab3 = QLabel('Creating data point cloud...')
         
             self.layout.addWidget(lab3,8,0,1,2)
+
+            self.loadlab = QLabel()
+            self.loadmovie = QMovie(pth+'loading.gif')
+            self.loadlab.setMovie(self.loadmovie)
         
             self.worker3.start()
+            self.layout.addWidget(self.loadlab,8,2,1,2)
+            self.loadmovie.start()
             self.worker3.finishSignal.connect(self.on_closeSignal3)
         else: 
             msg = QMessageBox(self)
@@ -981,6 +1072,8 @@ class getLidar_ChooseLidarSetWindow(QWidget):
          
         
     def on_closeSignal3(self):
+        
+        self.loadlab.setParent(None)
         labDone = QLabel('Done')
         self.layout.addWidget(labDone,8,2,1,2)
         
@@ -1001,7 +1094,8 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         
     def GoBack(self):
         self.close()
-        self.backToOne = ChooseCameraWindow() 
+        self.backToOne = ChooseCameraWindow()
+        
 
 class PickGCPsWindow(QWidget):
    def __init__(self):
@@ -1547,11 +1641,14 @@ class CheckPTZThread(QThread):
            
        self.finishSignal.emit(1) 
         
-       print('Thread Done')        
+       print('Thread Done')
        
+       
+class getLidar_FindCloseDatasetIDsThread(QThread):
 
-
-class getLidar_SearchThread(QThread):
+    '''
+    Worker thread to find lidar datasets that may be close to the camera.
+    '''
 
     threadSignal = pyqtSignal('PyQt_PyObject')
     finishSignal = pyqtSignal('PyQt_PyObject')
@@ -1565,38 +1662,129 @@ class getLidar_SearchThread(QThread):
         
         print('Thread Started')
         
-        IDs = SurfRCaT.getLidar_GetIDs()
-        
-        appropID = list() # Initiate list of IDs which contain the camera location #
-        i = 0
-        for ID in IDs:          
-            
-            i = i+1
-            perDone = i/len(IDs)
-            self.threadSignal.emit(perDone)  
-            
-            tiles = SurfRCaT.getLidar_TryID(ID,self.cameraLoc_lat,self.cameraLoc_lon)
-            
-            if tiles:
-                if len(tiles)>0:       
-                    appropID.append(ID)
-        
-        matchingTable = SurfRCaT.getLidar_GetMatchingNames(appropID)
-        
-        # Remove the strange Puerto Rico dataset that always shows up #
-        idxNames = matchingTable[matchingTable['ID']==8560].index
-        matchingTable.drop(idxNames,inplace=True)
-        ###############################################################
-          
+        IDs = SurfRCaT.getLidar_FindPossibleIDs(self.cameraLoc_lat,self.cameraLoc_lon)
+
         print('Thread Done')   
+
+        with open(pth+'lidarIDs.pkl','wb') as f:
+            pickle.dump(IDs,f)
+
+        self.finishSignal.emit(1)
+        
+
+class getLidar_FindCoveringDatasetsThread(QThread):
+    
+    '''
+    Worker thread to find lidar datasets the cover the camera location
+    '''
+    
+    threadSignal = pyqtSignal('PyQt_PyObject')
+    finishSignal = pyqtSignal('PyQt_PyObject')
+    badSignal = pyqtSignal('PyQt_PyObject')
+
+    def __init__(self,cameraLoc_lat,cameraLoc_lon):
+        super().__init__()
+        self.cameraLoc_lat = cameraLoc_lat 
+        self.cameraLoc_lon = cameraLoc_lon
+
+    def run(self):
+        
+        print('Thread Started')
+        
+        f = open(pth+'lidarIDs.pkl','rb')
+        IDs = pickle.load(f)
+
+        # If no lidar datasets were found here, need to tell the user #
+        if not IDs:
+            self.badSignal.emit(1)
+        else: 
+            ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
+            ftp.login('anonymous','anonymous')
+            
+            appropID = list() # Initiate list of IDs which contain the camera location #
+            i = 0
+            for ID in IDs:
+                print(ID)
+                
+                i = i+1
+                perDone = i/len(IDs)
+                self.threadSignal.emit(perDone)  
+                
+                check = SurfRCaT.getLidar_TryID(ftp,ID,self.cameraLoc_lat,self.cameraLoc_lon)
+                
+                if check:
+                    if len(check)>0:       
+                        appropID.append(ID)
+            
+            matchingTable = SurfRCaT.getLidar_GetDatasetNames(appropID)
+            
+            # Remove the strange Puerto Rico dataset that always shows up #
+            idxNames = matchingTable[matchingTable['ID']==8560].index
+            matchingTable.drop(idxNames,inplace=True)
+            ###############################################################
+              
+            print('Thread Done')
+
+            if len(matchingTable) == 0:
+                self.badSignal.emit(1)
+            else:
+                with open(pth+'lidarTable.pkl','wb') as f:
+                    pickle.dump(matchingTable,f)
+
+            self.finishSignal.emit(1)  
+
+
+class getLidar_WebCATThread(QThread):
+    
+    '''
+    Worker thread to get the names of the lidar datasets applicable to WebCAT cameras.
+    '''
+    
+    threadSignal = pyqtSignal('PyQt_PyObject')
+    finishSignal = pyqtSignal('PyQt_PyObject')
+
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+
+        cams = ['staugustinecam','twinpierscam','miami40thcam']
+
+        f = open(pth+'CameraName.pkl','rb')
+        name = pickle.load(f)
+
+        if name == 'buxtoncoastalcam':
+            IDs = [8688,6329,5184,4954,2488,1117,8609,1071,86,19,1397,6300,8,60,61,6,2,1]
+        elif name == 'cherrypiersouthcam':
+            IDs = [8617,6329,5184,4184,4800,34,10,8,61,6,2,1]
+        elif name == 'follypiernorthcam':
+            IDs = [8575,5184,34,10,2,1]
+        elif name == 'follypiersouthcam':
+            IDs = [8575,5184,34,10,2,1]
+        elif name == 'staugustinecam':
+            IDs = [6330,5185,5184,8698,1070,1119,34,37,100,19,8]
+        elif name == 'twinpierscam':
+            IDs == [8793,5183,8603,529,44,37,19,22]
+        else:
+            IDs == [6330,8713,5185,5184,5038,8608,520,34,37,19,8]
+
+        matchingTable = SurfRCaT.getLidar_GetDatasetNames(IDs)
+
+                      
+        print('Thread Done')
 
         with open(pth+'lidarTable.pkl','wb') as f:
             pickle.dump(matchingTable,f)
 
-        self.finishSignal.emit(1)  
+        self.finishSignal.emit(1)
+
 
 
 class getLidar_PrepChosenSetThread(QThread):
+    
+    '''
+    Worker thread to find the applicable tiles in the chosen dataset.
+    '''
 
     threadSignal = pyqtSignal('PyQt_PyObject')
     finishSignal = pyqtSignal('PyQt_PyObject')
@@ -1616,15 +1804,17 @@ class getLidar_PrepChosenSetThread(QThread):
         
         tilesKeep = list()
         i = 0
+        self.threadSignal.emit(0)
         for shapeNum in range(0,len(sf)):
-            
-            i = i+1
-            perDone = i/len(sf)
-            self.threadSignal.emit(perDone)
-            
+
             out = SurfRCaT.getLidar_SearchTiles(sf,shapeNum,self.cameraLoc_lat,self.cameraLoc_lon)
             if out:
                 tilesKeep.append(out)
+
+            i = i+1
+            perDone = i/len(sf)
+            self.threadSignal.emit(perDone)
+
         
 
         with open(pth+'tilesKeep.pkl','wb') as f:
@@ -1637,6 +1827,10 @@ class getLidar_PrepChosenSetThread(QThread):
   
       
 class getLidar_DownloadChosenSetThread(QThread):
+
+    '''
+    Worker thread to download the applicable tiles of the selected dataset.
+    '''
 
     threadSignal = pyqtSignal('PyQt_PyObject')
     finishSignal = pyqtSignal('PyQt_PyObject')
@@ -1657,17 +1851,17 @@ class getLidar_DownloadChosenSetThread(QThread):
         
         i = 0
         lidarDat = np.empty([0,3])
+        self.threadSignal.emit(.01)
         for thisFile in tilesKeep:
-            
-            i = i+1
-            perDone = i/len(tilesKeep)
-            self.threadSignal.emit(perDone)
             
             lidarXYZsmall = SurfRCaT.getLidar_Download(thisFile,IDToDownload,self.cameraLoc_lat,self.cameraLoc_lon)
             
             lidarDat = np.append(lidarDat,lidarXYZsmall,axis=0)
 
-            
+            i = i+1
+            perDone = i/len(tilesKeep)
+            self.threadSignal.emit(perDone)
+
         with open(pth+'lidarDat.pkl','wb') as f:
             pickle.dump(lidarDat,f)
             
@@ -1677,7 +1871,12 @@ class getLidar_DownloadChosenSetThread(QThread):
         
  
        
-class getLidar_FormatChosenSetThread(QThread):   
+class getLidar_FormatChosenSetThread(QThread):
+    
+    '''
+    Worker thread to format the downloaded data as a pandas dataframe,
+    with locations relative to the camera location.
+    '''
         
     finishSignal = pyqtSignal('PyQt_PyObject')
 
@@ -1702,6 +1901,10 @@ class getLidar_FormatChosenSetThread(QThread):
         
 
 class pptkWindowWorker(QThread):
+
+    '''
+    Worker thread to launch the pptk lidar viewer window
+    '''
     
     finishSignal = pyqtSignal('PyQt_PyObject')
 
@@ -1756,7 +1959,11 @@ class pptkWindowWorker(QThread):
 
 
 gcps_im = []
-class pickGCPs_Image(QThread):   
+class pickGCPs_Image(QThread):
+
+    '''
+    Worker thread to allow GCP identification in the image
+    '''
         
     finishSignal = pyqtSignal('PyQt_PyObject')
 
@@ -1807,7 +2014,11 @@ class pickGCPs_Image(QThread):
 
 
 
-class calibrate_CalibrateThread(QThread):   
+class calibrate_CalibrateThread(QThread):
+
+    '''
+    Worker thread to perform the calibration
+    '''
         
     finishSignal = pyqtSignal('PyQt_PyObject')
 

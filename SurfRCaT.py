@@ -238,61 +238,254 @@ def getImagery_SeperateViewsAndGetFrames(vidPth,viewDF):
 #=============================================================================#
 # Search for and identify lidar datasets that cover camera location #
 #=============================================================================#
-def getLidar_GetIDs():
-    
+##def getLidar_GetIDs():
+##    
+##    '''
+##    First function in the Lidar download process: get the IDs of all datasets on the NOAA ftp server.
+##    
+##    Inputs:
+##        None
+##    
+##    Outputs:
+##        IDs: A list containing all of the dataset IDs for use in later functions 
+##        
+##    '''
+##    
+##    import ftplib
+##    import re
+##    
+##    # Pull the numeric IDs from all datasets that exist #
+##    ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
+##    ftp.login('anonymous','anonymous')
+##    ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/')
+##    IDs = ftp.nlst()
+##    # Get rid of spurious IDs which have letters
+##    IDsGood = list()
+##    for tryThisString in IDs:
+##        testResult = re.search('[a-zA-Z]',tryThisString) # Use regular expressions to see if any letters exist in the string #
+##        if testResult:
+##            pass
+##        else:
+##            IDsGood.append(tryThisString)
+##    IDs = IDsGood
+##    return IDs
+
+
+def getLidar_FindPossibleIDs(cameraLoc_lat,cameraLoc_lon):
+
     '''
-    First function in the Lidar download process: get the IDs of all datasets on the NOAA ftp server.
+    First function in the lidar download process. Finds the dataset IDs of all lidar
+    datasets that could be close to the camera based on its location (and derived state
+    and coast). Function searches through a NOAA-provided table fo datasets and extracts
+    only the IDs of datasets that may be close to the camera. 
     
     Inputs:
-        None
+        cameraLoc_lat: Latitude location of camera
+        cameraLoc_lon: Longitude location of camera
     
     Outputs:
-        IDs: A list containing all of the dataset IDs for use in later functions 
+        IDs: A list containing the dataset IDs of possibly proximal datasets.
         
     '''
+
     
-    import ftplib
-    import re
+    import pandas as pd
+    import requests
+    import reverse_geocoder as rg
+
+    # Find what state the camera is in based on its location #
+    placeDict = rg.search((cameraLoc_lat,cameraLoc_lon))
+
+    # Establish dictionaries for state abbreviation and coast based on state, and get this info for the state #
+    us_state_abbrev = {
+        'Alabama': 'AL',
+        'Alaska': 'AK',
+        'Arizona': 'AZ',
+        'Arkansas': 'AR',
+        'California': 'CA',
+        'Colorado': 'CO',
+        'Connecticut': 'CT',
+        'Delaware': 'DE',
+        'District of Columbia': 'DC',
+        'Florida': 'FL',
+        'Georgia': 'GA',
+        'Hawaii': 'HI',
+        'Idaho': 'ID',
+        'Illinois': 'IL',
+        'Indiana': 'IN',
+        'Iowa': 'IA',
+        'Kansas': 'KS',
+        'Kentucky': 'KY',
+        'Louisiana': 'LA',
+        'Maine': 'ME',
+        'Maryland': 'MD',
+        'Massachusetts': 'MA',
+        'Michigan': 'MI',
+        'Minnesota': 'MN',
+        'Mississippi': 'MS',
+        'Missouri': 'MO',
+        'Montana': 'MT',
+        'Nebraska': 'NE',
+        'Nevada': 'NV',
+        'New Hampshire': 'NH',
+        'New Jersey': 'NJ',
+        'New Mexico': 'NM',
+        'New York': 'NY',
+        'North Carolina': 'NC',
+        'North Dakota': 'ND',
+        'Northern Mariana Islands':'MP',
+        'Ohio': 'OH',
+        'Oklahoma': 'OK',
+        'Oregon': 'OR',
+        'Palau': 'PW',
+        'Pennsylvania': 'PA',
+        'Puerto Rico': 'PR',
+        'Rhode Island': 'RI',
+        'South Carolina': 'SC',
+        'South Dakota': 'SD',
+        'Tennessee': 'TN',
+        'Texas': 'TX',
+        'Utah': 'UT',
+        'Vermont': 'VT',
+        'Virgin Islands': 'VI',
+        'Virginia': 'VA',
+        'Washington': 'WA',
+        'West Virginia': 'WV',
+        'Wisconsin': 'WI',
+        'Wyoming': 'WY',
+    }
+
+    coastDict = {
+        'Alabama': 'Gulf',
+        'Alaska': 'West',
+        'Arizona': '',
+        'Arkansas': '',
+        'California': 'West',
+        'Colorado': '',
+        'Connecticut': 'East',
+        'Delaware': 'East',
+        'Florida': '', # Special consideration, see below #
+        'Georgia': 'East',
+        'Hawaii': 'West',
+        'Idaho': '',
+        'Illinois': '',
+        'Indiana': '',
+        'Iowa': '',
+        'Kansas': '',
+        'Kentucky': '',
+        'Louisiana': 'Gulf',
+        'Maine': 'East',
+        'Maryland': 'East',
+        'Massachusetts': 'East',
+        'Michigan': '',
+        'Minnesota': '',
+        'Mississippi': 'Gulf',
+        'Missouri': '',
+        'Montana': '',
+        'Nebraska': '',
+        'Nevada': '',
+        'New Hampshire': 'East',
+        'New Jersey': 'East',
+        'New Mexico': '',
+        'New York': 'East',
+        'North Carolina': 'East',
+        'North Dakota': '',
+        'Ohio': '',
+        'Oklahoma': '',
+        'Oregon': 'West',
+        'Pennsylvania': '',
+        'Puerto Rico': 'East',
+        'Rhode Island': 'East',
+        'South Carolina': 'East',
+        'South Dakota': '',
+        'Tennessee': '',
+        'Texas': 'Gulf',
+        'Utah': '',
+        'Vermont': '',
+        'Virginia': 'East',
+        'Washington': 'West',
+        'West Virginia': '',
+        'Wisconsin': '',
+        'Wyoming': '',
+    }
     
-    # Pull the numeric IDs from all datasets that exist #
-    ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
-    ftp.login('anonymous','anonymous')
-    ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/')
-    IDs = ftp.nlst()
-    # Get rid of spurious IDs which have letters
-    IDsGood = list()
-    for tryThisString in IDs:
-        testResult = re.search('[a-zA-Z]',tryThisString) # Use regular expressions to see if any letters exist in the string #
-        if testResult:
-            pass
-        else:
-            IDsGood.append(tryThisString)
-    IDs = IDsGood
+    state = placeDict[0]['admin1']
+    try: # If not a US state, this will throw an error #
+        state_abbrev = us_state_abbrev[state]
+        # Get coast, and deal with determining coast for Florida #
+        if state == 'Florida':
+            if cameraLoc_lat>26:
+                if cameraLoc_lon<-81.5:
+                    coast = 'Gulf'
+                else:
+                    coast = 'East'
+            else:
+                if cameraLoc_lon<80.5:
+                    coast = 'Gulf'
+                else:
+                    coast = 'East'
+        else: 
+            coast = coastDict[state]
+
+        # Get the data tabel from NOAAs website #
+        url = 'https://coast.noaa.gov/htdata/lidar1_z/'
+        html = requests.get(url).content
+        df_list = pd.read_html(html)
+        dataTable = df_list[-1]
+        
+        # Make a list of all IDs and geography names #
+        IDlist = dataTable.loc[:,'ID #']
+        nameList = dataTable.loc[:,'Geography']
+
+        # Find all the IDs that contain the state, state abbrev, or coast name in their name and keep them #
+        IDs = list()
+        for n,i in zip(nameList,IDlist):
+            if state in n or state_abbrev in n or coast in n:
+                IDs.append(i)
+    except:
+        IDs = list()
+
     return IDs
 
 
 
-def getLidar_TryID(ID,cameraLoc_lat,cameraLoc_lon):
+        
+def getLidar_TryID(ftp,ID,cameraLoc_lat,cameraLoc_lon):
     
     '''
-    Function to go through each lidar dataset and determine if it covers the location of the camera. If
+    Function to go through each identified lidar dataset and determine if it covers the location of the camera. If
     it does, the lidar dataset is saved. Function takes advantage of a csv file given to each dataset on the NOAA
-    repository which gives the min and max extents of the dataset.
+    repositories which gives the min and max extents of the dataset.
     
     Inputs:
-        ID: A lidar dataset ID, as identified by getLidar_GetIDs
+        ID: A lidar dataset ID
         cameraLoc_lat: Latitude location of camera
         cameraLoc_lon: Longitude location of camera
         
     Outputs:
-        tiles: The tiles of each dataset that are near the camera 
+        check: A yes or no as to if this dataset covers the camera location 
     '''
     
     import ftplib
-    
-    ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
-    ftp.login('anonymous','anonymous')
-    ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(ID))  
+    from io import StringIO
+    from pandas import read_csv
+
+    # Get into the correct NOAA FTP site- there are 5 of them. I'm sure this isn't the clenest way to do this #
+    # "If at first you don't succeed..."
+    try:
+        ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12b/data/'+str(ID))
+    except:
+        try:
+            ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(ID))
+        except:
+            try:
+                ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid12b/data/'+str(ID))
+            except:
+                try:
+                    ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12a/data/'+str(ID))
+                except:
+                    ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid18/data/'+str(ID))
+                    
         
     # Find the minmax csv file which shows the min and max extents of each tile within the current dataset #
     files = ftp.nlst()
@@ -303,6 +496,12 @@ def getLidar_TryID(ID,cameraLoc_lat,cameraLoc_lon):
             if len(fileWant.split()) == 2:
                 fileWant = '['+fileWant.split()[1]
             fileWant = fileWant[2:len(fileWant)-2]
+
+##            r = StringIO()
+##            ftp.retrlines('RETR '+fileWant,r.write)
+##            dat = r.getvalue()
+
+
             # Save the file locally #
             gfile = open('minmax.csv','wb') # Create the local file #
             ftp.retrbinary('RETR '+fileWant,gfile.write) # Copy the contents of the file on FTP into the local file #
@@ -310,20 +509,34 @@ def getLidar_TryID(ID,cameraLoc_lat,cameraLoc_lon):
         
         
             # See if the location of the camera is contained within any of the tiles in this dataset. If it is, save the ID #
-            tiles = list()
-            with open('minmax.csv') as infile:
-                next(infile)
-                for line in infile:
-                    if float(line.split()[1][0:7]) <= cameraLoc_lon <= float(line.split()[2][0:7]) and float(line.split()[3][0:7])<= cameraLoc_lat <= float(line.split()[4][0:7]):
-                        tiles.append(line)
+
+            dat = read_csv('minmax.csv')
+            minx = dat[' min_x']
+            maxx = dat[' max_x']
+            miny = dat[' min_y']
+            maxy = dat[' max_y']
+
+            test = dat[(maxx>=cameraLoc_lon) & (minx<=cameraLoc_lon) & (maxy>=cameraLoc_lat) & (miny<=cameraLoc_lat)]
+            check = list()
+            if not test.empty:
+                check.append(1)
+            
+            
+
+##            tiles = list()
+##            with open('minmax.csv') as infile:
+##                next(infile)
+##                for line in infile:
+##                    if float(line.split()[1][0:7]) <= cameraLoc_lon <= float(line.split()[2][0:7]) and float(line.split()[3][0:7])<= cameraLoc_lat <= float(line.split()[4][0:7]):
+##                        tiles.append(line)
     
-            return tiles
+            return check
         
 
-def getLidar_GetMatchingNames(appropID):
+def getLidar_GetDatasetNames(appropID):
     
     '''
-    Function to link the ID of each lidar dataset found to be near the camera with the name and other metadata of the dataset.
+    Function to link the ID of each lidar dataset found to cover the camera with the name and other metadata of the dataset.
     
     Inputs:
         appropID: The ID of a dataset found to cover the camera by the getLidar_TryID function
