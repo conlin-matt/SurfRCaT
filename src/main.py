@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-This code creates and runs the user interface of the Surfcamera Remote
-Calibration Tool. Most of the logic behind the tool is contained within the
+Create and run the user interface of the Surfcamera Remote
+Calibration Tool. Most of the science behind the tool is contained within the
 functions in the SurfRCaT.py file. The UI is created with PyQt.
 
-Created by Matt Conlin, University of Florida
-12/2019
+Created by Matthew P. Conlin, University of Florida
 
 """
+
+__copyright__ = 'Copyright (c) 2019, Matthew P. Conlin'
+__license__ = 'GPL-3.0'
+__version__ = '2.0'
+
 
 import pptk
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
@@ -304,7 +308,34 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
            self.worker2 = CheckPTZThread(1)
        else:
            self.worker2 = CheckPTZThread(2)
-           
+
+
+       if cameraName == 'buxtoncoastalcam':
+           self.az = 5
+           self.ZL = 10
+       elif cameraName == 'cherrypiersouthcam':
+           self.az = 200
+           self.ZL = 15
+       elif cameraName == 'follypiernorthcam':
+           self.az = 150
+           self.ZL = 15
+       elif cameraName == 'follypiersouthcam':
+           self.az = 150
+           self.ZL = 15
+       elif cameraName == 'staugustinecam':
+           self.az = 80
+           self.ZL = 10
+       elif cameraName == 'twinpierscam':
+           self.az = 80
+           self.ZL = 5
+       elif cameraName == 'miami40thcam':
+           self.az = 60
+           self.ZL = 40
+       
+       with open(pth+'az.pkl','wb') as f:
+           pickle.dump(self.az,f)
+       with open(pth+'ZL.pkl','wb') as f:
+           pickle.dump(self.ZL,f) 
            
     def GoBack(self):
        '''
@@ -680,8 +711,13 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
        lblDir = QLabel('Input the approximate location (lat/lon) of the camera below:')
        lblLat = QLabel('Camera Latitude (decimal degrees):')
        lblLon = QLabel('Camera Longitude (decimal degrees):')
+       lblElev = QLabel('Elevation (m):')
+       lblAz = QLabel('Azimuth (degrees):')
        self.bxLat = QLineEdit()
        self.bxLon = QLineEdit()
+       self.bxElev = QLineEdit()
+       self.bxAz = QLineEdit()
+       self.azHelpBut = QPushButton('?')
        lblPth = QLabel('Input the full path of the image you want to use (path and filename with extension):')
        self.bxPth = QLineEdit()
        backBut = QPushButton('< Back')
@@ -696,10 +732,15 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
        grd.addWidget(self.bxLat,2,4,1,2)
        grd.addWidget(lblLon,3,1,1,3)
        grd.addWidget(self.bxLon,3,4,1,2)
-       grd.addWidget(lblPth,4,0,1,6)
-       grd.addWidget(self.bxPth,5,0,1,4)
-       grd.addWidget(backBut,6,0,1,2)
-       grd.addWidget(contBut,6,4,1,2)
+       grd.addWidget(lblElev,4,1,1,3)
+       grd.addWidget(self.bxElev,4,4,1,2)
+       grd.addWidget(self.azHelpBut,5,0,1,1)
+       grd.addWidget(lblAz,5,1,1,3)
+       grd.addWidget(self.bxAz,5,4,1,2)
+       grd.addWidget(lblPth,6,0,1,6)
+       grd.addWidget(self.bxPth,7,0,1,4)
+       grd.addWidget(backBut,8,0,1,2)
+       grd.addWidget(contBut,8,4,1,2)
        grd.setAlignment(Qt.AlignCenter)
        rightGroupBox.setLayout(grd)
        ##############################
@@ -707,6 +748,7 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
        # Assign signals to widgets #
        backBut.clicked.connect(self.GoBack)
        contBut.clicked.connect(self.getInputs)
+       self.azHelpBut.clicked.connect(self.onAzHelpClick)
        #############################
 
        
@@ -720,6 +762,13 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
        self.show()
        ############################
        
+    def onAzHelpClick(self):
+       msg = QMessageBox(self)
+       msg.setIcon(msg.Question)
+       msg.setText('The azimuth angle is the right-handed angle that the camera is facing with respect to due north. A camera looking directly north has an azimuth angle of 0' + u'\N{DEGREE SIGN}'+', one looking east an azimuth of 90'+u'\N{DEGREE SIGN}'+', one south an azimuth of 180'+u'\N{DEGREE SIGN}'+', and one west an azimuth of 270'+u'\N{DEGREE SIGN}'+'.')
+       msg.setStandardButtons(msg.Ok)
+       msg.show()
+
     def GoBack(self):
        '''
        Go back to camera choice window on Back click
@@ -733,12 +782,20 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
        '''
        cameraName = self.bxName.text()
        cameraLocation = [float(self.bxLat.text()),float(self.bxLon.text())]
+       az= float(self.bxAz.text())     
+       ZL = float(self.bxElev.text())
        pthToImage = self.bxPth.text()
+
+       
        # Save the camera name and location #
        with open(pth+'CameraLocation.pkl','wb') as f:
            pickle.dump(cameraLocation,f)
        with open(pth+'CameraName.pkl','wb') as f:
            pickle.dump(cameraName,f)
+       with open(pth+'az.pkl','wb') as f:
+           pickle.dump(az,f)
+       with open(pth+'ZL.pkl','wb') as f:
+           pickle.dump(ZL,f)
        
        im = cv2.imread(pthToImage) 
        cv2.imwrite(pth+'frameUse.png',im)
@@ -1255,7 +1312,7 @@ class PickGCPsWindow(QWidget):
        
    def GotoCalibration(self):
        self.close()
-       self.calibrateWindow = calibrate_FinalInputs_Welcome()
+       self.calibrateWindow = calibrate_Welcome()
        self.calibrateWindow.show()
 
 
@@ -1263,7 +1320,7 @@ class PickGCPsWindow(QWidget):
 ##===================================================##
 # Calibration module #
 ##===================================================##
-class calibrate_FinalInputs_Welcome(QWidget):
+class calibrate_Welcome(QWidget):
    def __init__(self):
         super().__init__()    
         
@@ -1300,15 +1357,15 @@ class calibrate_FinalInputs_Welcome(QWidget):
         self.ax.imshow(img)
         self.canvas.draw()
         
-        self.introLab = QLabel('Welcome to the Calibration module! In just a few more steps, you will obtain calibration parameters for this camera. Press Continue to get started.')
+        self.introLab = QLabel('Welcome to the Calibration module! Press the CALIBRATE button below to perform the calibration.')
         self.introLab.setWordWrap(True)
-        self.contBut = QPushButton('Continue >')
+        self.calibBut = QPushButton('CALIBRATE')
 
         self.rightGroupBox = QGroupBox()
         self.grd = QGridLayout()
         self.grd.addWidget(self.introLab,0,0,1,4)
         self.grd.addWidget(self.canvas,2,0,4,4)
-        self.grd.addWidget(self.contBut,6,1,1,2)
+        self.grd.addWidget(self.calibBut,6,1,1,2)
         self.rightGroupBox.setLayout(self.grd)
         ###############################
         
@@ -1324,132 +1381,15 @@ class calibrate_FinalInputs_Welcome(QWidget):
         ############################ 
         
         # Connect widgets with signals #
-        self.contBut.clicked.connect(self.onContClick)
-    
-   def onContClick(self):
-       
-        self.close()
-        self.moreInputs = calibrate_FinalInputs()
-        self.moreInputs.show()
+        self.calibBut.clicked.connect(self.onCalibClick)
+        self.worker = calibrate_CalibrateThread()
 
-
-
-class calibrate_FinalInputs(QWidget):
-   def __init__(self):
-        super().__init__()    
-        
-        if not QApplication.instance():
-            app = QApplication(sys.argv)
-        else:
-            app = QApplication.instance()             
-                 
-        # Left menu box setup #
-        bf = QFont()
-        bf.setBold(True)
-        leftBar1 = QLabel('• Welcome!')
-        leftBar2 = QLabel('• Get imagery')
-        leftBar3 = QLabel('• Get lidar data')
-        leftBar4 = QLabel('• Pick GCPs')
-        leftBar5 = QLabel('• Calibrate')
-        leftBar5.setFont(bf)
-
-        leftGroupBox = QGroupBox('Contents:')
-        vBox = QVBoxLayout()
-        vBox.addWidget(leftBar1)
-        vBox.addWidget(leftBar2)
-        vBox.addWidget(leftBar3)
-        vBox.addWidget(leftBar4)
-        vBox.addWidget(leftBar5)
-        vBox.addStretch(1)
-        leftGroupBox.setLayout(vBox)
-        ########################  
-
-        # Right contents box setup #
-        img = mpimg.imread(pth+'frameUse.png')
-        self.canvas = FigureCanvas(Figure())
-        self.ax = self.canvas.figure.subplots()
-        self.ax.imshow(img)
-        self.canvas.draw()
-        
-        self.labDir = QLabel('The image is shown below. Estimate the following two paramaters (Google Earth can be extremely helpful):')
-        self.labDir.setWordWrap(True)
-        self.lab1 = QLabel('Azimuth (deg):')
-        self.azBx = QLineEdit()
-        self.azHelpBut = QPushButton('?')
-        self.lab2 = QLabel('Camera elevation (m):')
-        self.elevBx = QLineEdit()
-        
-        self.calibBut = QPushButton('CALIBRATE')
-        
-        self.rightGroupBox = QGroupBox()
-        self.grd = QGridLayout()
-        self.grd.addWidget(self.labDir,0,0,1,6)
-        self.grd.addWidget(self.lab1,1,2,1,2)
-        self.grd.addWidget(self.azHelpBut,1,1,1,1)
-        self.grd.addWidget(self.azBx,1,4,1,2)
-        self.grd.addWidget(self.lab2,2,2,1,2)
-        self.grd.addWidget(self.elevBx,2,4,1,2)
-        self.grd.addWidget(self.canvas,3,0,6,6)
-        self.grd.addWidget(self.calibBut,9,4,1,2)
-        self.grd.setAlignment(Qt.AlignCenter)
-        self.rightGroupBox.setLayout(self.grd)
-        ###############################
-        
-        # Full widget layout setup #
-        fullLayout = QGridLayout()
-        fullLayout.addWidget(leftGroupBox,0,0,2,2)
-        fullLayout.addWidget(self.rightGroupBox,0,3,2,4)
-        self.setLayout(fullLayout)
-
-##        self.setGeometry(400,100,800,500)
-        self.setWindowTitle('SurfRCaT')
-        self.show()
-        ############################ 
-        
-        # Connect widgets with signals #
-        self.calibBut.clicked.connect(self.getInputs)
-        self.azHelpBut.clicked.connect(self.onAzHelpClick)
-        ################################
-        
-        # Instantiate worker thread now that we have all the inputs #
+        # Instantiate worker thread #
         self.worker = calibrate_CalibrateThread()
         #############################################################
-        
-   def getInputs(self,item):
 
-        self.az= float(self.azBx.text())     
-        self.ZL = float(self.elevBx.text())
-        
-        with open(pth+'az.pkl','wb') as f:
-            pickle.dump(self.az,f)
-        with open(pth+'ZL.pkl','wb') as f:
-            pickle.dump(self.ZL,f)
-        
-        self.calibrate()
-        
-        ###################################
-        
-#        # Also re-load the image, GCPs, and horizon points for input into the calibtation thread #
-#        frames = glob.glob('frame'+'*')
-#        frame = frames[1]
-#        img = mpimg.imread(wd+'/'+frame)
-#        
-#        f1 = open(wd+'GCPs_im.pkl','rb')
-#        f2 = open(wd+'GCPs_lidar.pkl','rb')
-#      
-#        GCPs_im = pickle.load(f1)
-#        GCPs_lidar = pickle.load(f2)
-#        ##########################################################################
-             
-
-   def onAzHelpClick(self):
-       msg = QMessageBox(self)
-       msg.setIcon(msg.Question)
-       msg.setText('The azimuth angle is the right-handed angle that the camera is facing with respect to due north. A camera looking directly north has an azimuth angle of 0' + u'\N{DEGREE SIGN}'+', one looking east an azimuth of 90'+u'\N{DEGREE SIGN}'+', one south an azimuth of 180'+u'\N{DEGREE SIGN}'+', and one west an azimuth of 270'+u'\N{DEGREE SIGN}'+'.')
-       msg.setStandardButtons(msg.Ok)
-       msg.show()      
-        
-   def calibrate(self):
+    
+   def onCalibClick(self):
        
         self.worker.start()
         self.worker.finishSignal.connect(self.on_closeSignal)  
@@ -1460,7 +1400,7 @@ class calibrate_FinalInputs(QWidget):
         self.finalWindow = calibrate_ShowCalibResultsWindow()
         self.finalWindow.show()
 
-       
+      
 
 class calibrate_ShowCalibResultsWindow(QWidget):
    def __init__(self):
@@ -2070,4 +2010,21 @@ if __name__ == '__main__':
     w = WelcomeWindow()
     exit_code = appctxt.app.exec_()      # 2. Invoke appctxt.app.exec_()
     sys.exit(exit_code)
-       
+
+
+
+'''
+#    This program is free software: you can redistribute it and/or  
+#    modify it under the terms of the GNU General Public License as 
+#    published by the Free Software Foundation, version 3 of the 
+#    License.
+
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see
+#                                <http://www.gnu.org/licenses/>.
+'''       

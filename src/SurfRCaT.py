@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-This code contains the main functions utilizied by the Surfcamera Remote
+Main functions utilizied by the Surfcamera Remote
 Calibration Tool. These functions are called by the front-end user interface.
 
-Created by Matt Conlin, University of Florida
-12/2019
+Created by Matthew P. Conlin, University of Florida
 
 """
+
+__copyright__ = 'Copyright (c) 2019, Matthew P. Conlin'
+__license__ = 'GPL-3.0'
+__version__ = '1.0'
+
 
 #============================================================================#
 # Get WebCAT video #
@@ -238,39 +242,6 @@ def getImagery_SeperateViewsAndGetFrames(vidPth,viewDF):
 #=============================================================================#
 # Search for and identify lidar datasets that cover camera location #
 #=============================================================================#
-##def getLidar_GetIDs():
-##    
-##    '''
-##    First function in the Lidar download process: get the IDs of all datasets on the NOAA ftp server.
-##    
-##    Inputs:
-##        None
-##    
-##    Outputs:
-##        IDs: A list containing all of the dataset IDs for use in later functions 
-##        
-##    '''
-##    
-##    import ftplib
-##    import re
-##    
-##    # Pull the numeric IDs from all datasets that exist #
-##    ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
-##    ftp.login('anonymous','anonymous')
-##    ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/')
-##    IDs = ftp.nlst()
-##    # Get rid of spurious IDs which have letters
-##    IDsGood = list()
-##    for tryThisString in IDs:
-##        testResult = re.search('[a-zA-Z]',tryThisString) # Use regular expressions to see if any letters exist in the string #
-##        if testResult:
-##            pass
-##        else:
-##            IDsGood.append(tryThisString)
-##    IDs = IDsGood
-##    return IDs
-
-
 def getLidar_FindPossibleIDs(cameraLoc_lat,cameraLoc_lon):
 
     '''
@@ -1054,7 +1025,20 @@ def calibrate_CalcReprojPos(gcps_lidar,calibVals):
     return u,v
 
 
+'''
+#    This program is free software: you can redistribute it and/or  
+#    modify it under the terms of the GNU General Public License as 
+#    published by the Free Software Foundation, version 3 of the 
+#    License.
 
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see
+#                                <http://www.gnu.org/licenses/>.
+'''
 
 
