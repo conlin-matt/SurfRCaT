@@ -29,23 +29,15 @@ Steps for building SurfRCaT from source:
 3) Open an Anaconda prompt by searching for 'Anaconda' in the Windows search bar and selecting the prompt. On a Mac, open a terminal window.
 4) Create a new environment called SurfRCaT_env containing Python 3.6 and the pdal package by running the following two commands in the Anaconda prompt (with an 'Enter' press between the commands):
 ```bash
-conda create -n SurfRCaT_env -c conda-forge python=3.6 python-pdal
+conda create -n SurfRCaT_env -c conda-forge python=3.6 python-pdal pyqt numpy pandas matplotlib opencv requests pyshp utm lxml
 conda activate SurfRCaT_env
 ```
-6) Pip install PyQt5, the Python binding for the QT GUI package, as well as fbs, the package for running the GUI, by executing:
+6) Pip install fbs, the package for running the GUI, and pptk, the Point Processing Toolkit by executing:
 ```bash
-pip install fbs PyQt5==5.9.2
+pip install fbs pptk
 ```
-7) Conda install some necessary packages by executing:
-```bash
-conda install numpy pandas matplotlib opencv
-```
-8) Pip install the other necessary packages by executing:
-```bash
-pip install pptk pickle requests ftplib pyshp utm json
-```
-9) Download [this](https://drive.google.com/open?id=1Pm4rXlXWJM-hBGHD12g2SBL67E5K2new) compressed folder, and copy the folder into the directory containing the contents of this repository.
-9) cd to the directory containing the contents of this repository by executing:
+7) Download [this](https://drive.google.com/open?id=1Pm4rXlXWJM-hBGHD12g2SBL67E5K2new) compressed folder, and copy the folder into the directory containing the contents of this repository.
+8) cd to the directory containing the contents of this repository by executing:
 ```bash
 cd <your directory>
 ```
@@ -53,8 +45,8 @@ Create a new fbs project by executing the following (you can use defaults for al
 ```bash
 fbs startproject 
 ```
-10) Copy the main.py file, SurfRCaT.py file, and LaunchPPTKwin folder into the newly created src/main/python directory within the directory containing the contents of this repository. 
-11) You're all set up to run the tool! Execute the following to run the tool:
+9) Copy the main.py file, SurfRCaT.py file, and LaunchPPTKwin folder into the newly created src/main/python directory within the directory containing the contents of this repository. 
+10) You're all set up to run the tool! Execute the following to run the tool:
 ```bash
 fbs run 
 ```
