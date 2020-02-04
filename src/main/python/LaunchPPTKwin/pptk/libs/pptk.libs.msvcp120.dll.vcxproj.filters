@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="F:\Projects\pypcl_python3_conversion\source\pptk\libs\CMakeLists.txt" />
+    <CustomBuild Include="F:\Projects\pypcl_python3_conversion\build_pptk_py3\CMakeFiles\5d34d707c4a637163979f4bc371c388c\pptk.libs.msvcp120.dll.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="F:\Projects\pypcl_python3_conversion\build_pptk_py3\pptk\libs\CMakeFiles\pptk.libs.msvcp120.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{45B4E6D8-7A2D-4FF1-93E0-76DB9CAC0E5C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
