@@ -32,9 +32,7 @@ import ftplib
 
 
 pth = os.path.dirname(os.path.realpath(__file__))
-print(pth)
 pth = os.path.join(str(pth),'')
-print(os.path.dirname(os.path.dirname(pth)))
 
 class WelcomeWindow(QWidget):
     ''' 
@@ -610,7 +608,6 @@ class getWebCATImagery_ChooseNewDateWindow(QWidget):
        yr = int(self.bxYear.text())
        mo = int(self.bxMonth.text())
        day = int(self.bxDay.text())
-       print(yr)
            
        # Instantiate worker threads #
        self.worker = DownloadVidThread(yr,mo,day)
@@ -1644,7 +1641,6 @@ class getLidar_FindCoveringDatasetsThread(QThread):
             appropID = list() # Initiate list of IDs which contain the camera location #
             i = 0
             for ID in IDs:
-                print(ID)
                 
                 i = i+1
                 perDone = i/len(IDs)
@@ -1687,6 +1683,8 @@ class getLidar_WebCATThread(QThread):
         super().__init__()
 
     def run(self):
+
+        print('Thread Started')
 
         cams = ['staugustinecam','twinpierscam','miami40thcam']
 
@@ -1785,8 +1783,6 @@ class getLidar_DownloadChosenSetThread(QThread):
         
         f = open(pth+'tilesKeep.pkl','rb')
         tilesKeep = pickle.load(f)
-        print(tilesKeep)
-        print(len(tilesKeep))
         
         f = open(pth+'chosenLidarID.pkl','rb')
         IDToDownload = pickle.load(f)
@@ -1828,6 +1824,8 @@ class getLidar_FormatChosenSetThread(QThread):
         self.cameraLoc_lon = cameraLoc_lon
         
     def run(self):
+
+        print('Thread Started')
         
         f = open(pth+'lidarDat.pkl','rb')
         lidarDat = pickle.load(f)
@@ -1889,7 +1887,6 @@ class pptkWindowWorker(QThread):
 ##        else:
 ##            pass
         
-        print(GCPs_lidar)
         np.savetxt(pth+'GCPS_lidar.txt',GCPs_lidar)
 
         with open(pth+'GCPs_lidar.pkl','wb') as f:
@@ -1936,7 +1933,6 @@ class pickGCPs_Image(QThread):
            
 ##           uid = np.unique(gcps_im2,return_index=True,axis=0)
 ##           gcps_im2 = gcps_im2[sorted(uid[1]),:]
-           print(gcps_im2)
             
            with open(pth+'GCPs_im.pkl','wb') as f:
                pickle.dump(gcps_im2,f)
