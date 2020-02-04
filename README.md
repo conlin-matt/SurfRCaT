@@ -8,11 +8,11 @@ The surf-camera remote calibration tool (SurfRCaT) allows for the calibration of
 
 ## How do I use it?
 
-SurfRCaT can be obtained and used in one of two ways: via the pre-compiled application or by building it from the source code. Either way, you must first have images from your camera to feed to the program. This is with the exception of the WebCAT surfcam array deployed by the Southeastern Coastal Ocean Observing Regional Association ([see here](https://secoora.org/webcat/)). If you want to use one of these cameras, SurfRCaT will get the imagery for you. 
+SurfRCaT can be obtained and used in one of two ways: via the pre-compiled application or by building it from the source code. If you want to calibrate a camera from the WebCAT surfcam array deployed by the Southeastern Coastal Ocean Observing Regional Association ([see here](https://secoora.org/webcat/)), SurfRCaT will automatically get all inputs.
 
 ### 1. SurfRCaT via precompiled app
 
-SurfRCaT has been bundled into a standalone application. You won't need to do any coding to use it. DISCLAIMER: The app can only be run on computers running Windows. Additionally, while the app has been tested to run well on a number of different machines, I cannot guarantee that it will run without error on all Windows machines. Any issues should be reported to the Issues page, and I will do my best to amend them.
+SurfRCaT has been bundled into a standalone application. You won't need to do any coding to use it. NOTE: The app can only be run on Windows machines.
 
 Steps for obtaining the SurfRCaT app:
 1) [Download](https://www.dropbox.com/s/xhh5aji6kcg705v/SurfRCaT_V2_2.exe?dl=1) the tool.
@@ -21,13 +21,13 @@ Steps for obtaining the SurfRCaT app:
 
 ### 2. SurfRCaT from source
 
-If you want a bit more control over the code, are not running Windows, or don't want to deal with a clunky executable, you can create SurfRCaT via the source code provided in this repo. While you will likely need to do some (pip) installations to make it work, the GUI tool will work the same as in the app once created. 
+If you want a bit more control over the code, you can create SurfRCaT via the source code provided in this repo. 
 
 Steps for building SurfRCaT from source:
 1) Clone or download the SurfRCaT repository into a folder of your choosing.
 2) If you don't already have it, download the appropriate Anaconda distribution for your machine from [here](https://www.anaconda.com/distribution/). Use the Python 3.7 64-bit version. Anaconda is an all-in-one package and environment manager, and makes downloading and dealing with Python packages relatively painless.
-3) Open an Anaconda prompt by searching for 'Anaconda' in the Windows search bar and selecting the prompt. On a Mac, open a terminal window.
-4) Create a new environment called SurfRCaT_env containing Python 3.6 and the pdal package by running the following two commands in the Anaconda prompt (with an 'Enter' press between the commands):
+3) Open an Anaconda prompt by searching for 'Anaconda' in the Windows search bar and selecting the prompt.
+4) Create a new environment called SurfRCaT_env containing Python 3.6 and most of the package dependencies by running the following two commands in the Anaconda prompt (with an 'Enter' press between the commands):
 ```bash
 conda create -n SurfRCaT_env -c conda-forge python=3.6 python-pdal pyqt numpy pandas matplotlib opencv requests pyshp utm lxml
 conda activate SurfRCaT_env
@@ -36,24 +36,22 @@ conda activate SurfRCaT_env
 ```bash
 pip install fbs pptk
 ```
-7) Download [this](https://drive.google.com/open?id=1Pm4rXlXWJM-hBGHD12g2SBL67E5K2new) compressed folder, and copy the folder into the directory containing the contents of this repository.
 8) cd to the directory containing the contents of this repository by executing:
 ```bash
 cd <your directory>
 ```
-Create a new fbs project by executing the following (you can use defaults for all options):
-```bash
-fbs startproject 
-```
-9) Copy the main.py file, SurfRCaT.py file, and LaunchPPTKwin folder into the newly created src/main/python directory within the directory containing the contents of this repository. 
-10) You're all set up to run the tool! Execute the following to run the tool:
+9) Invoke the tool by running:
 ```bash
 fbs run 
 ```
 
+## What if I have an issue? ##
+Please report all issues to the Issues page in this repo. 
+
+## Contributing ##
+Contributions are welcome! Please create a new branch for your change, push your changes to that branch, and submit a pull request to merge it with the main branch.
+
 ## FAQ
 1) How do I use the lidar point cloud viewer window to identify points?    
 Answer: The point cloud viewer window is a functionality of the Point Processing Toolkit (pptk), an open-source python package. See the pptk documentation [here](https://heremaps.github.io/pptk/viewer.html) for instructions. We recommend rotating/translating/zooming your view until the point cloud looks similar to the image to help you identify corresponding features. **Important note: You must zoom the view in/out before translating/rotating it to maintain your view position.**
-2) SurfRCaT seems like it froze. What do I do?  
-Answer: SurfRCaT launches and runs some processes without any visual signature of doing so, making it look like the app has frozen when it really hasn't. So, give it a few minutes. If it still seems frozen, just close and re-launch. Note: The incorporation of a spinning wheel (or similar) while background processes run would be a welcome pull request!
 
