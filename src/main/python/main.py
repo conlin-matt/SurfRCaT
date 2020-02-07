@@ -29,6 +29,7 @@ from matplotlib.figure import Figure
 import numpy as np
 import time
 import ftplib
+import csv
 
 
 pth = os.path.dirname(os.path.realpath(__file__))
@@ -1997,11 +1998,11 @@ class calibrate_CalibrateThread(QThread):
             
         ar1 = np.array(['Omega(rad)','Phi(rad)','Kappa(rad)','CamX(m)','CamY(m)','CamZ(m)','x0(pix)','y0(pix)','f(pix)'])
         ar2 = np.array([calibVals[0],calibVals[1],calibVals[2],calibVals[3],calibVals[4],calibVals[5],calibVals[6],calibVals[7],calibVals[8]])
-        with open('calibVals.txt','w') as f:
+        with open(pth+'calibVals2.txt','w') as f:
             writer = csv.writer(f,delimiter=',')
             writer.writerows(zip(ar1,ar2))
             
-##        np.savetxt(pth+'calibVals.txt',calibVals,fmt='%6f')
+        np.savetxt(pth+'calibVals.txt',calibVals,fmt='%6f')
             
       
         self.finishSignal.emit(1)    

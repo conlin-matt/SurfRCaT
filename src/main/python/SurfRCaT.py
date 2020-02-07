@@ -651,10 +651,9 @@ def getLidar_SearchTiles(sf,shapeNum,cameraLoc_lat,cameraLoc_lon):
     # If either distance is <350 m, keep the tile. This ensures close tiles are kept and the tile containing the camera is kept. #
     try:
         rec = sf.record(shapeNum)
-        if min(dist1)<4500 or min(dist2)<4500:
-            if min(dist1)>3500 or min(dist2)>3500:
-##        if min(dist1)<600 or min(dist2)<600:
-                return rec['Name']
+        if min(dist1)<1200 or min(dist2)<1200:
+            return rec['Name']
+        
     except:
         pass
 
@@ -723,8 +722,7 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
     lidarYsmall = list()
     lidarZsmall = list()    
     for xi,yi,zi,di in zip(lidarX,lidarY,lidarZ,dist):
-##        if di>3500 and di<4500:
-        if di<4500:
+        if di<1000:
             lidarXsmall.append(xi)
             lidarYsmall.append(yi)
             lidarZsmall.append(zi)
