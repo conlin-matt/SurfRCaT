@@ -4,11 +4,11 @@
 
 ## What is it?
 
-The surf-camera remote calibration tool (SurfRCaT) allows for the calibration of any U.S. coastal camera that views structures identifiable in lidar data. It does this by facilitating the co-location of points in an image from the camera and co-spatial airborn lidar observations (see image above). NOTE: As of now, SurfRCaT will only work on Windows machines.
+The surf-camera remote calibration tool (SurfRCaT) allows for the calibration of any U.S. coastal camera that views structures identifiable in lidar data. It does this by facilitating the co-location of points in an image from the camera and co-spatial airborn lidar observations (see image above). 
 
 ## How do I use it?
 
-SurfRCaT can be obtained and used in one of two ways: via the pre-compiled application or by building it from the source code. If you want to calibrate a camera from the WebCAT surfcam array deployed by the Southeastern Coastal Ocean Observing Regional Association ([see here](https://secoora.org/webcat/)), SurfRCaT will automatically get all inputs.
+SurfRCaT can be obtained and used in one of two ways: via the pre-compiled application or by building it from the source code. If you want to calibrate a camera from the WebCAT surfcam array deployed by the Southeastern Coastal Ocean Observing Regional Association ([see here](https://secoora.org/webcat/)), SurfRCaT will automatically get all inputs. NOTE: As of now, SurfRCaT will only work on Windows machines.
 
 ### 1. SurfRCaT via precompiled app
 
