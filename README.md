@@ -61,8 +61,8 @@ Below is a step-by-step example to get you more familiar with using SurfRCaT aft
 ![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/Example_ImageGCPs.png)
 
 9) Press "Done" when done and "Continue" to move on (or retry if you aren't happy with your point selection).
-10) The Calibration Module window will now appear. Press "CALIBRATE" to perform the calibration. You should get results resembling those shown below:
-
+10) The Calibration Module window will now appear. Press "CALIBRATE" to perform the calibration. You should get results resembling those shown below. Note the RMS of control point residuals: 2.1 pixels. 
+![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/Example_Results.png)
 
 
 ## Issues ##
