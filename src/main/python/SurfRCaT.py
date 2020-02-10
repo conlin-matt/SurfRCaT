@@ -651,7 +651,7 @@ def getLidar_SearchTiles(sf,shapeNum,cameraLoc_lat,cameraLoc_lon):
     # If either distance is <350 m, keep the tile. This ensures close tiles are kept and the tile containing the camera is kept. #
     try:
         rec = sf.record(shapeNum)
-        if min(dist1)<1200 or min(dist2)<1200:
+        if min(dist1)<800 or min(dist2)<800:
             return rec['Name']
         
     except:
@@ -722,7 +722,7 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
     lidarYsmall = list()
     lidarZsmall = list()    
     for xi,yi,zi,di in zip(lidarX,lidarY,lidarZ,dist):
-        if di<1000:
+        if di<350:
             lidarXsmall.append(xi)
             lidarYsmall.append(yi)
             lidarZsmall.append(zi)
@@ -750,29 +750,41 @@ def getLidar_CreatePC(lidarDat,cameraLoc_lat,cameraLoc_lon):
     '''
 
     import utm
-    import numpy 
+    import numpy  as np
     import pandas as pd
     
     pc = pd.DataFrame({'x':lidarDat[:,0],'y':lidarDat[:,1],'z':lidarDat[:,2]})
 
     # Convert eveything to UTM and translate to camera at (0,0) #
-    utmCoordsX = list()
-    utmCoordsY = list()
-    for ix,iy in zip(pc['x'],pc['y']):
-        utmCoords1 = utm.from_latlon(iy,ix)
-        utmCoordsX.append( utmCoords1[0] )
-        utmCoordsY.append( utmCoords1[1] )
-    utmCoords = numpy.array([utmCoordsX,utmCoordsY])
+    utmCoords = utm.from_latlon(np.array(pc['y']),np.array(pc['x']))
+    utmCoords = np.hstack([np.reshape(utmCoords[0],[np.size(utmCoords[0]),1]),np.reshape(utmCoords[1],[np.size(utmCoords[1]),1])])
+
+    
+##    utmCoordsX = list()
+##    utmCoordsY = list()
+##    for ix,iy in zip(pc['x'],pc['y']):
+##        utmCoords1 = utm.from_latlon(iy,ix)
+##        utmCoordsX.append( utmCoords1[0] )
+##        utmCoordsY.append( utmCoords1[1] )
+##    utmCoords = np.array([utmCoordsX,utmCoordsY])
         
     utmCam = utm.from_latlon(cameraLoc_lat,cameraLoc_lon)
         
-    # Translate to camera position #
-    utmCoords[0,:] = utmCoords[0,:]-utmCam[0]
-    utmCoords[1,:] = utmCoords[1,:]-utmCam[1]
+##    # Translate to camera position #
+##    utmCoords[0,:] = utmCoords[0,:]-utmCam[0]
+##    utmCoords[1,:] = utmCoords[1,:]-utmCam[1]
    
+##    # Put these new coordinates into the point cloud %
+##    pc['x'] = numpy.transpose(utmCoords[0,:])
+##    pc['y'] = numpy.transpose(utmCoords[1,:])
+
+    # Translate to camera position #
+    utmCoords[:,0] = utmCoords[:,0]-utmCam[0]
+    utmCoords[:,1] = utmCoords[:,1]-utmCam[1]
+    
     # Put these new coordinates into the point cloud %
-    pc['x'] = numpy.transpose(utmCoords[0,:])
-    pc['y'] = numpy.transpose(utmCoords[1,:])
+    pc['x'] = utmCoords[:,0]
+    pc['y'] = utmCoords[:,1]
     
     return pc
 
