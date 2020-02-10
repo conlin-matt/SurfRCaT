@@ -4,7 +4,7 @@
 
 ## What is it?
 
-The surf-camera remote calibration tool (SurfRCaT) allows for the calibration of any U.S. coastal camera that views structures identifiable in lidar data. It does this by facilitating the co-location of points in an image from the camera and co-spatial airborn lidar observations (see image above). 
+The surf-camera remote calibration tool (SurfRCaT) allows for the calibration of any U.S. coastal camera that views structures identifiable in lidar data. It does this by facilitating the co-location of points in an image from the camera and co-spatial airborn lidar observations (see image above). A calibrated camera can be used to make image measurements in real-world coordinates. 
 
 ## How do I use it?
 
@@ -12,7 +12,7 @@ SurfRCaT can be obtained and used in one of two ways: via the pre-compiled appli
 
 ### 1. SurfRCaT via precompiled app
 
-SurfRCaT has been bundled into a standalone application. You won't need to do any coding to use it. NOTE: The app can only be run on Windows machines.
+SurfRCaT has been bundled into a standalone application. You won't need to do any coding to use it.
 
 Steps for obtaining the SurfRCaT app:
 1) [Download](https://www.dropbox.com/s/xhh5aji6kcg705v/SurfRCaT_V2_2.exe?dl=1) the tool.
@@ -45,13 +45,27 @@ cd <your directory>
 fbs run 
 ```
 
-## What if I have an issue? ##
+## Test Example ##
+Below is a step-by-step example to get you more familiar with using SurfRCaT after it is installed. This also functions as a test to ensure SurfRCaT is working properly on your machine. You should be able to complete all steps and get results that are reasonably similar to those presented below:
+
+1) Invoke the tool, either as the app or from source (see above).
+2) Choose the "Select WebCAT camera from list" option.
+3) Select the "Folly Beach Pier (south) camera and press "Continue". The video should download followed by the seperation of unique views.
+4) A window showing images from this camera's two views should appear (see below). Select the view from the dropdown list corresponding to the image showing the pier: view one (left image) or view two (right image). 
+5) A table showing lidar datasets that cover this area will appear. Click the box next to the first listed dataset (ID: 5184) and press "Continue." 3 processes should now occur in the following order: tile sorting, data downloading, and point cloud generation. These three processes will take some time (depending on machine) to complete. Progress bars should show the status of the first two (though not continuously for the second). Press "Continue" when the processes complete.
+6) You have now entered the GCP-picking module, the heart of SurfRCaT. First, watch the following video showing how to identify GCPs:
+
+Now, try it yourself. Press "Continue" to begin remote-GCP extraction. When the lidar point cloud opens, zoom out slightly with the mouse scroll wheel. Then, rotate the view counter-clockwise by clicking and holding and moving the mouse until you can see the pier. Select the four points on the pier (in this order) shown in the image below. To select a point: hold control, click on the point, release control, wait 2 seconds, and then right click anywhere in the viewer. When done, close the lidar viewer window by x-ing out of it. 
+
+The text above the image should now change from "The lidar point cloud is opening..." to "Real-world coordinates of points saved!". In the image, click on the same four points, in the same order, as shown in the image below.
+
+Press "Continue" when done. 
+7) The Calibration Module window will now appear. Press Continue to perform the calibration. You should get results resembling those shown below:
+
+
+
+## Issues ##
 Please report all issues to the Issues page in this repo. 
 
 ## Contributing ##
 Contributions are welcome! Please create a new branch for your change, push your changes to that branch, and submit a pull request to merge it with the main branch.
-
-## FAQ
-1) How do I use the lidar point cloud viewer window to identify points?    
-Answer: The point cloud viewer window is a functionality of the Point Processing Toolkit (pptk), an open-source python package. See the pptk documentation [here](https://heremaps.github.io/pptk/viewer.html) for instructions. We recommend rotating/translating/zooming your view until the point cloud looks similar to the image to help you identify corresponding features. **Important note: You must zoom the view in/out before translating/rotating it to maintain your view position.**
-
