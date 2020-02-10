@@ -55,12 +55,12 @@ Below is a step-by-step example to get you more familiar with using SurfRCaT aft
 5) A table showing lidar datasets that cover this area will appear. Click the box next to the first listed dataset (ID: 5184) and press "Continue." 3 processes should now occur in the following order: tile sorting, data downloading, and point cloud generation. These three processes will take some time (depending on machine) to complete. Progress bars should show the status of the first two (though not continuously for the second). Press "Continue" when the processes complete.
 6) You have now entered the GCP-picking module, the heart of SurfRCaT. First, watch the following video showing how to identify GCPs:
 
-Now, try it yourself. Press "Continue" to begin remote-GCP extraction. When the lidar point cloud opens, zoom out slightly with the mouse scroll wheel. Then, rotate the view counter-clockwise by clicking and holding and moving the mouse until you can see the pier. Select the four points on the pier (in this order) shown in the image below. To select a point: hold control, click on the point, release control, wait 2 seconds, and then right click anywhere in the viewer. When done, close the lidar viewer window by x-ing out of it. 
+Now, try it yourself. Press "Go" to begin remote-GCP extraction. When the lidar point cloud opens, zoom out slightly with the mouse scroll wheel. Then, rotate the view counter-clockwise by clicking and holding and moving the mouse until you can see the pier. Select the four points on the pier (in this order) shown in the image below. To select a point: hold control, click on the point, release control, wait 2 seconds, and then right click anywhere in the viewer. When done, close the lidar viewer window by x-ing out of it. 
 
 The text above the image should now change from "The lidar point cloud is opening..." to "Real-world coordinates of points saved!". In the image, click on the same four points, in the same order, as shown in the image below.
 
-Press "Continue" when done. 
-7) The Calibration Module window will now appear. Press Continue to perform the calibration. You should get results resembling those shown below:
+Press "Done" when done and "Continue" to move on (or retry if you aren't happy with your point selection).
+7) The Calibration Module window will now appear. Press "CALIBRATE" to perform the calibration. You should get results resembling those shown below:
 
 
 
