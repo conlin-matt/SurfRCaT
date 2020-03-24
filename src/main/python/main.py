@@ -53,12 +53,13 @@ class WelcomeWindow(QWidget):
         bf = QFont()
         bf.setBold(True)
         leftBar1 = QLabel('• Welcome!')
-        leftBar1.setFont(bf)
         leftBar2 = QLabel('• Get imagery')
         leftBar3 = QLabel('• Get lidar data')
         leftBar4 = QLabel('• Pick GCPs')
         leftBar5 = QLabel('• Calibrate')
-        
+        leftBar6 = QLabel('• Rectify')
+        leftBar1.setFont(bf)
+
         leftGroupBox = QGroupBox('Contents:')
         vBox = QVBoxLayout()
         vBox.addWidget(leftBar1)
@@ -66,6 +67,7 @@ class WelcomeWindow(QWidget):
         vBox.addWidget(leftBar3)
         vBox.addWidget(leftBar4)
         vBox.addWidget(leftBar5)
+        vBox.addWidget(leftBar6)
         vBox.addStretch(1)
         leftGroupBox.setLayout(vBox)
         ########################    
@@ -76,21 +78,38 @@ class WelcomeWindow(QWidget):
                       +'the United States Geological Survey (USGS), and the National Oceanic and Atmospheric Administration (NOAA). This tool allows you to calibrate any coastal camera in the U.S. of '
                       +'generally known location with accessible video footage. If you have an issue, please post it on the GitHub issues page (https://github.com/conlin-matt/SurfRCaT/issues).')      
         txt2.setWordWrap(True)
-        txt3 = QLabel('Press Continue to start calibrating a camera!')
+        txt3 = QLabel('Press Continue to start calibrating a camera.')
+        txt3.setWordWrap(True)
+        txt4 = QLabel('Or, if you already have calibration parameters, and would like to jump directly to rectification, select Rectify.')
+        txt4.setWordWrap(True)
         contBut = QPushButton('Continue >')
+        rectifBut = QPushButton('Rectify >')
         
         rightGroupBox = QGroupBox()
+##        grd = QGridLayout()
+##        grd.addWidget(txt,0,0,1,4)
+##        grd.addWidget(txt2,1,0,1,4)
+##        grd.addWidget(txt3,2,0,1,4)
+##        grd.addWidget(rectifBut,3,0,1,2)
+##        grd.addWidget(contBut,3,2,1,2)
+##        rightGroupBox.setLayout(grd)
+        
         hBox1 = QHBoxLayout()
         hBox1.addWidget(txt3)
         hBox1.addWidget(contBut)
+        hBox2 = QHBoxLayout()
+        hBox2.addWidget(txt4)
+        hBox2.addWidget(rectifBut)        
         vBox = QVBoxLayout()
         vBox.addWidget(txt)
         vBox.addWidget(txt2)
         vBox.addLayout(hBox1)
+        vBox.addLayout(hBox2)
         rightGroupBox.setLayout(vBox)
         ############################
         
         # Connect widgets with signals #
+        rectifBut.clicked.connect(self.jumpToRectify)
         contBut.clicked.connect(self.StartTool)
         ################################
         
@@ -111,6 +130,11 @@ class WelcomeWindow(QWidget):
        self.close()
        self.tool = ChooseCameraWindow()
        self.tool.show()
+       
+    def jumpToRectify(self):
+        self.close()
+        self.w = rectify()
+        self.w.show()
 
 
 
@@ -131,11 +155,12 @@ class ChooseCameraWindow(QWidget):
         bf.setBold(True)
         leftBar1 = QLabel('• Welcome!')
         leftBar2 = QLabel('• Get imagery')
-        leftBar2.setFont(bf)
         leftBar3 = QLabel('• Get lidar data')
         leftBar4 = QLabel('• Pick GCPs')
         leftBar5 = QLabel('• Calibrate')
-        
+        leftBar6 = QLabel('• Rectify')
+        leftBar2.setFont(bf)
+
         leftGroupBox = QGroupBox('Contents:')
         vBox = QVBoxLayout()
         vBox.addWidget(leftBar1)
@@ -143,6 +168,7 @@ class ChooseCameraWindow(QWidget):
         vBox.addWidget(leftBar3)
         vBox.addWidget(leftBar4)
         vBox.addWidget(leftBar5)
+        vBox.addWidget(leftBar6)
         vBox.addStretch(1)
         leftGroupBox.setLayout(vBox)
         ########################    
@@ -218,11 +244,12 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
        bf.setBold(True)
        leftBar1 = QLabel('• Welcome!')
        leftBar2 = QLabel('• Get imagery')
-       leftBar2.setFont(bf)
        leftBar3 = QLabel('• Get lidar data')
        leftBar4 = QLabel('• Pick GCPs')
        leftBar5 = QLabel('• Calibrate')
-        
+       leftBar6 = QLabel('• Rectify')
+       leftBar2.setFont(bf)
+
        leftGroupBox = QGroupBox('Contents:')
        vBox = QVBoxLayout()
        vBox.addWidget(leftBar1)
@@ -230,6 +257,7 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
        vBox.addWidget(leftBar3)
        vBox.addWidget(leftBar4)
        vBox.addWidget(leftBar5)
+       vBox.addWidget(leftBar6)
        vBox.addStretch(1)
        leftGroupBox.setLayout(vBox)
        ########################    
@@ -308,7 +336,8 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
        else:
            self.worker2 = CheckPTZThread(2)
 
-
+        
+       # Add the pre-defined azimuth and elev for each WebCAT camera #
        if cameraName == 'buxtoncoastalcam':
            self.az = 5
            self.ZL = 10
@@ -416,11 +445,12 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
        bf.setBold(True)
        leftBar1 = QLabel('• Welcome!')
        leftBar2 = QLabel('• Get imagery')
-       leftBar2.setFont(bf)
        leftBar3 = QLabel('• Get lidar data')
        leftBar4 = QLabel('• Pick GCPs')
        leftBar5 = QLabel('• Calibrate')
-       
+       leftBar6 = QLabel('• Rectify')
+       leftBar2.setFont(bf)
+
        leftGroupBox = QGroupBox('Contents:')
        vBox = QVBoxLayout()
        vBox.addWidget(leftBar1)
@@ -428,6 +458,7 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
        vBox.addWidget(leftBar3)
        vBox.addWidget(leftBar4)
        vBox.addWidget(leftBar5)
+       vBox.addWidget(leftBar6)
        vBox.addStretch(1)
        leftGroupBox.setLayout(vBox)
        ########################    
@@ -436,11 +467,13 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
        self.rightGroupBox = QGroupBox()
        f1 = open(pth+'viewDF.pkl','rb')
        f2 = open(pth+'vidFile.pkl','rb')
+       f3 = open(pth+'CameraName.pkl','rb')
        self.viewDF = pickle.load(f1)
        vidFile = pickle.load(f2)
        vidPth = vidFile
+       cameraName = pickle.load(f3)
        
-       self.frameDF = SurfRCaT.getImagery_SeperateViewsAndGetFrames(vidPth,self.viewDF)
+       self.frameDF = SurfRCaT.getImagery_GetFrames(pth+vidPth,self.viewDF)
        numViews = len(self.frameDF)
        
        # Set up the text label #
@@ -493,7 +526,10 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
        ############################
        
        # Instantiate worker threads #
-       self.worker = CheckPTZThread(1)
+       if cameraName == 'follypiersouthcam': # Need 1 erosion iter for Folly Pier South, 2 for other cams # 
+           self.worker = CheckPTZThread(1)
+       else:
+           self.worker = CheckPTZThread(2)
        ##############################
        
     def viewSelected(self,item):
@@ -549,11 +585,12 @@ class getWebCATImagery_ChooseNewDateWindow(QWidget):
        bf.setBold(True)
        leftBar1 = QLabel('• Welcome!')
        leftBar2 = QLabel('• Get imagery')
-       leftBar2.setFont(bf)
        leftBar3 = QLabel('• Get lidar data')
        leftBar4 = QLabel('• Pick GCPs')
        leftBar5 = QLabel('• Calibrate')
-       
+       leftBar6 = QLabel('• Rectify')
+       leftBar2.setFont(bf)
+
        leftGroupBox = QGroupBox('Contents:')
        vBox = QVBoxLayout()
        vBox.addWidget(leftBar1)
@@ -561,6 +598,7 @@ class getWebCATImagery_ChooseNewDateWindow(QWidget):
        vBox.addWidget(leftBar3)
        vBox.addWidget(leftBar4)
        vBox.addWidget(leftBar5)
+       vBox.addWidget(leftBar6)
        vBox.addStretch(1)
        leftGroupBox.setLayout(vBox)
        ########################    
@@ -615,6 +653,7 @@ class getWebCATImagery_ChooseNewDateWindow(QWidget):
        
        f = open(pth+'CameraName.pkl','rb')
        cameraName = pickle.load(f)
+       print(cameraName)
        if cameraName == 'follypiersouthcam': # Need 1 erosion iter for Folly Pier South, 2 for other cams # 
            self.worker2 = CheckPTZThread(1)
        else:
@@ -687,11 +726,12 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
        bf.setBold(True)
        leftBar1 = QLabel('• Welcome!')
        leftBar2 = QLabel('• Get imagery')
-       leftBar2.setFont(bf)
        leftBar3 = QLabel('• Get lidar data')
        leftBar4 = QLabel('• Pick GCPs')
        leftBar5 = QLabel('• Calibrate')
-       
+       leftBar6 = QLabel('• Rectify')
+       leftBar2.setFont(bf)
+
        leftGroupBox = QGroupBox('Contents:')
        vBox = QVBoxLayout()
        vBox.addWidget(leftBar1)
@@ -699,6 +739,7 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
        vBox.addWidget(leftBar3)
        vBox.addWidget(leftBar4)
        vBox.addWidget(leftBar5)
+       vBox.addWidget(leftBar6)
        vBox.addStretch(1)
        leftGroupBox.setLayout(vBox)
        ########################    
@@ -827,10 +868,11 @@ class getLidar_FindUseableDatasetsWindow(QWidget):
        leftBar1 = QLabel('• Welcome!')
        leftBar2 = QLabel('• Get imagery')
        leftBar3 = QLabel('• Get lidar data')
-       leftBar3.setFont(bf)
        leftBar4 = QLabel('• Pick GCPs')
        leftBar5 = QLabel('• Calibrate')
-       
+       leftBar6 = QLabel('• Rectify')
+       leftBar3.setFont(bf)
+
        leftGroupBox = QGroupBox('Contents:')
        vBox = QVBoxLayout()
        vBox.addWidget(leftBar1)
@@ -838,6 +880,7 @@ class getLidar_FindUseableDatasetsWindow(QWidget):
        vBox.addWidget(leftBar3)
        vBox.addWidget(leftBar4)
        vBox.addWidget(leftBar5)
+       vBox.addWidget(leftBar6)
        vBox.addStretch(1)
        leftGroupBox.setLayout(vBox)
        ########################    
@@ -973,10 +1016,11 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         leftBar1 = QLabel('• Welcome!')
         leftBar2 = QLabel('• Get imagery')
         leftBar3 = QLabel('• Get lidar data')
-        leftBar3.setFont(bf)
         leftBar4 = QLabel('• Pick GCPs')
         leftBar5 = QLabel('• Calibrate')
-        
+        leftBar6 = QLabel('• Rectify')
+        leftBar3.setFont(bf)
+
         leftGroupBox = QGroupBox('Contents:')
         vBox = QVBoxLayout()
         vBox.addWidget(leftBar1)
@@ -984,6 +1028,7 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         vBox.addWidget(leftBar3)
         vBox.addWidget(leftBar4)
         vBox.addWidget(leftBar5)
+        vBox.addWidget(leftBar6)
         vBox.addStretch(1)
         leftGroupBox.setLayout(vBox)
         ########################    
@@ -1173,9 +1218,10 @@ class PickGCPsWindow(QWidget):
         leftBar2 = QLabel('• Get imagery')
         leftBar3 = QLabel('• Get lidar data')
         leftBar4 = QLabel('• Pick GCPs')
-        leftBar4.setFont(bf)
         leftBar5 = QLabel('• Calibrate')
-        
+        leftBar6 = QLabel('• Rectify')
+        leftBar4.setFont(bf)
+
         leftGroupBox = QGroupBox('Contents:')
         vBox = QVBoxLayout()
         vBox.addWidget(leftBar1)
@@ -1183,6 +1229,7 @@ class PickGCPsWindow(QWidget):
         vBox.addWidget(leftBar3)
         vBox.addWidget(leftBar4)
         vBox.addWidget(leftBar5)
+        vBox.addWidget(leftBar6)
         vBox.addStretch(1)
         leftGroupBox.setLayout(vBox)
         ########################  
@@ -1335,6 +1382,7 @@ class calibrate_Welcome(QWidget):
         leftBar3 = QLabel('• Get lidar data')
         leftBar4 = QLabel('• Pick GCPs')
         leftBar5 = QLabel('• Calibrate')
+        leftBar6 = QLabel('• Rectify')
         leftBar5.setFont(bf)
 
         leftGroupBox = QGroupBox('Contents:')
@@ -1344,6 +1392,7 @@ class calibrate_Welcome(QWidget):
         vBox.addWidget(leftBar3)
         vBox.addWidget(leftBar4)
         vBox.addWidget(leftBar5)
+        vBox.addWidget(leftBar6)
         vBox.addStretch(1)
         leftGroupBox.setLayout(vBox)
         ########################  
@@ -1373,7 +1422,6 @@ class calibrate_Welcome(QWidget):
         fullLayout.addWidget(self.rightGroupBox,0,3,2,4)
         self.setLayout(fullLayout)
 
-##        self.setGeometry(400,100,1000,500)
         self.setWindowTitle('SurfRCaT')
         self.show()
         ############################ 
@@ -1417,9 +1465,9 @@ class calibrate_ShowCalibResultsWindow(QWidget):
         leftBar3 = QLabel('• Get lidar data')
         leftBar4 = QLabel('• Pick GCPs')
         leftBar5 = QLabel('• Calibrate')
+        leftBar6 = QLabel('• Rectify')
         leftBar5.setFont(bf)
 
-        
         leftGroupBox = QGroupBox('Contents:')
         vBox = QVBoxLayout()
         vBox.addWidget(leftBar1)
@@ -1427,6 +1475,7 @@ class calibrate_ShowCalibResultsWindow(QWidget):
         vBox.addWidget(leftBar3)
         vBox.addWidget(leftBar4)
         vBox.addWidget(leftBar5)
+        vBox.addWidget(leftBar6)
         vBox.addStretch(1)
         leftGroupBox.setLayout(vBox)
         ########################  
@@ -1468,23 +1517,23 @@ class calibrate_ShowCalibResultsWindow(QWidget):
         
         self.introLab = QLabel('The reprojection of each picked GCP based on the calibration is shown below. The Xs should align with the Os if the calibration was accurate.')
         self.introLab.setWordWrap(True)
-        self.residLab = QLabel('The RMS of the control point residuals for the calibration is '+str(round(RMSresid,3))+' pixels. The residuals for each point have been saved in the text file calibResid.txt. The calibration parameters have been saved to the text file calibVals.txt. If you are unhappy with the calibration, you can retry by clicking the Retry button. Otherwise, you can close the tool.')
+        self.residLab = QLabel('The RMS of the control point residuals for the calibration is '+str(round(RMSresid,3))+' pixels. The residuals for each point have been saved in the text file calibResid.txt. The calibration parameters have been saved to the text file calibVals.txt. If you are unhappy with the calibration, you can retry by clicking the Retry button. Otherwise, click Continue to enter the rectification module.')
         self.residLab.setWordWrap(True)
         self.retryBut = QPushButton('Retry')
-        self.closeBut = QPushButton('Close')
+        self.contBut = QPushButton('Continue')
         self.rightGroupBox = QGroupBox()
         self.grd = QGridLayout()
         self.grd.addWidget(self.introLab,0,0,1,4)
         self.grd.addWidget(self.canvas,2,0,4,4)
         self.grd.addWidget(self.residLab,6,0,2,4)
         self.grd.addWidget(self.retryBut,8,0,1,1)
-        self.grd.addWidget(self.closeBut,8,3,1,1)
+        self.grd.addWidget(self.contBut,8,3,1,1)
         self.rightGroupBox.setLayout(self.grd)
         ###############################
 
         # Connect widgets with signals #
         self.retryBut.clicked.connect(self.onRetryClick)
-        self.closeBut.clicked.connect(self.onCloseClick)
+        self.contBut.clicked.connect(self.onContClick)
         ################################
         
         
@@ -1504,13 +1553,241 @@ class calibrate_ShowCalibResultsWindow(QWidget):
        self.w = PickGCPsWindow()
        self.w.show()
         
-   def onCloseClick(self):
+   def onContClick(self):
        self.close()
+       self.w = rectify()
+       self.w.show()
         
 
+##===================================================##
+# Rectification module #
+##===================================================##
+class rectify(QWidget):
+   def __init__(self):
+        super().__init__()    
+        
+        if not QApplication.instance():
+            app = QApplication(sys.argv)
+        else:
+            app = QApplication.instance()             
+                 
+        # Left menu box setup #
+        bf = QFont()
+        bf.setBold(True)
+        leftBar1 = QLabel('• Welcome!')
+        leftBar2 = QLabel('• Get imagery')
+        leftBar3 = QLabel('• Get lidar data')
+        leftBar4 = QLabel('• Pick GCPs')
+        leftBar5 = QLabel('• Calibrate')
+        leftBar6 = QLabel('• Rectify')
+        leftBar6.setFont(bf)
+
+        leftGroupBox = QGroupBox('Contents:')
+        vBox = QVBoxLayout()
+        vBox.addWidget(leftBar1)
+        vBox.addWidget(leftBar2)
+        vBox.addWidget(leftBar3)
+        vBox.addWidget(leftBar4)
+        vBox.addWidget(leftBar5)
+        vBox.addWidget(leftBar6)
+        vBox.addStretch(1)
+        leftGroupBox.setLayout(vBox)
+        ########################  
+
+        # Right contents box setup #
+        introLab = QLabel('Welcome to the rectification module. Here you can produce a rectified image from your camera using the previously-obtained calibration parameters. You can input any image from the camera, so long as it is an image of the same area as the image used in the calibration.')
+        introLab.setWordWrap(True)
+        dirLab1 = QLabel('Please provide the full path and filename of the image you wish to rectify')
+        dirLab1.setWordWrap(True)
+        dirLab2 = QLabel('Please provide an object-space grid to rectify the image onto (cordinates are meters from input camera location)')
+        dirLab2.setWordWrap(True)
+        imagePthLab = QLabel('Image path:')
+        self.imagePthBx = QLineEdit()
+        xminLab = QLabel('xmin:')
+        self.xminBx = QLineEdit()
+        xmaxLab = QLabel('xmax:')
+        self.xmaxBx = QLineEdit()        
+        dxLab = QLabel('dx:')
+        self.dxBx = QLineEdit()
+        yminLab = QLabel('ymin:')
+        self.yminBx = QLineEdit()
+        ymaxLab = QLabel('ymax:')
+        self.ymaxBx = QLineEdit()
+        dyLab = QLabel('dy:')
+        self.dyBx = QLineEdit()
+        zLab = QLabel('z:')
+        self.zBx = QLineEdit()
+        contBut = QPushButton('Continue >')
+
+        self.rightGroupBox1 = QGroupBox()
+        self.rightGroupBox2 = QGroupBox()
+        self.grd = QGridLayout()
+        self.grd1 = QGridLayout()
+        self.grd2 = QGridLayout()
+        
+        self.grd.addWidget(introLab,0,0,1,6)
+        
+        self.grd1.addWidget(dirLab1,0,0,1,6)
+        self.grd1.addWidget(imagePthLab,1,0,1,2)
+        self.grd1.addWidget(self.imagePthBx,1,2,1,4)
+        self.rightGroupBox1.setLayout(self.grd1)
+
+        self.grd2.addWidget(dirLab2,0,0,1,6)
+        self.grd2.addWidget(xminLab,1,0,1,2)
+        self.grd2.addWidget(self.xminBx,1,2,1,4)
+        self.grd2.addWidget(xmaxLab,2,0,1,2)
+        self.grd2.addWidget(self.xmaxBx,2,2,1,4)
+        self.grd2.addWidget(dxLab,3,0,1,2)
+        self.grd2.addWidget(self.dxBx,3,2,1,4)
+        self.grd2.addWidget(yminLab,4,0,1,2)
+        self.grd2.addWidget(self.yminBx,4,2,1,4)
+        self.grd2.addWidget(ymaxLab,5,0,1,2)
+        self.grd2.addWidget(self.ymaxBx,5,2,1,4)
+        self.grd2.addWidget(dyLab,6,0,1,2)
+        self.grd2.addWidget(self.dyBx,6,2,1,4)
+        self.grd2.addWidget(zLab,7,0,1,2)
+        self.grd2.addWidget(self.zBx,7,2,1,4)
+        self.grd2.addWidget(contBut,8,5,1,1)
+        self.rightGroupBox2.setLayout(self.grd2)
+
+        # Connect widgets with signals #
+        contBut.clicked.connect(self.onContClick)
+        ################################
+
+        # Full widget layout setup #
+        fullLayout = QGridLayout()
+        fullLayout.addWidget(leftGroupBox,0,0,5,2)
+        fullLayout.addLayout(self.grd,0,3,1,4)
+        fullLayout.addWidget(self.rightGroupBox1,1,3,2,4)
+        fullLayout.addWidget(self.rightGroupBox2,3,3,2,4)
+        self.setLayout(fullLayout)
+        self.setWindowTitle('SurfRCaT')
+        self.show()
+        ############################
+
+   def onContClick(self):
+
+        # Acquire all the inputs #
+        xmin = float(self.xminBx.text())
+        xmax = float(self.xmaxBx.text())
+        dx = float(self.dxBx.text())
+        ymin = float(self.yminBx.text())
+        ymax = float(self.ymaxBx.text())
+        dy = float(self.dyBx.text())
+        z = float(self.zBx.text())
+        print(ymin)
+
+        impth = self.imagePthBx.text()
+        img = mpimg.imread(impth)
+        print(impth)
+
+        # Start the worker #
+        self.worker = performRectificationThread(img,impth,xmin,xmax,dx,ymin,ymax,dy,z)
+
+        lab1 = QLabel('Performing rectification...')
+        self.grd2.addWidget(lab1,9,0,1,3)
+
+        self.loadlab = QLabel()
+        self.loadmovie = QMovie(pth+'loading.gif')
+        self.loadlab.setMovie(self.loadmovie)
+       
+        self.worker.start()
+        self.grd2.addWidget(self.loadlab,9,3,1,3)
+        self.loadmovie.start()
+        self.worker.finishSignal.connect(self.on_closeSignal) 
+
+   def on_closeSignal(self):
+        self.close()
+        self.w = rectify_ShowRectif()
+        self.w.show()
+
+
+class rectify_ShowRectif(QWidget):
+   def __init__(self):
+        super().__init__()    
+        
+        if not QApplication.instance():
+            app = QApplication(sys.argv)
+        else:
+            app = QApplication.instance()             
+                 
+        # Left menu box setup #
+        bf = QFont()
+        bf.setBold(True)
+        leftBar1 = QLabel('• Welcome!')
+        leftBar2 = QLabel('• Get imagery')
+        leftBar3 = QLabel('• Get lidar data')
+        leftBar4 = QLabel('• Pick GCPs')
+        leftBar5 = QLabel('• Calibrate')
+        leftBar6 = QLabel('• Rectify')
+        leftBar6.setFont(bf)
+
+        leftGroupBox = QGroupBox('Contents:')
+        vBox = QVBoxLayout()
+        vBox.addWidget(leftBar1)
+        vBox.addWidget(leftBar2)
+        vBox.addWidget(leftBar3)
+        vBox.addWidget(leftBar4)
+        vBox.addWidget(leftBar5)
+        vBox.addWidget(leftBar6)
+        vBox.addStretch(1)
+        leftGroupBox.setLayout(vBox)
+        ########################  
+
+        # Right contents box setup #
+        f1 = open(pth+'im_rectif.pkl','rb')
+        f2 = open(pth+'extents.pkl','rb')
+        im_rectif = pickle.load(f1)
+        extents = pickle.load(f2)
+        
+        self.canvas = FigureCanvas(Figure())
+        self.ax = self.canvas.figure.subplots()
+        self.ax.imshow(im_rectif,extent=extents,interpolation='bilinear')
+        self.ax.set_xlabel('Local x (m)')
+        self.ax.set_ylabel('Local y (m)')
+        self.ax.axis('equal')
+        self.canvas.draw()
+        
+        self.introLab = QLabel('Your rectified image is shown below, and is saved to the same directory as the input image with the name <imName>_rectif.png. If you would like to rectify another image, select Back. Otherwise, you can close the tool.')
+        self.introLab.setWordWrap(True)
+        self.backBut = QPushButton('< Back')
+        self.closeBut = QPushButton('Close')
+
+        self.rightGroupBox = QGroupBox()
+        self.grd = QGridLayout()
+        self.grd.addWidget(self.introLab,0,0,1,4)
+        self.grd.addWidget(self.canvas,2,0,4,4)
+        self.grd.addWidget(self.backBut,6,0,1,2)
+        self.grd.addWidget(self.closeBut,6,2,1,2)
+        self.rightGroupBox.setLayout(self.grd)
+        ###############################
+        
+        # Full widget layout setup #
+        fullLayout = QGridLayout()
+        fullLayout.addWidget(leftGroupBox,0,0,2,2)
+        fullLayout.addWidget(self.rightGroupBox,0,3,2,4)
+        self.setLayout(fullLayout)
+
+        self.setWindowTitle('SurfRCaT')
+        self.show()
+        ############################
+
+        # Connect widgets with signals #
+        self.backBut.clicked.connect(self.on_BackClick)
+        self.closeBut.clicked.connect(self.on_CloseClick)
+
+   def on_BackClick(self):
+       self.close()
+       self.w = rectify()
+       self.w.show()
+
+   def on_CloseClick(self):
+       self.close()
 
 
 
+        
+        
 ##=========## 
 ## Threads ##
 ##=========## 
@@ -1535,12 +1812,12 @@ class DownloadVidThread(QThread):
        camToInput = pickle.load(f)
        
        if self.year and self.month and self.day:
-           vidFile = SurfRCaT.getImagery_GetVideo(camToInput,year=self.year,month=self.month,day=self.day)
+           vidFile = SurfRCaT.getImagery_GetVideo(pth,camToInput,year=self.year,month=self.month,day=self.day)
        else:
-           vidFile = SurfRCaT.getImagery_GetVideo(camToInput)
+           vidFile = SurfRCaT.getImagery_GetVideo(pth,camToInput)
        
        # Deal with Buxton camera name change #
-       fs = os.path.getsize(vidFile) # Get size of video file #  
+       fs = os.path.getsize(pth+vidFile) # Get size of video file #  
        if camToInput == 'buxtoncoastalcam' and fs<1000:
            vidFile = SurfRCaT.getImagery_GetVideo('buxtonnorthcam')
        #######################################
@@ -1571,7 +1848,7 @@ class CheckPTZThread(QThread):
        vidFile = pickle.load(f)
        
        # Check if PTZ #       
-       fullVidPth = vidFile           
+       fullVidPth = pth+vidFile           
        viewDF,frameVec = SurfRCaT.getImagery_CheckPTZ(fullVidPth,self.numIters)
        
        with open(pth+'viewDF.pkl','wb') as f:
@@ -1692,6 +1969,7 @@ class getLidar_WebCATThread(QThread):
         f = open(pth+'CameraName.pkl','rb')
         name = pickle.load(f)
 
+        # Add the pre-defined applicable lidar ids for each WebCAT camera #
         if name == 'buxtoncoastalcam':
             IDs = [8688,6329,5184,4954,2488,1117,8609,1071,86,19,1397,6300,8,60,61,6,2,1]
         elif name == 'cherrypiersouthcam':
@@ -1703,9 +1981,9 @@ class getLidar_WebCATThread(QThread):
         elif name == 'staugustinecam':
             IDs = [6330,5185,5184,8698,1070,1119,34,37,100,19,8]
         elif name == 'twinpierscam':
-            IDs == [8793,5183,8603,529,44,37,19,22]
+            IDs = [8793,5183,8603,529,44,37,19,22]
         else:
-            IDs == [6330,8713,5185,5184,5038,8608,520,34,37,19,8]
+            IDs = [6330,8713,5185,5184,5038,8608,520,34,37,19,8]
 
         matchingTable = SurfRCaT.getLidar_GetDatasetNames(IDs)
 
@@ -1738,15 +2016,18 @@ class getLidar_PrepChosenSetThread(QThread):
         print('Thread Started')
                 
         f = open(pth+'chosenLidarID.pkl','rb')
+        f1 = open(pth+'az.pkl','rb')
         IDToDownload = pickle.load(f)
+        az = pickle.load(f1)
         sf = SurfRCaT.getLidar_GetShapefile(IDToDownload)
+        poly = SurfRCaT.getLidar_CalcViewArea(az,40,1000,self.cameraLoc_lat,self.cameraLoc_lon)
         
         tilesKeep = list()
         i = 0
         self.threadSignal.emit(0)
         for shapeNum in range(0,len(sf)):
 
-            out = SurfRCaT.getLidar_SearchTiles(sf,shapeNum,self.cameraLoc_lat,self.cameraLoc_lon)
+            out = SurfRCaT.getLidar_SearchTiles(sf,poly,shapeNum,self.cameraLoc_lat,self.cameraLoc_lon)
             if out:
                 tilesKeep.append(out)
 
@@ -1873,20 +2154,10 @@ class pptkWindowWorker(QThread):
         iGCPs2 = iGCPs1[1:len(iGCPs1)-2]
         
         iGCPs = list(map(int,iGCPs2.split(',')))
-##        iGCPs = list(map(int,iGCPs))
         
         GCPs_lidar = np.empty([0,3])
         for i in iGCPs:
             GCPs_lidar = np.vstack((GCPs_lidar,pc.iloc[i,:]))
-            
-##        GCPs_lidar = np.array(pc.iloc[iGCPs,:])
-
-##        GCPs_lidar = np.empty([0,3])
-##        for i in range(0,len(GCPs_lidar1)):
-##            if GCPs_lidar1[i,0] not in GCPs_lidar[:,0] or GCPs_lidar1[i,1] not in GCPs_lidar[:,1]:
-##                GCPs_lidar = np.vstack([GCPs_lidar,np.hstack([GCPs_lidar1[i,0],GCPs_lidar1[i,1],GCPs_lidar1[i,2]])])
-##        else:
-##            pass
         
         np.savetxt(pth+'GCPS_lidar.txt',GCPs_lidar)
 
@@ -1930,10 +2201,6 @@ class pickGCPs_Image(QThread):
                pass
            gcps_im2 = uVals  
                
-
-           
-##           uid = np.unique(gcps_im2,return_index=True,axis=0)
-##           gcps_im2 = gcps_im2[sorted(uid[1]),:]
             
            with open(pth+'GCPs_im.pkl','wb') as f:
                pickle.dump(gcps_im2,f)
@@ -1984,14 +2251,14 @@ class calibrate_CalibrateThread(QThread):
         # Get initial approximations for all remaining parameters #
         XL = 0 # We etablished this by creating the lidar point cloud relative to the camera's estimated location. #
         YL = 0
-        f,x0,y0 = SurfRCaT.calibrate_getInitialApprox_IOPs(img)
-        omega,phi,kappa = SurfRCaT.calibrate_getInitialApprox_ats2opk(az,80,180)
+        f,x0,y0 = SurfRCaT.calibrate_GetInitialApprox_IOPs(img)
+        omega,phi,kappa = SurfRCaT.calibrate_GetInitialApprox_ats2opk(az,80,180)
         initApprox = np.array([omega,phi,kappa,XL,YL,ZL,f,x0,y0])
         
         # Perform the calibration #
-        calibVals1,So1 = SurfRCaT.calibrate_performCalibration(initApprox,np.array([0,0,0,1,1,1,0,0,0]),gcps_im,gcps_lidar)
+        calibVals1,So1 = SurfRCaT.calibrate_PerformCalibration(initApprox,np.array([0,0,0,1,1,1,0,0,0]),gcps_im,gcps_lidar)
         updatedApprox = calibVals1
-        calibVals,So = SurfRCaT.calibrate_performCalibration(np.array([updatedApprox[0],updatedApprox[1],updatedApprox[2],initApprox[3],initApprox[4],initApprox[5],updatedApprox[6],updatedApprox[7],updatedApprox[8]]),np.array([1,1,1,0,0,0,1,1,1]),gcps_im,gcps_lidar)
+        calibVals,So = SurfRCaT.calibrate_PerformCalibration(np.array([updatedApprox[0],updatedApprox[1],updatedApprox[2],initApprox[3],initApprox[4],initApprox[5],updatedApprox[6],updatedApprox[7],updatedApprox[8]]),np.array([1,1,1,0,0,0,1,1,1]),gcps_im,gcps_lidar)
         
         with open(pth+'calibVals.pkl','wb') as f:
             pickle.dump(calibVals,f)
@@ -2008,6 +2275,60 @@ class calibrate_CalibrateThread(QThread):
         self.finishSignal.emit(1)    
 
         print('Thread Done')
+
+
+
+class performRectificationThread(QThread):
+    
+    '''
+    Worker thread to perform the rectification.
+    '''
+        
+    finishSignal = pyqtSignal('PyQt_PyObject')
+
+    def __init__(self,img,impth,xmin,xmax,dx,ymin,ymax,dy,z):
+        super().__init__()
+        self.img = img
+        self.impth = impth
+        self.xmin = xmin
+        self.xmax = xmax
+        self.dx = dx
+        self.ymin = ymin
+        self.ymax = ymax
+        self.dy = dy
+        self.z = z
+        
+    def run(self):
+
+        print('Thread Started')
+        
+        f = open(pth+'calibVals.pkl','rb')
+        calibVals = pickle.load(f)
+
+        im_rectif,extents = SurfRCaT.rectify_RectifyImage(calibVals,self.img,self.xmin,self.xmax,self.dx,self.ymin,self.ymax,self.dy,self.z)
+
+        # Save the parameters #  
+        with open(pth+'im_rectif.pkl','wb') as f:
+            pickle.dump(im_rectif,f)
+        with open(pth+'extents.pkl','wb') as f:
+            pickle.dump(extents,f)
+
+        # Save the rectified image #
+        imDir = os.path.dirname(self.impth)
+        imName = os.path.basename(self.impth).split('.')[0]
+        self.canvas = FigureCanvas(Figure())
+        self.ax = self.canvas.figure.subplots()
+        self.ax.imshow(im_rectif,extent=extents,interpolation='bilinear')
+        self.ax.set_xlabel('Local x (m)')
+        self.ax.set_ylabel('Local y (m)')
+        self.ax.axis('equal')
+        self.canvas.print_figure(imDir+'/'+imName+'_rectif.png')
+            
+        self.finishSignal.emit(1)    
+        
+        print('Thread Done')
+
+
 
        
 if __name__ == '__main__':

@@ -15,7 +15,7 @@ __version__ = '2.0'
 #============================================================================#
 # Get WebCAT video #
 #============================================================================#
-def getImagery_GetVideo(camToInput,year=2018,month=11,day=3,hour=1000):
+def getImagery_GetVideo(pth,camToInput,year=2019,month=11,day=1,hour=1000):
     
     """
     Function to download a video clip from a specified WebCAT camera to local directory. The desired year, month, day, and time can be given, 
@@ -53,7 +53,7 @@ def getImagery_GetVideo(camToInput,year=2018,month=11,day=3,hour=1000):
     # Read and load the video file from that URL using requests library
     filename = url.split('/')[-1] # Get the filename as everything after the last backslash #
     r = requests.get(url,stream = True) # Create the Response Object, which contains all of the information about the file and file location %
-    with open(filename,'wb') as f: # This loop does the downloading 
+    with open(pth+filename,'wb') as f: # This loop does the downloading 
         for chunk in r.iter_content(chunk_size = 1024*1024):
             if chunk:
                 f.write(chunk)
@@ -113,7 +113,7 @@ def getImagery_CheckPTZ(vidPth,numErosionIter):
         
         # Erode the image (morphological erosion) #
         kernel = np.ones((5,5),np.uint8)
-        imeroded = cv2.erode(image,kernel,iterations = numErosionIter)
+        imeroded = cv2.erode(image,kernel,iterations=numErosionIter)
 
         # Find edges using Canny Edge Detector #
         edges = cv2.Canny(imeroded,50,100)
@@ -205,7 +205,7 @@ def getImagery_CheckPTZ(vidPth,numErosionIter):
         return viewDF,frameVec
 
 
-def getImagery_SeperateViewsAndGetFrames(vidPth,viewDF):
+def getImagery_GetFrames(vidPth,viewDF):
     
     '''
     Function to put the frames from each view into a dataframe 
@@ -468,10 +468,6 @@ def getLidar_TryID(ftp,ID,cameraLoc_lat,cameraLoc_lon):
                 fileWant = '['+fileWant.split()[1]
             fileWant = fileWant[2:len(fileWant)-2]
 
-##            r = StringIO()
-##            ftp.retrlines('RETR '+fileWant,r.write)
-##            dat = r.getvalue()
-
 
             # Save the file locally #
             gfile = open('minmax.csv','wb') # Create the local file #
@@ -491,15 +487,6 @@ def getLidar_TryID(ftp,ID,cameraLoc_lat,cameraLoc_lon):
             check = list()
             if not test.empty:
                 check.append(1)
-            
-            
-
-##            tiles = list()
-##            with open('minmax.csv') as infile:
-##                next(infile)
-##                for line in infile:
-##                    if float(line.split()[1][0:7]) <= cameraLoc_lon <= float(line.split()[2][0:7]) and float(line.split()[3][0:7])<= cameraLoc_lat <= float(line.split()[4][0:7]):
-##                        tiles.append(line)
     
             return check
         
@@ -548,6 +535,45 @@ def getLidar_GetDatasetNames(appropID):
 #=============================================================================#
 # Prepare and download the chosen dataset
 #=============================================================================#
+def getLidar_CalcViewArea(az,window,dmax,lat,lon):
+    
+    from math import sin,cos,tan,sqrt,radians
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from matplotlib import path
+    import utm
+
+    # Convert lat lon to UTM #
+    camLoc_x = utm.from_latlon(lat,lon)[0]
+    camLoc_y = utm.from_latlon(lat,lon)[1]
+
+    # Calculate x and y distance to farthest point along azimuthal line #
+    # and lines at angles of az+-window #
+    dx0 = dmax*cos(radians(90-az))
+    dy0 = dmax*sin(radians(90-az))
+
+    dx1 = dmax*cos(radians(90-(az-window)))
+    dy1 = dmax*sin(radians(90-(az-window)))
+
+    dx2 = dmax*cos(radians(90-(az+window)))
+    dy2 = dmax*sin(radians(90-(az+window)))
+
+    # Calculate the verticies of the endpoints, defining the polygon #
+    xmax0 = camLoc_x+dx0
+    ymax0 = camLoc_y+dy0
+
+    xmax1 = camLoc_x+dx1
+    ymax1 = camLoc_y+dy1
+
+    xmax2 = camLoc_x+dx2
+    ymax2 = camLoc_y+dy2
+
+    # Create the polygon object #
+    poly = path.Path([(camLoc_x,camLoc_y),(xmax1,ymax1),(xmax0,ymax0),(xmax2,ymax2),(camLoc_x,camLoc_y)])
+
+    return poly   
+
+
 def getLidar_GetShapefile(IDToDownload):
     
     '''
@@ -568,7 +594,22 @@ def getLidar_GetShapefile(IDToDownload):
 
     ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
     ftp.login('anonymous','anonymous')
-    ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(IDToDownload))
+
+    try:
+        ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12b/data/'+str(IDToDownload))
+    except:
+        try:
+            ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(IDToDownload))
+        except:
+            try:
+                ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid12b/data/'+str(IDToDownload))
+            except:
+                try:
+                    ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12a/data/'+str(IDToDownload))
+                except:
+                    ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid18/data/'+str(IDToDownload))
+                    
+##    ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(IDToDownload))
     files = ftp.nlst()
 
 
@@ -595,7 +636,7 @@ def getLidar_GetShapefile(IDToDownload):
 
 
 
-def getLidar_SearchTiles(sf,shapeNum,cameraLoc_lat,cameraLoc_lon):
+def getLidar_SearchTiles(sf,poly,shapeNum,cameraLoc_lat,cameraLoc_lon):
 
     '''
     Function to determine the distance of each tile to the camera
@@ -625,37 +666,60 @@ def getLidar_SearchTiles(sf,shapeNum,cameraLoc_lat,cameraLoc_lon):
     bx_bl = utm.from_latlon(bx[1],bx[0]) 
     bx_br = utm.from_latlon(bx[1],bx[2]) 
     bx_tr = utm.from_latlon(bx[3],bx[2]) 
-    bx_tl = utm.from_latlon(bx[3],bx[0]) 
-    # Min distance between camera loc and horizontal lines connecting tile verticies #
-    line_minXbb = numpy.array([numpy.linspace(bx_bl[0],bx_br[0],num=1000),numpy.linspace(bx_bl[1],bx_br[1],num=1000)])
-    line_maxXbb = numpy.array([numpy.linspace(bx_tl[0],bx_tr[0],num=1000),numpy.linspace(bx_tl[1],bx_tr[1],num=1000)])
+    bx_tl = utm.from_latlon(bx[3],bx[0])
+##    # Calculate the midpoint of the tile #
+##    dx = bx_tr[0]-bx_bl[0]
+##    dy = bx_tr[1]-bx_bl[1]
+##    xmid = bx_bl[0]+(dx/2)
+##    ymid = bx_bl[1]+(dy/2)
     
-    # Distance from camera to midpoint of tile #
-    meanX = numpy.mean(numpy.array([line_minXbb[0,:],line_maxXbb[0,:]]))
-    meanY = numpy.mean(numpy.array([line_minXbb[1,:],line_maxXbb[1,:]]))
-    dist = math.sqrt((meanX-cameraLoc_UTMx)**2 + (meanY-cameraLoc_UTMy)**2)
-    
-    # Distance from camera to edges of tile #
-    distx = line_minXbb[0,:]-cameraLoc_UTMx
-    disty1 = line_minXbb[1,:]-cameraLoc_UTMy
-    disty2 = line_maxXbb[1,:]-cameraLoc_UTMy
-    disty = min(numpy.hstack([disty1,disty2]))
-
-    
-    dist1 = list()
-    dist2 = list()
-    for ixMin,iyMin,ixMax,iyMax in zip(line_minXbb[0,:],line_minXbb[1,:],line_maxXbb[0,:],line_maxXbb[1,:]):
-        dist1.append(math.sqrt((ixMin-cameraLoc_UTMx)**2 + (iyMin-cameraLoc_UTMy)**2))
-        dist2.append(math.sqrt((ixMax-cameraLoc_UTMx)**2 + (iyMax-cameraLoc_UTMy)**2))
-  
-    # If either distance is <350 m, keep the tile. This ensures close tiles are kept and the tile containing the camera is kept. #
+    # If any verticies are within the polygon, keep the tile #
     try:
         rec = sf.record(shapeNum)
-        if min(dist1)<800 or min(dist2)<800:
+        if poly.contains_points([(bx_bl[0],bx_bl[1])]) or poly.contains_points([(bx_br[0],bx_br[1])]) or poly.contains_points([(bx_tl[0],bx_tl[1])]) or poly.contains_points([(bx_tr[0],bx_tr[1])]):
             return rec['Name']
-        
     except:
         pass
+
+
+
+
+##    
+##    # Min distance between camera loc and horizontal lines connecting tile verticies #
+##    line_minXbb = numpy.array([numpy.linspace(bx_bl[0],bx_br[0],num=1000),numpy.linspace(bx_bl[1],bx_br[1],num=1000)])
+##    line_maxXbb = numpy.array([numpy.linspace(bx_tl[0],bx_tr[0],num=1000),numpy.linspace(bx_tl[1],bx_tr[1],num=1000)])
+##    
+##    # Distance from camera to midpoint of tile #
+##    meanX = numpy.mean(numpy.array([line_minXbb[0,:],line_maxXbb[0,:]]))
+##    meanY = numpy.mean(numpy.array([line_minXbb[1,:],line_maxXbb[1,:]]))
+##    dist = math.sqrt((meanX-cameraLoc_UTMx)**2 + (meanY-cameraLoc_UTMy)**2)
+##    
+##    # Distance from camera to edges of tile #
+##    distx = line_minXbb[0,:]-cameraLoc_UTMx
+##    disty1 = line_minXbb[1,:]-cameraLoc_UTMy
+##    disty2 = line_maxXbb[1,:]-cameraLoc_UTMy
+##    disty = min(numpy.hstack([disty1,disty2]))
+##
+##    
+##    dist1 = list()
+##    dist2 = list()
+##    xdist1 = list()
+##    xdist2 = list()
+##    for ixMin,iyMin,ixMax,iyMax in zip(line_minXbb[0,:],line_minXbb[1,:],line_maxXbb[0,:],line_maxXbb[1,:]):
+##        xdist1.append(ixMin-cameraLoc_UTMx)
+##        xdist2.append(ixMax-cameraLoc_UTMx)
+##        dist1.append(math.sqrt((ixMin-cameraLoc_UTMx)**2 + (iyMin-cameraLoc_UTMy)**2))
+##        dist2.append(math.sqrt((ixMax-cameraLoc_UTMx)**2 + (iyMax-cameraLoc_UTMy)**2))
+##  
+##    # If either distance is <350 m, keep the tile. This ensures close tiles are kept and the tile containing the camera is kept. #
+##    try:
+##        rec = sf.record(shapeNum)
+####        if min(dist1)<600 or min(dist2)<600:
+##        if min(xdist1)<1000 and min(dist1)<1000:
+##            return rec['Name']
+##        
+##    except:
+##        pass
 
 
 
@@ -683,7 +747,21 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
           
     ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
     ftp.login('anonymous','anonymous')
-    ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(IDToDownload))
+    
+    try:
+        ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12b/data/'+str(IDToDownload))
+    except:
+        try:
+            ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(IDToDownload))
+        except:
+            try:
+                ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid12b/data/'+str(IDToDownload))
+            except:
+                try:
+                    ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12a/data/'+str(IDToDownload))
+                except:
+                    ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid18/data/'+str(IDToDownload))
+ 
            
     # Save the laz file locally - would prefer not to do this, but can't seem to get the pipeline to download directly from the ftp??? #
     gfile = open('lazfile.laz','wb') # Create the local file #
@@ -722,7 +800,7 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
     lidarYsmall = list()
     lidarZsmall = list()    
     for xi,yi,zi,di in zip(lidarX,lidarY,lidarZ,dist):
-        if di<350:
+        if di<1000:
             lidarXsmall.append(xi)
             lidarYsmall.append(yi)
             lidarZsmall.append(zi)
@@ -758,25 +836,8 @@ def getLidar_CreatePC(lidarDat,cameraLoc_lat,cameraLoc_lon):
     # Convert eveything to UTM and translate to camera at (0,0) #
     utmCoords = utm.from_latlon(np.array(pc['y']),np.array(pc['x']))
     utmCoords = np.hstack([np.reshape(utmCoords[0],[np.size(utmCoords[0]),1]),np.reshape(utmCoords[1],[np.size(utmCoords[1]),1])])
-
-    
-##    utmCoordsX = list()
-##    utmCoordsY = list()
-##    for ix,iy in zip(pc['x'],pc['y']):
-##        utmCoords1 = utm.from_latlon(iy,ix)
-##        utmCoordsX.append( utmCoords1[0] )
-##        utmCoordsY.append( utmCoords1[1] )
-##    utmCoords = np.array([utmCoordsX,utmCoordsY])
         
     utmCam = utm.from_latlon(cameraLoc_lat,cameraLoc_lon)
-        
-##    # Translate to camera position #
-##    utmCoords[0,:] = utmCoords[0,:]-utmCam[0]
-##    utmCoords[1,:] = utmCoords[1,:]-utmCam[1]
-   
-##    # Put these new coordinates into the point cloud %
-##    pc['x'] = numpy.transpose(utmCoords[0,:])
-##    pc['y'] = numpy.transpose(utmCoords[1,:])
 
     # Translate to camera position #
     utmCoords[:,0] = utmCoords[:,0]-utmCam[0]
@@ -793,7 +854,7 @@ def getLidar_CreatePC(lidarDat,cameraLoc_lat,cameraLoc_lon):
 #=============================================================================#
 # Perform Calibration #
 #=============================================================================#
-def calibrate_getInitialApprox_IOPs(img):
+def calibrate_GetInitialApprox_IOPs(img):
     '''
     Get initial approximatation for camera IOPs (focal length (f) and principal points (x0,y0)) using the geometry of the image.
     - Estimate focal length by assuming a horizontal field of view of 60 degrees (typical of webcams), and using simple geometry with this and the width of the image.
@@ -812,7 +873,7 @@ def calibrate_getInitialApprox_IOPs(img):
 
 
 
-def calibrate_getInitialApprox_ats2opk(a,t,s):
+def calibrate_GetInitialApprox_ats2opk(a,t,s):
     '''
     Get initial approximations for the three needed camera look-angles by using easily estimated azimuth, tilt, and swing. 
     Form the ats rotation matrix and decompose it to omega,phi,kappa angles.
@@ -843,7 +904,7 @@ def calibrate_getInitialApprox_ats2opk(a,t,s):
 
 
     
-def calibrate_performCalibration(initApprox,freeVec,gcps_im,gcps_lidar):
+def calibrate_PerformCalibration(initApprox,freeVec,gcps_im,gcps_lidar):
         '''
         Perform the augmented space resection using the initial approximations for all parameters
         input to this function.
@@ -1042,6 +1103,78 @@ def calibrate_CalcReprojPos(gcps_lidar,calibVals):
         v = np.vstack([v,v1])
         
     return u,v
+
+#=============================================================================#
+# Perform Rectification #
+#=============================================================================#
+def rectify_RectifyImage(calibVals,img,xmin,xmax,dx,ymin,ymax,dy,z):
+    
+    import math
+    import numpy as np
+    from scipy.interpolate import interp2d,griddata
+    
+    # Define the calib params #
+    omega = calibVals[0]
+    phi = calibVals[1]
+    kappa = calibVals[2]
+    XL = calibVals[3]
+    YL = calibVals[4]
+    ZL = calibVals[5]
+    f = calibVals[6]
+    x0 = calibVals[7]
+    y0 = calibVals[8]
+    
+    # Set up the rotation matrix #
+    m11 = math.cos(phi)*math.cos(kappa)
+    m12 = (math.sin(omega)*math.sin(phi)*math.cos(kappa)) + (math.cos(omega)*math.sin(kappa))
+    m13 = (-math.cos(omega)*math.sin(phi)*math.cos(kappa)) + (math.sin(omega)*math.sin(kappa))
+    m21 = -math.cos(phi)*math.sin(kappa)
+    m22 = (-math.sin(omega)*math.sin(phi)*math.sin(kappa)) + (math.cos(omega)*math.cos(kappa))
+    m23 = (math.cos(omega)*math.sin(phi)*math.sin(kappa)) + (math.sin(omega)*math.cos(kappa))
+    m31 = math.sin(phi)
+    m32 = -math.sin(omega)*math.cos(phi)
+    m33 = math.cos(omega)*math.cos(phi)
+    
+    # Set up object-space grid #
+    xg = np.arange(xmin,xmax,dx)
+    yg = np.arange(ymin,ymax,dy)
+    xgrd,ygrd = np.meshgrid(xg,yg)
+    zgrd = np.zeros([len(xgrd[:,1]),len(xgrd[1,:])])+z
+    extents = np.array([(-.5*dx)+min(xg),max(xg)+(.5*dx),min(yg)-(.5*dy),max(yg)+(.5*dy)])
+
+    # Get image coordinates of each desired world coordinate based on calib vals #
+    x = x0 - (f*(((m11*(xgrd-XL)) + (m12*(ygrd-YL)) + (m13*(zgrd-ZL))) / ((m31*(xgrd-XL)) + (m32*(ygrd-YL)) + (m33*(zgrd-ZL)))))
+    y = y0 - (f*(((m21*(xgrd-XL)) + (m22*(ygrd-YL)) + (m23*(zgrd-ZL))) / ((m31*(xgrd-XL)) + (m32*(ygrd-YL)) + (m33*(zgrd-ZL)))))
+
+    # Create grid for the photo coordinates #
+    u = np.arange(len(img[0,:,1]))
+    v = np.arange(len(img[:,0,1]))
+    ug,vg = np.meshgrid(u,v)
+
+    # Interpolate xy (image coordinates) of world points to photo coordinates to get color #
+    uInterp = np.reshape(ug,[np.size(ug)])
+    vInterp = np.reshape(vg,[np.size(vg)])
+    rInterp = np.reshape(img[:,:,0],[np.size(img[:,:,0])])
+    gInterp = np.reshape(img[:,:,1],[np.size(img[:,:,1])])
+    bInterp = np.reshape(img[:,:,2],[np.size(img[:,:,2])])
+    xInterp = np.reshape(x,[np.size(x)])
+    yInterp = np.reshape(y,[np.size(y)])
+
+    col_r = griddata((uInterp,vInterp),rInterp,(xInterp,yInterp))
+    col_g = griddata((uInterp,vInterp),gInterp,(xInterp,yInterp))
+    col_b = griddata((uInterp,vInterp),bInterp,(xInterp,yInterp))
+    
+    col_r = np.reshape(col_r,[len(x[:,0]),len(x[0,:])])
+    col_g = np.reshape(col_g,[len(x[:,0]),len(x[0,:])])
+    col_b = np.reshape(col_b,[len(x[:,0]),len(x[0,:])])
+
+    # Create the rectified image #
+    im_rectif = np.stack([col_r,col_g,col_b],axis=2)
+    im_rectif = np.flipud(im_rectif)
+    
+    return im_rectif,extents
+
+
 
 
 '''
