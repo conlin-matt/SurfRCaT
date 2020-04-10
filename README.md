@@ -66,6 +66,7 @@ Below is a step-by-step example to get you more familiar with using SurfRCaT aft
 
 11) Press "Continue" to move on.
 12) The Rectification Module window will now appear. To rectify the image you used to calibrate the camera, enter the path to the saved image, which is 'installDirectory/frameUse.png'. Enter the following for the object space grid: xmin = 0, xmax = 100, dx = .2, ymin = -120, ymax = -70, dy = .2, z = 0. Press Continue, and you should get a rectified image similar to the image shown below.
+
 ![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/Example_Rectif.png)
 
 ## Issues ##
