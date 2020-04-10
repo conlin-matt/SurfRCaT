@@ -51,7 +51,7 @@ Below is a step-by-step example to get you more familiar with using SurfRCaT aft
 1) Invoke the tool, either as the app or from source (see above).
 2) Choose the "Select WebCAT camera from list" option.
 3) Select the "Folly Beach Pier (south) camera and press "Continue". The video should download followed by the seperation of unique views.
-4) A window showing images from this camera's two views should appear (see below). Select the view from the dropdown list corresponding to the image showing the pier: view one (left image) or view two (right image). 
+4) A window showing images from this camera's view should appear (just one). Select 'View 1' from the dropdown list.
 5) A table showing lidar datasets that cover this area will appear. Click the box next to the first listed dataset (ID: 5184) and press "Continue." 3 processes should now occur in the following order: tile sorting, data downloading, and point cloud generation. These three processes will take some time (depending on machine) to complete. Progress bars should show the status of the first two (though not continuously for the second). Press "Continue" when the processes complete.
 6) You have now entered the GCP-picking module, the heart of SurfRCaT. First, watch [this](https://www.dropbox.com/s/jiogwhe14z5g9i4/GCPPicking_Trim.mp4?dl=0) video showing how to identify GCPs.
 7) Now, try it yourself. Press "Go" to begin remote-GCP extraction. When the lidar point cloud opens (it can take up to 2 minutes to do so), zoom out slightly with the mouse scroll wheel. Then, rotate the view counter-clockwise by clicking and holding and moving the mouse until you can see the pier. Select the four points on the pier (in this order) shown in the image below. To select a point: hold control, click on the point, release control, wait 2 seconds, and then right click anywhere in the viewer. When done, close the lidar viewer window by x-ing out of it. 
@@ -64,6 +64,9 @@ Below is a step-by-step example to get you more familiar with using SurfRCaT aft
 10) The Calibration Module window will now appear. Press "CALIBRATE" to perform the calibration. You should get results resembling those shown below. Note the RMS of control point residuals: 2.1 pixels. 
 ![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/Example_Results.png)
 
+11) Press "Continue" to move on.
+12) The Rectification Module window will now appear. To rectify the image you used to calibrate the camera, enter the path to the saved image, which is 'installDirectory/frameUse.png'. Enter the following for the object space grid: xmin = 0, xmax = 100, dx = .2, ymin = -120, ymax = -70, dy = .2, z = 0. Press Continue, and you should get a rectified image similar to the image shown below.
+![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/Example_Rectif.png)
 
 ## Issues ##
 Please report all issues to the Issues page in this repo. 
