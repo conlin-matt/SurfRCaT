@@ -4,15 +4,20 @@ Create and run the user interface of the Surfcamera Remote
 Calibration Tool. Most of the science behind the tool is contained within the
 functions in the SurfRCaT.py file. The UI is created with PyQt.
 
+The UI is run as a series of windows, each of which is its own class. All calls to
+SurfRCaT.py are completed with stand alone threads. Each thread is also its own class,
+and all are defined after the window classes. 
+
 Created by Matthew P. Conlin, University of Florida
 
 """
 
-__copyright__ = 'Copyright (c) 2019, Matthew P. Conlin'
+__copyright__ = 'Copyright (c) 2020, Matthew P. Conlin'
 __license__ = 'GPL-3.0'
-__version__ = '2.0'
+__version__ = '1.0'
 
 
+# Import packages #
 import pptk
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
 from PyQt5.QtWidgets import *
@@ -32,8 +37,10 @@ import ftplib
 import csv
 
 
+# Establish and format the local installation directory. All outputs will be saved to this directory #
 pth = os.path.dirname(os.path.realpath(__file__))
 pth = os.path.join(str(pth),'')
+
 
 class WelcomeWindow(QWidget):
     ''' 
@@ -86,13 +93,6 @@ class WelcomeWindow(QWidget):
         rectifBut = QPushButton('Rectify >')
         
         rightGroupBox = QGroupBox()
-##        grd = QGridLayout()
-##        grd.addWidget(txt,0,0,1,4)
-##        grd.addWidget(txt2,1,0,1,4)
-##        grd.addWidget(txt3,2,0,1,4)
-##        grd.addWidget(rectifBut,3,0,1,2)
-##        grd.addWidget(contBut,3,2,1,2)
-##        rightGroupBox.setLayout(grd)
         
         hBox1 = QHBoxLayout()
         hBox1.addWidget(txt3)
@@ -133,7 +133,7 @@ class WelcomeWindow(QWidget):
        
     def jumpToRectify(self):
         self.close()
-        self.w = rectify()
+        self.w = rectify_InputsWindow()
         self.w.show()
 
 
@@ -221,7 +221,7 @@ class ChooseCameraWindow(QWidget):
 
 
 ##============================================================================## 
-# Get Imagery Module: Get the image you want to use for the calibration #
+# Get Imagery Module: Get the image to be used for the calibration #
 ##============================================================================##
 class getWebCATImagery_WebCATLocationWindow(QWidget):
     '''
@@ -546,6 +546,9 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
        self.worker.start()
 
     def on_closeSignal(self):
+        '''
+        Moves to next window.
+        '''
 
         f = open(pth+'lidarTable.pkl','rb')
         lidarTable = pickle.load(f)
@@ -569,6 +572,7 @@ class getWebCATImagery_ChooseNewDateWindow(QWidget):
     '''
     Window allowing the user to input desired date for WebCAT imagery, if defaults were not good
     '''
+    
     def __init__(self):
         super().__init__()    
         
@@ -644,6 +648,10 @@ class getWebCATImagery_ChooseNewDateWindow(QWidget):
        
        
     def getInputs(self):
+       '''
+       Gets all the user inputs.
+       '''
+       
        yr = int(self.bxYear.text())
        mo = int(self.bxMonth.text())
        day = int(self.bxDay.text())
@@ -802,6 +810,10 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
        ############################
        
     def onAzHelpClick(self):
+       '''
+       Display help box for azimuth.
+       '''
+       
        msg = QMessageBox(self)
        msg.setIcon(msg.Question)
        msg.setText('The azimuth angle is the right-handed angle that the camera is facing with respect to due north. A camera looking directly north has an azimuth angle of 0' + u'\N{DEGREE SIGN}'+', one looking east an azimuth of 90'+u'\N{DEGREE SIGN}'+', one south an azimuth of 180'+u'\N{DEGREE SIGN}'+', and one west an azimuth of 270'+u'\N{DEGREE SIGN}'+'.')
@@ -849,7 +861,11 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
 # Get lidar module #
 ##============================================================================##
 
-class getLidar_FindUseableDatasetsWindow(QWidget):    
+class getLidar_FindUseableDatasetsWindow(QWidget):
+     '''
+     Window showing progress of search through NOAA lidar repositories for potentially usable datasets
+     '''
+     
      def __init__(self):
         super().__init__()    
         
@@ -936,6 +952,7 @@ class getLidar_FindUseableDatasetsWindow(QWidget):
        ##############################
 
      def on_closeSignal1(self):
+         
          self.loadlab.setParent(None)
          self.loadmovie.stop()
          
@@ -1007,6 +1024,11 @@ class getLidar_FindUseableDatasetsWindow(QWidget):
 
 
 class getLidar_ChooseLidarSetWindow(QWidget):
+    '''
+    Window showing a table of datasets that cover the location of the camera, allowing
+    the user to choose their desired dataset.
+    '''
+    
     def __init__(self, data, rows, columns):
         QWidget.__init__(self)
         
@@ -1097,13 +1119,21 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         ##############################
         
     def dataChoice(self,item):
+        '''
+        Save user's choice of dataset.
+        '''
+        
         print(str(item.text())) 
         
         num = int(item.text())
         with open(pth+'chosenLidarID.pkl','wb') as f:
             pickle.dump(num,f)
     
-    def downloadCorrectData(self):   
+    def downloadCorrectData(self):
+        '''
+        Begin the download of the chosen dataset.
+        '''
+        
         lab1 = QLabel('Sorting tiles:')
         self.pb1 = QProgressBar()
         
@@ -1124,6 +1154,10 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         self.pb1.setValue(perDone*100)
         
     def on_closeSignal(self):
+        '''
+        Move to next task when tiles are sorted.
+        '''
+        
         lab2 = QLabel('Downloading lidar data near camera:')
         self.pb2 = QProgressBar()
         
@@ -1137,6 +1171,10 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         self.pb2.setValue(perDone*100)
         
     def on_closeSignal2(self):
+        '''
+        Move to next task when lidar is downloaded.
+        '''
+        
         f = open(pth+'lidarDat.pkl','rb')
         ld = pickle.load(f)
         if len(ld>0):
@@ -1162,6 +1200,10 @@ class getLidar_ChooseLidarSetWindow(QWidget):
             msg.buttonClicked.connect(self.chooseOtherSet)
             
     def chooseOtherSet(self):
+        '''
+        Allow the user to re-choose a dataset.
+        '''
+        
         self.close()
         
         f = open(pth+'lidarTable.pkl','rb')
@@ -1172,6 +1214,9 @@ class getLidar_ChooseLidarSetWindow(QWidget):
          
         
     def on_closeSignal3(self):
+        '''
+        Finish when point cloud is created.
+        '''
         
         self.loadlab.setParent(None)
         labDone = QLabel('Done')
@@ -1189,6 +1234,10 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         backBut2.clicked.connect(self.GoBack)
         
     def moveToNext(self):
+        '''
+        Move to next window.
+        '''
+        
         self.close()
         self.nextWindow = PickGCPsWindow()        
         
@@ -1197,7 +1246,15 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         self.backToOne = ChooseCameraWindow()
         
 
+##============================================================================##
+# Pick GCPs module #
+##============================================================================##
+
 class PickGCPsWindow(QWidget):
+   '''
+   Window introducing the PickGCPs module and allowing the user to perform the GCP picking.
+   '''
+   
    def __init__(self):
         super().__init__()    
         
@@ -1241,7 +1298,7 @@ class PickGCPsWindow(QWidget):
         self.ax.imshow(img)
         self.canvas.draw()
             
-        self.introLab = QLabel('Welcome to the GCP picking module! Here, you will be guided through the process of co-locating points in the image and the lidar observations. You must identify the correspondence of at least 4 unique points for the calibration to work.')
+        self.introLab = QLabel('Welcome to the GCP picking module! Here, you will be guided through the process of co-locating points in the image and the lidar observations. You must identify the correspondence of at least 3 unique points for the calibration to work.')
         self.introLab.setWordWrap(True)
         self.goLab = QLabel('Ready to co-locate points?')
         self.goBut = QPushButton('Go')
@@ -1279,6 +1336,9 @@ class PickGCPsWindow(QWidget):
 
        
    def getPoints1(self):
+       '''
+       Start the lidar picking process.
+       '''
 
        # Launch the lidar PC #
        self.worker.start()
@@ -1298,9 +1358,11 @@ class PickGCPsWindow(QWidget):
        self.grd.addWidget(self.helpBut,7,0,1,1)
 
 
-
                           
    def on_CloseSignal(self):
+       '''
+       Start the image picking process.
+       '''
 
        self.dirLab.setParent(None)
 
@@ -1315,19 +1377,24 @@ class PickGCPsWindow(QWidget):
 
        # Launch the image GCP picking process #
        self.worker2.start()
-
-     
+ 
               
    def onHelpClick(self):
+       '''
+       Show help if needed.
+       '''
+       
        msg = QMessageBox(self)
        msg.setIcon(msg.Question)
        msg.setText('The lidar point cloud has been opened in a seperate window. The viewer can be navigated by clicking and dragging (to rotate view) as well as zooming in/out. Try to rotate/zoom the view until it looks as similar to the image as you can. To select a point, first right click anywhere in the viewer. Then, hold Control (Windows) or Command (Mac) and left click on the point to select it. Then return to this program to continue. IMPORTANT: You must right click in the viewer before selecting each new point in the lidar data.')
        msg.setStandardButtons(msg.Ok)
        msg.show()
        
-
                
    def on_DoneClick(self):
+       '''
+       Save the GCPs and display them to the user.
+       '''
        
        self.dirLab2.setParent(None)
        self.doneBut.setParent(None)
@@ -1351,21 +1418,35 @@ class PickGCPsWindow(QWidget):
        
 
    def Retry(self):
+       '''
+       Go back to the start of the GCP picking module if the user wants to try again.
+       '''
+       
+       global gcps_im
+       gcps_im = []
        self.close()
        self.a = PickGCPsWindow()
        self.a.show()
        
    def GotoCalibration(self):
+       '''
+       Go to the calibration module
+       '''
+       
        self.close()
        self.calibrateWindow = calibrate_Welcome()
        self.calibrateWindow.show()
 
 
 
-##===================================================##
+##=========================================================================##
 # Calibration module #
-##===================================================##
+##=========================================================================##
 class calibrate_Welcome(QWidget):
+   '''
+   Window welcoming the user to the calibration module and letting them begin with a click
+   '''
+   
    def __init__(self):
         super().__init__()    
         
@@ -1436,11 +1517,17 @@ class calibrate_Welcome(QWidget):
 
     
    def onCalibClick(self):
+        '''
+        Begin the calibration process on the button click.
+        '''
        
         self.worker.start()
         self.worker.finishSignal.connect(self.on_closeSignal)  
       
    def on_closeSignal(self):
+        '''
+        Move to the next window.
+        '''
        
         self.close()
         self.finalWindow = calibrate_ShowCalibResultsWindow()
@@ -1449,6 +1536,10 @@ class calibrate_Welcome(QWidget):
       
 
 class calibrate_ShowCalibResultsWindow(QWidget):
+   '''
+   Window showing the reprojected positions of the GCPs on the image based on the resolved calibration parameters.
+   '''
+   
    def __init__(self):
         super().__init__()    
         
@@ -1549,20 +1640,32 @@ class calibrate_ShowCalibResultsWindow(QWidget):
         ############################
 
    def onRetryClick(self):
+       '''
+       Let the user retry the picking on a button click.
+       '''
+       
        self.close()
        self.w = PickGCPsWindow()
        self.w.show()
         
    def onContClick(self):
+       '''
+       Move to the next window.
+       '''
+       
        self.close()
-       self.w = rectify()
+       self.w = rectify_InputsWindow()
        self.w.show()
         
 
-##===================================================##
+
+##=========================================================================##
 # Rectification module #
-##===================================================##
-class rectify(QWidget):
+##=========================================================================##
+class rectify_InputsWindow(QWidget):
+   '''
+   Window allowing the user to input the image and object-space grid onto which to rectify the image.
+   '''
    def __init__(self):
         super().__init__()    
         
@@ -1570,7 +1673,7 @@ class rectify(QWidget):
             app = QApplication(sys.argv)
         else:
             app = QApplication.instance()             
-                 
+        
         # Left menu box setup #
         bf = QFont()
         bf.setBold(True)
@@ -1597,9 +1700,11 @@ class rectify(QWidget):
         # Right contents box setup #
         introLab = QLabel('Welcome to the rectification module. Here you can produce a rectified image from your camera using the previously-obtained calibration parameters. You can input any image from the camera, so long as it is an image of the same area as the image used in the calibration.')
         introLab.setWordWrap(True)
-        dirLab1 = QLabel('Please provide the full path and filename of the image you wish to rectify')
+        dirLab1 = QLabel('Please provide the full path and filename of the image you wish to rectify:')
         dirLab1.setWordWrap(True)
-        dirLab2 = QLabel('Please provide an object-space grid to rectify the image onto (cordinates are meters from input camera location)')
+        dirLab11 = QLabel('Or')
+        self.UseCalibIm = QRadioButton('Use calibration image')
+        dirLab2 = QLabel('Please provide an object-space grid to rectify the image onto (cordinates are meters from input camera location):')
         dirLab2.setWordWrap(True)
         imagePthLab = QLabel('Image path:')
         self.imagePthBx = QLineEdit()
@@ -1630,6 +1735,8 @@ class rectify(QWidget):
         self.grd1.addWidget(dirLab1,0,0,1,6)
         self.grd1.addWidget(imagePthLab,1,0,1,2)
         self.grd1.addWidget(self.imagePthBx,1,2,1,4)
+        self.grd1.addWidget(dirLab11,2,0,1,2)
+        self.grd1.addWidget(self.UseCalibIm,3,0,1,4)
         self.rightGroupBox1.setLayout(self.grd1)
 
         self.grd2.addWidget(dirLab2,0,0,1,6)
@@ -1666,6 +1773,9 @@ class rectify(QWidget):
         ############################
 
    def onContClick(self):
+        '''
+        Get all user inputs on button click.
+        '''
 
         # Acquire all the inputs #
         xmin = float(self.xminBx.text())
@@ -1677,7 +1787,11 @@ class rectify(QWidget):
         z = float(self.zBx.text())
         print(ymin)
 
-        impth = self.imagePthBx.text()
+        if self.UseCalibIm.isChecked():
+            impth = pth+'frameUse.png'
+        else:
+            impth = self.imagePthBx.text()
+            
         img = mpimg.imread(impth)
         print(impth)
 
@@ -1697,12 +1811,20 @@ class rectify(QWidget):
         self.worker.finishSignal.connect(self.on_closeSignal) 
 
    def on_closeSignal(self):
+        '''
+        Move to next window.
+        '''
+        
         self.close()
-        self.w = rectify_ShowRectif()
+        self.w = rectify_ShowResultsWindow()
         self.w.show()
 
 
-class rectify_ShowRectif(QWidget):
+class rectify_ShowResultsWindow(QWidget):
+   '''
+   Window showing the user the rectified image product.
+   '''
+   
    def __init__(self):
         super().__init__()    
         
@@ -1777,11 +1899,19 @@ class rectify_ShowRectif(QWidget):
         self.closeBut.clicked.connect(self.on_CloseClick)
 
    def on_BackClick(self):
+       '''
+       Go back to rectification inputs on button click (to do another image perhaps)
+       '''
+       
        self.close()
-       self.w = rectify()
+       self.w = rectify_InputsWindow()
        self.w.show()
 
    def on_CloseClick(self):
+       '''
+       Close the tool on button click.
+       '''
+       
        self.close()
 
 
@@ -1832,7 +1962,7 @@ class DownloadVidThread(QThread):
       
 class CheckPTZThread(QThread):
     ''' 
-    Worker thread to check if camera is a PTZ camera. Uses the CheckPTZ function from RECALL.
+    Worker thread to check if camera is a PTZ camera.
     '''
     finishSignal = pyqtSignal('PyQt_PyObject')
 
@@ -1890,7 +2020,7 @@ class getLidar_FindCloseDatasetIDsThread(QThread):
 class getLidar_FindCoveringDatasetsThread(QThread):
     
     '''
-    Worker thread to find lidar datasets the cover the camera location
+    Worker thread to find lidar datasets the cover the camera location.
     '''
     
     threadSignal = pyqtSignal('PyQt_PyObject')
@@ -1951,7 +2081,7 @@ class getLidar_FindCoveringDatasetsThread(QThread):
 class getLidar_WebCATThread(QThread):
     
     '''
-    Worker thread to get the names of the lidar datasets applicable to WebCAT cameras.
+    Worker thread to get the names of the lidar datasets applicable to WebCAT cameras (pre-loaded).
     '''
     
     threadSignal = pyqtSignal('PyQt_PyObject')
@@ -2141,11 +2271,21 @@ class pptkWindowWorker(QThread):
         f = open(pth+'lidarPC.pkl','rb')
         pc = pickle.load(f)
 
+        # Delete any pre-existing GCP files if they exist #
+        try:
+            os.remove(pth+'GCPs_lidar.txt')
+            os.remove(pth+'GCPs_lidar.pkl')
+            os.remove(pth+'GCPs_im.txt')
+            os.remove(pth+'GCPs_im.pkl')
+        except OSError:
+            pass
+
         # Call the viewer and let the user identify points (subprocess saves the output to file #
         command = 'cmd.exe /C '+pth+'LaunchPPTKwin\LaunchPPTKwin.exe'
         print(command)
         self.child = QProcess()
         self.child.start(command)
+        self.child.waitForStarted(-1)
         self.child.waitForFinished(-1)
 
         # Load the output and create the GCPs from it #
@@ -2254,7 +2394,7 @@ class calibrate_CalibrateThread(QThread):
         f,x0,y0 = SurfRCaT.calibrate_GetInitialApprox_IOPs(img)
         omega,phi,kappa = SurfRCaT.calibrate_GetInitialApprox_ats2opk(az,80,180)
         initApprox = np.array([omega,phi,kappa,XL,YL,ZL,f,x0,y0])
-        
+
         # Perform the calibration #
         calibVals1,So1 = SurfRCaT.calibrate_PerformCalibration(initApprox,np.array([0,0,0,1,1,1,0,0,0]),gcps_im,gcps_lidar)
         updatedApprox = calibVals1
@@ -2263,14 +2403,13 @@ class calibrate_CalibrateThread(QThread):
         with open(pth+'calibVals.pkl','wb') as f:
             pickle.dump(calibVals,f)
             
-        ar1 = np.array(['Omega(rad)','Phi(rad)','Kappa(rad)','CamX(m)','CamY(m)','CamZ(m)','x0(pix)','y0(pix)','f(pix)'])
-        ar2 = np.array([calibVals[0],calibVals[1],calibVals[2],calibVals[3],calibVals[4],calibVals[5],calibVals[6],calibVals[7],calibVals[8]])
-        with open(pth+'calibVals2.txt','w') as f:
-            writer = csv.writer(f,delimiter=',')
-            writer.writerows(zip(ar1,ar2))
+##        ar1 = np.array(['Omega(rad)','Phi(rad)','Kappa(rad)','CamX(m)','CamY(m)','CamZ(m)','x0(pix)','y0(pix)','f(pix)'])
+##        ar2 = np.array([calibVals[0],calibVals[1],calibVals[2],calibVals[3],calibVals[4],calibVals[5],calibVals[6],calibVals[7],calibVals[8]])
+##        with open(pth+'calibVals2.txt','w') as f:
+##            writer = csv.writer(f,delimiter=',')
+##            writer.writerows(zip(ar1,ar2))
             
-        np.savetxt(pth+'calibVals.txt',calibVals,fmt='%6f')
-            
+        np.savetxt(pth+'calibVals.txt',calibVals,fmt='%6f')            
       
         self.finishSignal.emit(1)    
 
@@ -2304,6 +2443,7 @@ class performRectificationThread(QThread):
         
         f = open(pth+'calibVals.pkl','rb')
         calibVals = pickle.load(f)
+        print(calibVals)
 
         im_rectif,extents = SurfRCaT.rectify_RectifyImage(calibVals,self.img,self.xmin,self.xmax,self.dx,self.ymin,self.ymax,self.dy,self.z)
 
@@ -2330,10 +2470,10 @@ class performRectificationThread(QThread):
 
 
 
-       
+# Launch the tool #       
 if __name__ == '__main__':
     appctxt = ApplicationContext()       # 1. Instantiate ApplicationContext
-    w = WelcomeWindow()
+    w = rectify_InputsWindow()
     exit_code = appctxt.app.exec_()      # 2. Invoke appctxt.app.exec_()
     sys.exit(exit_code)
 

@@ -7,9 +7,9 @@ Created by Matthew P. Conlin, University of Florida
 
 """
 
-__copyright__ = 'Copyright (c) 2019, Matthew P. Conlin'
+__copyright__ = 'Copyright (c) 2020, Matthew P. Conlin'
 __license__ = 'GPL-3.0'
-__version__ = '2.0'
+__version__ = '1.0'
 
 
 #============================================================================#
@@ -23,6 +23,7 @@ def getImagery_GetVideo(pth,camToInput,year=2019,month=11,day=1,hour=1000):
     clips on the website can help determine the desired date/time to use. 
     
     Inputs:
+        pth: (string) File location to save file to
         camToInput: (string) name of WebCAT camera you want imagery for
         year: (int) year of date you want video for
         month: (int) month of date you want video for
@@ -30,7 +31,7 @@ def getImagery_GetVideo(pth,camToInput,year=2019,month=11,day=1,hour=1000):
         hour: (int) hour of date you want video for
         
     Outputs:
-        vidFile: path to downloaded video file 
+        vidFile: (string) path to downloaded video file 
     
     """
     
@@ -47,10 +48,10 @@ def getImagery_GetVideo(pth,camToInput,year=2019,month=11,day=1,hour=1000):
     else:
         day = str(day)
        
-    # Get the video # 
+    # Get the video URL # 
     url = 'http://webcat-video.axds.co/{}/raw/{}/{}_{}/{}_{}_{}/{}.{}-{}-{}_{}.mp4'.format(camToInput,year,year,month,year,month,day,camToInput,year,month,day,hour)   
     
-    # Read and load the video file from that URL using requests library
+    # Read and load the video file from that URL #
     filename = url.split('/')[-1] # Get the filename as everything after the last backslash #
     r = requests.get(url,stream = True) # Create the Response Object, which contains all of the information about the file and file location %
     with open(pth+filename,'wb') as f: # This loop does the downloading 
@@ -77,7 +78,7 @@ def getImagery_CheckPTZ(vidPth,numErosionIter):
     from a series of video snaps and compares the angle of the line, utilizing the assumption that
     unique view-points will contain uniquly angled lines. Canny edge detection followed by a Hough
     Transform are used to find the longest line in each image. Function returns a data frame containing 
-    indicies of snaps at each view. Companion function SeperateViewsAndGetFrames seperates the frames.
+    indicies of snaps at each view. Companion function getImagery_GetFrames seperates the frames.
     The method definitely isn't perfect, but it typically does a good enough job to distinguish
     between unique views if the horizon is visible.
     
@@ -88,8 +89,8 @@ def getImagery_CheckPTZ(vidPth,numErosionIter):
                         performed. 2 typically gives good results.
     
     Outputs:
-        viewDF: Data frame containing indicies of snaps at each view-point
-        frameVec: 1d array (vector) containing all the frame numbers.
+        viewDF: (DataFrame)Data frame containing indicies of snaps at each view-point
+        frameVec: (array) 1d array (vector) containing all the frame numbers.
         
     """
     
@@ -139,7 +140,7 @@ def getImagery_CheckPTZ(vidPth,numErosionIter):
             frameNum = np.append(frameNum,count)
         
     
-    # Round angles to remove small fluctuations, and take abs #
+    # Round angles to remove small fluctuations, and take abs val #
     psis = np.round(abs(psis),3)
 
     # Find the frames where calculated angle changes #
@@ -212,10 +213,10 @@ def getImagery_GetFrames(vidPth,viewDF):
     
     Inputs:
         vidPth: (string)  path to the video file that was obtained and saved by getImagery_GetVideo function
-        viewDF: The dataframe of views returned by the checkPTZ function 
+        viewDF: (DataFrame) The dataframe of views returned by the checkPTZ function 
     
     Outputs:
-        frameDF: dataframe of snaps in each view
+        frameDF: (DataFrame) dataframe of snaps in each view
     
     '''
     
@@ -235,7 +236,7 @@ def getImagery_GetFrames(vidPth,viewDF):
         frameDF = frameDF.append({'View':i,'Image':image},ignore_index=True)
         
     return frameDF
-
+#=============================================================================#
 
 
 
@@ -251,11 +252,11 @@ def getLidar_FindPossibleIDs(cameraLoc_lat,cameraLoc_lon):
     only the IDs of datasets that may be close to the camera. 
     
     Inputs:
-        cameraLoc_lat: Latitude location of camera
-        cameraLoc_lon: Longitude location of camera
+        cameraLoc_lat: (float) Latitude location of camera
+        cameraLoc_lon: (float) Longitude location of camera
     
     Outputs:
-        IDs: A list containing the dataset IDs of possibly proximal datasets.
+        IDs: (List) A list containing the dataset IDs of possibly proximal datasets.
         
     '''
 
@@ -398,7 +399,7 @@ def getLidar_FindPossibleIDs(cameraLoc_lat,cameraLoc_lon):
         else: 
             coast = coastDict[state]
 
-        # Get the data tabel from NOAAs website #
+        # Get the data table from NOAAs website #
         url = 'https://coast.noaa.gov/htdata/lidar1_z/'
         html = requests.get(url).content
         df_list = pd.read_html(html)
@@ -424,24 +425,25 @@ def getLidar_FindPossibleIDs(cameraLoc_lat,cameraLoc_lon):
 def getLidar_TryID(ftp,ID,cameraLoc_lat,cameraLoc_lon):
     
     '''
-    Function to go through each identified lidar dataset and determine if it covers the location of the camera. If
-    it does, the lidar dataset is saved. Function takes advantage of a csv file given to each dataset on the NOAA
+    Function to go through a lidar dataset and determine if it covers the location of the camera. If
+    it does, the lidar dataset ID is saved. Function takes advantage of a csv file given to each dataset on the NOAA
     repositories which gives the min and max extents of the dataset.
     
     Inputs:
-        ID: A lidar dataset ID
-        cameraLoc_lat: Latitude location of camera
-        cameraLoc_lon: Longitude location of camera
+        ftp: (string) The ftp site address
+        ID: (int) A lidar dataset ID
+        cameraLoc_lat: (float) Latitude location of camera
+        cameraLoc_lon: (float) Longitude location of camera
         
     Outputs:
-        check: A yes or no as to if this dataset covers the camera location 
+        check: (int) A yes (1) or no (0) as to if this dataset covers the camera location 
     '''
     
     import ftplib
     from io import StringIO
     from pandas import read_csv
 
-    # Get into the correct NOAA FTP site- there are 5 of them. I'm sure this isn't the clenest way to do this #
+    # Get into the correct NOAA FTP site- there are 5 of them. I'm sure this isn't the clenest way to do this... #
     # "If at first you don't succeed..."
     try:
         ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12b/data/'+str(ID))
@@ -497,17 +499,17 @@ def getLidar_GetDatasetNames(appropID):
     Function to link the ID of each lidar dataset found to cover the camera with the name and other metadata of the dataset.
     
     Inputs:
-        appropID: The ID of a dataset found to cover the camera by the getLidar_TryID function
+        appropID: (int) The ID of a dataset found to cover the camera by the getLidar_TryID function
         
     Outputs:
-        matchingTable: A dictionary giving each ID linked to metadata (name, date, etc.)
+        matchingTable: (DataFrame) A DataFrame giving each ID linked to metadata (name, date, etc.)
         
     '''
     
     import pandas as pd
     import requests
     
-    # Get the data tabel from NOAAs website #
+    # Get the data table from NOAAs website #
     url = 'https://coast.noaa.gov/htdata/lidar1_z/'
     html = requests.get(url).content
     df_list = pd.read_html(html)
@@ -536,6 +538,23 @@ def getLidar_GetDatasetNames(appropID):
 # Prepare and download the chosen dataset
 #=============================================================================#
 def getLidar_CalcViewArea(az,window,dmax,lat,lon):
+
+    '''
+    Function to calculate a polygon of the expected geographic view area of the camera. The polygon
+    is calculated as a triangle extending dmax km in the azimuth direction of the camera +- a tolerance.
+    Any lidar dataset tiles that interect with this polygon will be kept.
+
+    Inputs:
+        az: (float) The estimated azimuth of the camera
+        window: (float) The tolerance to use around az to calculate the polygon (I use 40 degrees)
+        dmax: (float) The maximum distance in the az direction of the camera of the polygon (I use 1 km)
+        lat: (float) The latitude of the camera
+        lon: (float) The longitude of the camera
+
+    Outputs:
+        poly: (object) The polygon object
+        
+    '''
     
     from math import sin,cos,tan,sqrt,radians
     import matplotlib.pyplot as plt
@@ -543,7 +562,7 @@ def getLidar_CalcViewArea(az,window,dmax,lat,lon):
     from matplotlib import path
     import utm
 
-    # Convert lat lon to UTM #
+    # Convert lat lon of camera to UTM #
     camLoc_x = utm.from_latlon(lat,lon)[0]
     camLoc_y = utm.from_latlon(lat,lon)[1]
 
@@ -581,17 +600,17 @@ def getLidar_GetShapefile(IDToDownload):
     to determine if the tile is near the camera, to avoid downloading a bunch of data not near the camera.
     
     Inputs:
-        IDToDownload: ID of chosen lidar dataset, returned by the checkbox from user input.
+        IDToDownload: (int) ID of chosen lidar dataset, returned by the checkbox from user input.
         
     Outputs:
-        sf: The shapefile of the tiles
+        sf: (object) The shapefile of the tiles
         
     '''
     
     import ftplib
     import shapefile
 
-
+    # Get to the correct FTP site and get all the files #
     ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
     ftp.login('anonymous','anonymous')
 
@@ -609,12 +628,7 @@ def getLidar_GetShapefile(IDToDownload):
                 except:
                     ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid18/data/'+str(IDToDownload))
                     
-##    ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(IDToDownload))
     files = ftp.nlst()
-
-
-    # Now that we have the dataset, we need to search the dataset for tiles which are near the camera. Otherwise,
-    # we will be loading a whole lot of useless data into memory, which takes forever. #
 
     # Load the datset shapefile and dbf file from the ftp. These describe the tiles #
     shpFile = str([s for s in files if "shp" in s])
@@ -639,16 +653,17 @@ def getLidar_GetShapefile(IDToDownload):
 def getLidar_SearchTiles(sf,poly,shapeNum,cameraLoc_lat,cameraLoc_lon):
 
     '''
-    Function to determine the distance of each tile to the camera
+    Function to determine if a tile is within the calculated view area of the camera 
     
     Inputs: 
-        sf: The shapefile of the tiles from the getLidar_GetShapefile function
-        shapeNum: The tile number
-        cameraLoc_lat: Latitude of camera
-        cameraLoc_lon: Longitude of camera
+        sf: (object) The shapefile of the tiles returned by getLidar_GetShapefile function
+        poly (object) The camera view polygon object returned by getLidar_CalcViewArea function
+        shapeNum: (int)The tile number
+        cameraLoc_lat: (float) Latitude of camera
+        cameraLoc_lon: (float) Longitude of camera
     
     Outputs:
-        rec['name']: The names of the tiles that are close to the camera
+        rec['name']: (string) The name of the tile if any part of it is within the view polygon
         
     '''
     
@@ -660,20 +675,14 @@ def getLidar_SearchTiles(sf,poly,shapeNum,cameraLoc_lat,cameraLoc_lon):
     cameraLoc_UTMx = utm.from_latlon(cameraLoc_lat,cameraLoc_lon)[0]
     cameraLoc_UTMy = utm.from_latlon(cameraLoc_lat,cameraLoc_lon)[1]
     
-    # See if the tile is near the camera #
-    bx = sf.shape(shapeNum).bbox # Get the bounding box #
-    # Get the bounding box verticies in utm. bl = bottom-left, etc. #
+    # Get the bounding box of the tile in UTM
+    bx = sf.shape(shapeNum).bbox 
     bx_bl = utm.from_latlon(bx[1],bx[0]) 
     bx_br = utm.from_latlon(bx[1],bx[2]) 
     bx_tr = utm.from_latlon(bx[3],bx[2]) 
     bx_tl = utm.from_latlon(bx[3],bx[0])
-##    # Calculate the midpoint of the tile #
-##    dx = bx_tr[0]-bx_bl[0]
-##    dy = bx_tr[1]-bx_bl[1]
-##    xmid = bx_bl[0]+(dx/2)
-##    ymid = bx_bl[1]+(dy/2)
     
-    # If any verticies are within the polygon, keep the tile #
+    # If any verticies of the bounding box are within the polygon, keep the tile #
     try:
         rec = sf.record(shapeNum)
         if poly.contains_points([(bx_bl[0],bx_bl[1])]) or poly.contains_points([(bx_br[0],bx_br[1])]) or poly.contains_points([(bx_tl[0],bx_tl[1])]) or poly.contains_points([(bx_tr[0],bx_tr[1])]):
@@ -683,56 +692,16 @@ def getLidar_SearchTiles(sf,poly,shapeNum,cameraLoc_lat,cameraLoc_lon):
 
 
 
-
-##    
-##    # Min distance between camera loc and horizontal lines connecting tile verticies #
-##    line_minXbb = numpy.array([numpy.linspace(bx_bl[0],bx_br[0],num=1000),numpy.linspace(bx_bl[1],bx_br[1],num=1000)])
-##    line_maxXbb = numpy.array([numpy.linspace(bx_tl[0],bx_tr[0],num=1000),numpy.linspace(bx_tl[1],bx_tr[1],num=1000)])
-##    
-##    # Distance from camera to midpoint of tile #
-##    meanX = numpy.mean(numpy.array([line_minXbb[0,:],line_maxXbb[0,:]]))
-##    meanY = numpy.mean(numpy.array([line_minXbb[1,:],line_maxXbb[1,:]]))
-##    dist = math.sqrt((meanX-cameraLoc_UTMx)**2 + (meanY-cameraLoc_UTMy)**2)
-##    
-##    # Distance from camera to edges of tile #
-##    distx = line_minXbb[0,:]-cameraLoc_UTMx
-##    disty1 = line_minXbb[1,:]-cameraLoc_UTMy
-##    disty2 = line_maxXbb[1,:]-cameraLoc_UTMy
-##    disty = min(numpy.hstack([disty1,disty2]))
-##
-##    
-##    dist1 = list()
-##    dist2 = list()
-##    xdist1 = list()
-##    xdist2 = list()
-##    for ixMin,iyMin,ixMax,iyMax in zip(line_minXbb[0,:],line_minXbb[1,:],line_maxXbb[0,:],line_maxXbb[1,:]):
-##        xdist1.append(ixMin-cameraLoc_UTMx)
-##        xdist2.append(ixMax-cameraLoc_UTMx)
-##        dist1.append(math.sqrt((ixMin-cameraLoc_UTMx)**2 + (iyMin-cameraLoc_UTMy)**2))
-##        dist2.append(math.sqrt((ixMax-cameraLoc_UTMx)**2 + (iyMax-cameraLoc_UTMy)**2))
-##  
-##    # If either distance is <350 m, keep the tile. This ensures close tiles are kept and the tile containing the camera is kept. #
-##    try:
-##        rec = sf.record(shapeNum)
-####        if min(dist1)<600 or min(dist2)<600:
-##        if min(xdist1)<1000 and min(dist1)<1000:
-##            return rec['Name']
-##        
-##    except:
-##        pass
-
-
-
 def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
     
     '''
-    Function to download the close tiles of the identified lidar dataset.
+    Function to download a tile of the selected lidar dataset using the PDAL module
     
     Inputs:
-        thisFile: the file to download
-        IDToDownload: The ID of the dataset being downloaded
-        cameraLoc_lat: Latitude of camera
-        cameraLoc_lon: Longitude of camera
+        thisFile: (str)the tile to download
+        IDToDownload: (int) The ID of the dataset being downloaded
+        cameraLoc_lat: (float) Latitude of camera
+        cameraLoc_lon: (float) Longitude of camera
         
     Outputs:
         lidarXYZsmall: XYZ point cloud, as an nx3 array, of the lidar data
@@ -744,7 +713,8 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
     import math
     import json    
     import pdal
-          
+
+    # Get to the right FTP #      
     ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
     ftp.login('anonymous','anonymous')
     
@@ -763,7 +733,7 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
                     ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid18/data/'+str(IDToDownload))
  
            
-    # Save the laz file locally - would prefer not to do this, but can't seem to get the pipeline to download directly from the ftp??? #
+    # Save the laz file locally #
     gfile = open('lazfile.laz','wb') # Create the local file #
     ftp.retrbinary('RETR '+thisFile,gfile.write) # Copy the contents of the file on FTP into the local file #
     gfile.close() # Close the remote file #
@@ -795,7 +765,7 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
         a = math.sin(dlat/2)**2 + math.cos(math.radians(abs(py))) * math.cos(math.radians(abs(cameraLoc_lat))) * math.sin(dlon/2)**2
         c = 2*math.atan2(math.sqrt(a),math.sqrt(1-a))
         dist.append(R*c)
-   
+
     lidarXsmall = list()
     lidarYsmall = list()
     lidarZsmall = list()    
@@ -814,16 +784,16 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
 def getLidar_CreatePC(lidarDat,cameraLoc_lat,cameraLoc_lon): 
     
     '''
-    Fucntion to convert lidat point cloud (in lat/lon coords) to one in UTM coords
+    Fucntion to convert lidar point cloud (in lat/lon coords) to one in UTM coords
     relative to the location of the camera (camera location set as origin)
     
     Inputs:
-        lidarDat: The XYZ lidar point cloud returned by getLidar_Download function
-        cameraLoc_lat: Latitude of camera
-        cameraLoc_lon: Longitude of camera
+        lidarDat: (array) The XYZ lidar point cloud returned by getLidar_Download function
+        cameraLoc_lat: (float) Latitude of camera
+        cameraLoc_lon: (float) Longitude of camera
     
     Outputs:
-        pc: The new point cloud, for use in future functions
+        pc: (array) The new point cloud, for use in future functions
         
     '''
 
@@ -855,17 +825,30 @@ def getLidar_CreatePC(lidarDat,cameraLoc_lat,cameraLoc_lon):
 # Perform Calibration #
 #=============================================================================#
 def calibrate_GetInitialApprox_IOPs(img):
+    
     '''
-    Get initial approximatation for camera IOPs (focal length (f) and principal points (x0,y0)) using the geometry of the image.
-    - Estimate focal length by assuming a horizontal field of view of 60 degrees (typical of webcams), and using simple geometry with this and the width of the image.
-    - Estimate principal points as the center of the image.
+    Get initial approximatation for camera IOPs (focal length (f) and principal points (x0,y0)) using the geometry of the image.Estimate
+    focal length by assuming a horizontal field of view of 60 degrees (typical of webcams), and using simple geometry with this and
+    the width of the image. Estimate principal points as the center of the image.
+
+    Inputs:
+        img: (array) The image to used for GCP picking
+
+    Outputs:
+        f: (float) initial approximation for focal length (in pixels)
+        x0: (float) initial approximation for x principal point coordinate #
+        y0: (float) initial approximation for y principal point coordinate #
+        
     '''
     
     import math
-    w = len(img[1,:,:])
+
+    # Estimare focal length using assumed FOV of 60 degrees and the measured width of the image #
+    w = len(img[1,:,:]) # Get the sensor width as the image width #
     a = math.radians(60)
     f = (w/2)*(1/math.tan(a/2))
-    
+
+    # Estimate principal point coords as center of the image #
     x0 = len(img[1,:,1])/2
     y0 = len(img[:,1,1])/2
     
@@ -874,12 +857,28 @@ def calibrate_GetInitialApprox_IOPs(img):
 
 
 def calibrate_GetInitialApprox_ats2opk(a,t,s):
+    
     '''
-    Get initial approximations for the three needed camera look-angles by using easily estimated azimuth, tilt, and swing. 
-    Form the ats rotation matrix and decompose it to omega,phi,kappa angles.
+    Get initial approximations for the three needed camera look-angles by using easily estimated azimuth, tilt, and swing. These angles
+    are converted to the omega,phi,kappa convention by forming the rotation matrix via azimuth,tilt,swing and decomposing it
+    to obtain the omega,phi,kappa angles.
+    
+    Reference: Wolf, Dewitt, and Wilkinson. Elements of Photogrammetry with Applications in GIS, 4th ed. 
+    
+    Inputs:
+        a: (float) Estimated azimuth of the camera (in degrees)
+        t: (float) Estimated tilt of the camera (in degrees). I use 80 degrees for webcams.
+        s: (float) Estimated swing og the camera (in degrees). I use 180 degrees (i.e. no swing) for webcams.
+
+    Outputs:
+        omega: (float) Initial approximation for omega for the camera (in radians)
+        phi: (float) Initial approximation for phi for the camera (in radians)
+        kappa: (float) Initial approximation for kappa for the camera (in radians)
+    
     '''
     import math
-    
+
+    # Convert inputs in degrees to radians #
     a = math.radians(a)
     t = math.radians(t)
     s = math.radians(s)
@@ -905,33 +904,38 @@ def calibrate_GetInitialApprox_ats2opk(a,t,s):
 
     
 def calibrate_PerformCalibration(initApprox,freeVec,gcps_im,gcps_lidar):
+    
         '''
         Perform the augmented space resection using the initial approximations for all parameters
         input to this function.
+
+        Reference: Wolf, Dewitt, and Wilkinson. Elements of Photogrammetry with Applications in GIS, 4th ed. 
         
         Inputs:
-            initApprox: a vector containing the initial approximations for all nine parameters, in the order:
+            initApprox: (array) A vector containing the initial approximations for all nine parameters, in the order:
                         omega,phi,kappa,XL,YL,ZL,f,x0,y0
-            freeVec: A vector that defines the terms that are free to change and those that fixed during the adjustment. Each element corresponds
+            freeVec: (array) A vector that defines the terms that are free to change and those that fixed during the adjustment. Each element corresponds
                      to the same positioned element in initiApprox. A value of 1 indiciates the parameter is fixed, a value of 0 indicates it is free to change. 
-            gcps_im: The array of image coordinates of ground control points
-            gcps_lidar: The array of world-coordinates of ground control points
+            gcps_im: (array) The array of image coordinates of ground control points
+            gcps_lidar: (array) The array of world-coordinates of ground control points
         
         Outputs:
-            valsVec: a vector containing the final values for each parameter after adjustment, in the same order as in initApprox
-            So: The standard error of unit weight for each iteration of the adjustment. 
+            valsVec: (array) A vector containing the final values for each parameter after adjustment, in the same order as in initApprox
+            So: (array) The standard error of unit weight for each iteration of the adjustment. 
         
         '''
         import math
         import numpy as np
         
         unknowns = np.where(freeVec==0)[0] # Indicies of unknown values #
-        
-        allvals = np.empty([0,len(unknowns)]) # Matrix to store the values (rows) for each parameter (columns) as the least squares solution iterates #
+
+        # Matrix to store the values (rows) for each parameter (columns) as the least squares solution iterates and other empty arrays #
+        allvals = np.empty([0,len(unknowns)]) 
         Delta = np.ones(len(unknowns))
         So = np.empty([0,1]) 
         valsVec = initApprox
-        
+
+        # This while loop performs the least-squares adjustment #
         iteration = 0
         while np.max(np.abs(Delta))>.00001:
             
@@ -944,7 +948,8 @@ def calibrate_PerformCalibration(initApprox,freeVec,gcps_im,gcps_lidar):
             f = valsVec[6]
             x0 = valsVec[7]
             y0 = valsVec[8]
-            
+
+            # If we get over 1200 iterations, the solution probably isn't converging and we should stop #
             iteration = iteration+1
             if iteration>1200:
                 print('Error: The soultion is likely diverging')
@@ -959,7 +964,7 @@ def calibrate_PerformCalibration(initApprox,freeVec,gcps_im,gcps_lidar):
                 pass
             
             
-            # Step 0: calculate the elements of the M matrix #
+            # Step 0: calculate the elements of the rotation matrix #
             m11 = math.cos(phi)*math.cos(kappa)
             m12 = (math.sin(omega)*math.sin(phi)*math.cos(kappa)) + (math.cos(omega)*math.sin(kappa))
             m13 = (-math.cos(omega)*math.sin(phi)*math.cos(kappa)) + (math.sin(omega)*math.sin(kappa))
@@ -1026,11 +1031,9 @@ def calibrate_PerformCalibration(initApprox,freeVec,gcps_im,gcps_lidar):
                 epsilon = np.vstack([epsilon,epsilon1])   
                 
 
-            # Step 2: Solve for corrections to each parameter using the weighted normal equation #
+            # Step 2: Solve for corrections to each parameter using the normal equation #
             Delta = np.linalg.inv(np.transpose(B) @ B) @ (np.transpose(B) @ epsilon)
-            
             v = (B@Delta)-epsilon
-        
         
             # Step 3: Apply the corrections # 
             for i in range(0,len(unknowns)):
@@ -1046,9 +1049,20 @@ def calibrate_PerformCalibration(initApprox,freeVec,gcps_im,gcps_lidar):
         return valsVec,So    
 
 
+
 def calibrate_CalcReprojPos(gcps_lidar,calibVals):
+    
     '''
-    Calculate the reprojected positions of the GCPs based on the calculated calibration values.
+    Calculate the reprojected positions of the GCPs on the image based on the calculated calibration values.
+
+    Inputs:
+        gcps_lidar: (array) The array of lidar GCPs
+        calibVals: (array) The calibration vector returned by calibrate_PerformCalibration function
+
+    Outputs:
+        u: (array) The x image coordinates of the reprojected positions
+        v: (array) The y image coordinates of the reprojected positions
+    
     '''
     
     
@@ -1065,7 +1079,6 @@ def calibrate_CalcReprojPos(gcps_lidar,calibVals):
     f = calibVals[6]
     x0 = calibVals[7]
     y0 = calibVals[8]
-    
     
     # Calculate the projected position of each GCP based on final vals #
     m11 = math.cos(phi)*math.cos(kappa)
@@ -1103,11 +1116,35 @@ def calibrate_CalcReprojPos(gcps_lidar,calibVals):
         v = np.vstack([v,v1])
         
     return u,v
+#=============================================================================#
+
+
 
 #=============================================================================#
 # Perform Rectification #
 #=============================================================================#
 def rectify_RectifyImage(calibVals,img,xmin,xmax,dx,ymin,ymax,dy,z):
+
+    '''
+    Function to rectify an image using the resolved calibration parameters. User inputs a grid in real world space
+    onto which the image is rectified.
+
+    Inputs:
+        calibVals: (array) The calibration vector returned by calibrate_PerformCalibration function
+        img: (array) The image to be rectified
+        xmin: (float) minimum x-coordinate of real-world grid
+        xmax: (float) maximum x-coordinate of real-world grid
+        dx: (float) spacing in x-direction of the grid
+        ymin: (float) minimum y-coordinate of real-world grid
+        ymax: (float) maximum y-coordinate of real-world grid
+        dy: (float) spacing in y-direction of the grid
+        z: (float) elevation onto which the image is projected #
+
+    Outputs:
+        im_rectif: (array) The rectified image
+        extents: (array) The geographic extents of the rectified image, for plotting purposes
+
+    '''
     
     import math
     import numpy as np
