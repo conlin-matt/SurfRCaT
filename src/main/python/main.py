@@ -2473,7 +2473,7 @@ class performRectificationThread(QThread):
 # Launch the tool #       
 if __name__ == '__main__':
     appctxt = ApplicationContext()       # 1. Instantiate ApplicationContext
-    w = rectify_InputsWindow()
+    w = WelcomeWindow()
     exit_code = appctxt.app.exec_()      # 2. Invoke appctxt.app.exec_()
     sys.exit(exit_code)
 
