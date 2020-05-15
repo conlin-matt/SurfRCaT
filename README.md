@@ -29,7 +29,7 @@ Steps for building SurfRCaT from source:
 3) Open an Anaconda prompt by searching for 'Anaconda' in the Windows search bar and selecting the prompt.
 4) Create a new environment called SurfRCaT_env containing Python 3.6 and most of the package dependencies by running the following two commands in the Anaconda prompt (with an 'Enter' press between the commands):
 ```bash
-conda create -n SurfRCaT_env -c conda-forge python=3.6 python-pdal pyqt numpy pandas matplotlib opencv json requests pyshp utm lxml
+conda create -n SurfRCaT_env -c conda-forge python=3.6 python-pdal pyqt numpy pandas matplotlib opencv requests pyshp utm lxml
 conda activate SurfRCaT_env
 ```
 6) Pip install fbs, the package for running the GUI, and pptk, the Point Processing Toolkit by executing:
