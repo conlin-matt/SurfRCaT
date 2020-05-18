@@ -2277,6 +2277,7 @@ class pptkWindowWorker(QThread):
             os.remove(pth+'GCPs_lidar.pkl')
             os.remove(pth+'GCPs_im.txt')
             os.remove(pth+'GCPs_im.pkl')
+            os.remove(pth+'Testing.txt')
         except OSError:
             pass
 
@@ -2473,7 +2474,7 @@ class performRectificationThread(QThread):
 # Launch the tool #       
 if __name__ == '__main__':
     appctxt = ApplicationContext()       # 1. Instantiate ApplicationContext
-    w = WelcomeWindow()
+    w = PickGCPsWindow()
     exit_code = appctxt.app.exec_()      # 2. Invoke appctxt.app.exec_()
     sys.exit(exit_code)
 
