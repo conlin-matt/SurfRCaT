@@ -32,13 +32,13 @@ Steps for building SurfRCaT from source:
 conda create -n SurfRCaT_env -c conda-forge python=3.6 python-pdal pyqt numpy pandas matplotlib opencv requests pyshp utm lxml
 conda activate SurfRCaT_env
 ```
-6) Pip install fbs, the package for running the GUI, and pptk, the Point Processing Toolkit by executing:
+6) Pip install fbs, the package for running the GUI, pptk, the Point Processing Toolkit and reverse_geocoder, by executing:
 ```bash
-pip install fbs pptk
+pip install fbs pptk reverse_geocoder
 ```
 8) cd to the directory containing the contents of this repository by executing:
 ```bash
-cd <your directory>
+cd <your directory>e
 ```
 9) Invoke the tool by running:
 ```bash
