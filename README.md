@@ -38,7 +38,7 @@ pip install fbs pptk reverse_geocoder
 ```
 8) cd to the directory containing the contents of this repository by executing:
 ```bash
-cd <your directory>e
+cd <your directory>
 ```
 9) Invoke the tool by running:
 ```bash
