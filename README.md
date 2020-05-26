@@ -1,3 +1,6 @@
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/conlin-matt/SurfRCaT)
+![GitHub](https://img.shields.io/github/license/conlin-matt/SurfRCaT)
+
 # SurfRCaT Documentation
 
 ![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/SurfRCaT_PickGCPs.PNG)
