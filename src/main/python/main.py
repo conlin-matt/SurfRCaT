@@ -38,8 +38,9 @@ import csv
 
 
 # Establish and format the local installation directory. All outputs will be saved to this directory #
-pth = os.path.dirname(os.path.realpath(__file__))
-pth = os.path.join(str(pth),'')
+pth1 = os.path.dirname(os.path.realpath(__file__))
+pth1 = os.path.join(str(pth1),'')
+print(pth1)
 
 
 class WelcomeWindow(QWidget):
@@ -83,32 +84,55 @@ class WelcomeWindow(QWidget):
         txt = QLabel('Welcome to the Surfcamera Remote Calibration Tool (SurfRCaT)!')
         txt2 = QLabel('SurfRCaT has been developed in partnership with the Southeastern Coastal Ocean Observing Regional Association (SECOORA; https://secoora.org/), '
                       +'the United States Geological Survey (USGS), and the National Oceanic and Atmospheric Administration (NOAA). This tool allows you to calibrate any coastal camera in the U.S. of '
-                      +'generally known location with accessible video footage. If you have an issue, please post it on the GitHub issues page (https://github.com/conlin-matt/SurfRCaT/issues).')      
+                      +'generally known location for which you have video footage. If you have an issue, please post it on the GitHub issues page (https://github.com/conlin-matt/SurfRCaT/issues).')      
         txt2.setWordWrap(True)
-        txt3 = QLabel('Press Continue to start calibrating a camera.')
+        
+        txt3 = QLabel('First, please establish a working directory for outputs to be saved to and/or loaded from (if they already exist):')
         txt3.setWordWrap(True)
-        txt4 = QLabel('Or, if you already have calibration parameters, and would like to jump directly to rectification, select Rectify.')
+        fdBut = QPushButton('Browse')
+        wdLab = QLabel('Working directory:')
+        self.wdLine = QLineEdit()
+        self.wdLine.setReadOnly(True)
+        
+        txt4 = QLabel('Press Continue to start calibrating a camera.')
         txt4.setWordWrap(True)
+        txt5 = QLabel('Or, if you already have calibration parameters, and would like to jump directly to rectification, select Rectify.')
+        txt5.setWordWrap(True)
         contBut = QPushButton('Continue >')
         rectifBut = QPushButton('Rectify >')
+
+        rightGroupBox = QGroupBox()        
+        rightGroupBox1 = QGroupBox()
+        rightGroupBox2 = QGroupBox()
+        rightGroupBox3 = QGroupBox()
+        grd = QGridLayout()
+        grdTop = QGridLayout()
+        grdBL = QGridLayout()
+        grdBR = QGridLayout()
+
+        grdTop.addWidget(txt,0,1,1,2)
+        grdTop.addWidget(txt2,1,0,1,4)
+        rightGroupBox1.setLayout(grdTop)
+        grdBL.addWidget(txt3,0,0,1,4)
+        grdBL.addWidget(fdBut,1,1,1,2)
+        grdBL.addWidget(wdLab,2,0,1,1)
+        grdBL.addWidget(self.wdLine,2,1,1,3)
+        rightGroupBox2.setLayout(grdBL)
+        grdBR.addWidget(txt4,0,0,1,3)
+        grdBR.addWidget(contBut,0,3,1,1)
+        grdBR.addWidget(txt5,1,0,1,3)
+        grdBR.addWidget(rectifBut,1,3,1,1)
+        rightGroupBox3.setLayout(grdBR)
         
-        rightGroupBox = QGroupBox()
-        
-        hBox1 = QHBoxLayout()
-        hBox1.addWidget(txt3)
-        hBox1.addWidget(contBut)
-        hBox2 = QHBoxLayout()
-        hBox2.addWidget(txt4)
-        hBox2.addWidget(rectifBut)        
-        vBox = QVBoxLayout()
-        vBox.addWidget(txt)
-        vBox.addWidget(txt2)
-        vBox.addLayout(hBox1)
-        vBox.addLayout(hBox2)
-        rightGroupBox.setLayout(vBox)
+        grd.addWidget(rightGroupBox1,0,0,3,4)
+        grd.addWidget(rightGroupBox2,3,0,2,4)
+        grd.addWidget(rightGroupBox3,5,0,2,4)
+        rightGroupBox.setLayout(grd)
+
         ############################
         
         # Connect widgets with signals #
+        fdBut.clicked.connect(self.getWD)
         rectifBut.clicked.connect(self.jumpToRectify)
         contBut.clicked.connect(self.StartTool)
         ################################
@@ -122,6 +146,19 @@ class WelcomeWindow(QWidget):
         self.setWindowTitle('SurfRCaT')
         self.show()
         ###############################
+        
+    def getWD(self):
+        global pth
+        dlg = QFileDialog()
+        dlg.setFileMode(QFileDialog.Directory)
+        if dlg.exec_():
+            direc = dlg.selectedFiles()
+            self.direc = direc[0]
+            pth = self.direc+'/'
+            
+            self.wdLine.setText(self.direc)
+            print(pth)
+            
          
     def StartTool(self):
        '''
@@ -276,18 +313,21 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
        opt.setCurrentIndex(0)
        backBut = QPushButton('< Back')
        contBut = QPushButton('Continue >')
+       useSavedBut = QRadioButton('Used saved image')
        
        self.rightGroupBox = QGroupBox()
        self.grd = QGridLayout()
        self.grd.addWidget(txt,0,0,1,2)
        self.grd.addWidget(opt,1,0,1,2)
-       self.grd.addWidget(backBut,2,0,1,1)
-       self.grd.addWidget(contBut,2,1,1,1)
+       self.grd.addWidget(useSavedBut,2,0,1,2)
+       self.grd.addWidget(backBut,3,0,1,1)
+       self.grd.addWidget(contBut,3,1,1,1)
        self.grd.setAlignment(Qt.AlignCenter)
        self.rightGroupBox.setLayout(self.grd)
        ############################
        
        # Connect widgets with signals #
+       useSavedBut.clicked.connect(self.useSaved)
        opt.activated.connect(self.getSelected)
        backBut.clicked.connect(self.GoBack)
        contBut.clicked.connect(self.DownloadVidAndExtractStills)
@@ -306,6 +346,27 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
        # Instantiate worker threads #
        self.worker = DownloadVidThread(None,None,None)
        ##############################
+
+    def useSaved(self):
+
+       # Get the saved lidar dataset IDs for the camera #
+       self.worker = getLidar_WebCATThread()
+       self.worker.finishSignal.connect(self.on_closeSignall)
+       self.worker.start()
+
+    def on_closeSignall(self):
+        '''
+        Moves to next window.
+        '''
+
+        f = open(pth+'lidarTable.pkl','rb')
+        lidarTable = pickle.load(f)
+
+        self.close()
+        self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
+        self.lw.resize(900,350)
+        self.lw.show()
+        
 
     def getSelected(self,item):
        '''
@@ -380,7 +441,7 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
        self.grd.addWidget(lab1,3,0,1,1)
 
        self.loadlab = QLabel()
-       self.loadmovie = QMovie(pth+'loading.gif')
+       self.loadmovie = QMovie(pth1+'loading.gif')
        self.loadlab.setMovie(self.loadmovie)
        
        self.worker.start()
@@ -401,7 +462,7 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
        self.grd.addWidget(lab2,4,0,1,1)
        
        self.loadlab = QLabel()
-       self.loadmovie = QMovie(pth+'loading.gif')
+       self.loadmovie = QMovie(pth1+'loading.gif')
        self.loadlab.setMovie(self.loadmovie)
        
        self.worker2.start()
@@ -672,7 +733,7 @@ class getWebCATImagery_ChooseNewDateWindow(QWidget):
        self.grd.addWidget(lab1,5,0,1,2)
 
        self.loadlab = QLabel()
-       self.loadmovie = QMovie(pth+'loading.gif')
+       self.loadmovie = QMovie(pth1+'loading.gif')
        self.loadlab.setMovie(self.loadmovie)
        
        self.worker.start()
@@ -693,7 +754,7 @@ class getWebCATImagery_ChooseNewDateWindow(QWidget):
        self.grd.addWidget(lab2,6,0,1,2)
 
        self.loadlab = QLabel()
-       self.loadmovie = QMovie(pth+'loading.gif')
+       self.loadmovie = QMovie(pth1+'loading.gif')
        self.loadlab.setMovie(self.loadmovie)
        
        self.worker2.start()
@@ -755,10 +816,10 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
        # Right contents box setup #
        lblDir1 = QLabel('Input the name of this camera:')
        self.bxName = QLineEdit()
-       lblDir = QLabel('Input the approximate location (lat/lon) of the camera below:')
+       lblDir = QLabel('Input the approximate location (WGS 84 lat/lon) of the camera below:')
        lblLat = QLabel('Camera Latitude (decimal degrees):')
        lblLon = QLabel('Camera Longitude (decimal degrees):')
-       lblElev = QLabel('Elevation (m):')
+       lblElev = QLabel('Elevation (NAVD88 m):')
        lblAz = QLabel('Azimuth (degrees):')
        self.bxLat = QLineEdit()
        self.bxLon = QLineEdit()
@@ -1075,21 +1136,26 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         self.table.setHorizontalHeaderLabels(["Dataset ID","Year Collected","Dataset Name"])
         self.table.setSelectionBehavior(QTableView.SelectRows)
         
+        useSaved = QRadioButton('Use saved lidar data')
+        orBut = QLabel('Or')
         self.dir = QLabel('Select the dataset you want to use by checking its box:')
         self.contBut = QPushButton('Continue >')
         self.backBut = QPushButton('< Back')
         
         rightGroupBox = QGroupBox()
         self.layout = QGridLayout(self)
-        self.layout.addWidget(self.dir,0,0,1,1)
-        self.layout.addWidget(self.table,1,0,4,4)
-        self.layout.addWidget(self.contBut,6,3,1,1)
-        self.layout.addWidget(self.backBut,6,2,1,1)
+        self.layout.addWidget(useSaved,0,0,1,4)
+        self.layout.addWidget(orBut,1,2,1,1)
+        self.layout.addWidget(self.dir,2,0,1,1)
+        self.layout.addWidget(self.table,3,0,4,4)
+        self.layout.addWidget(self.contBut,8,3,1,1)
+        self.layout.addWidget(self.backBut,8,2,1,1)
         self.layout.setAlignment(Qt.AlignCenter)
         rightGroupBox.setLayout(self.layout)
         ##############################
         
         # Connect widgets to signals #
+        useSaved.clicked.connect(self.selectSaved)
         self.table.itemClicked.connect(self.dataChoice)
         self.contBut.clicked.connect(self.downloadCorrectData)
         self.backBut.clicked.connect(self.GoBack)
@@ -1117,6 +1183,43 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         
         self.worker3 = getLidar_FormatChosenSetThread(cameraLocation[0],cameraLocation[1])
         ##############################
+        
+    def selectSaved(self):
+
+        if os.path.exists(pth+'lidarPC.pkl'):
+
+            msg = QMessageBox(self)
+            msg.setIcon(QMessageBox.Warning)
+            txt = ('Are you sure you want to use your saved lidar point cloud? If the saved point cloud was created for a different camera, '+
+                   'even one that is near this camera, a new point cloud needs to be made.')
+            msg.setText(txt)
+            msg.setWindowTitle('Are you sure?')
+            msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+
+            msg.buttonClicked.connect(self.onMsgBoxClick)
+            msg.show()
+        else:
+            
+            msg = QMessageBox(self)
+            msg.setIcon(QMessageBox.Critical)
+            txt = ('No lidar point clouds were found in your working directory. Please use the prompts below to create one.')
+            msg.setText(txt)
+            msg.setWindowTitle('Error')
+            msg.setStandardButtons(QMessageBox.Ok)
+
+            msg.show()
+
+
+    def onMsgBoxClick(self,i):
+        if i.text() == '&Yes':
+            
+            self.close()
+            self.nextWindow = PickGCPsWindow()
+            
+        elif i.text() == '&No':
+            pass
+    
+          
         
     def dataChoice(self,item):
         '''
@@ -1237,9 +1340,14 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         '''
         Move to next window.
         '''
+
+        f = open(pth+'CameraName.pkl','rb')
+        camName = pickle.load(f)
+        f2 = open(pth+'chosenLidarID.pkl','rb')
+        ID = pickle.load(f2)
         
         self.close()
-        self.nextWindow = PickGCPsWindow()        
+        self.nextWindow = PickGCPsWindow(camName,str(ID))        
         
     def GoBack(self):
         self.close()
@@ -1256,8 +1364,8 @@ class PickGCPsWindow(QWidget):
    '''
    
    def __init__(self):
-        super().__init__()    
-        
+        super().__init__()
+
         if not QApplication.instance():
             app = QApplication(sys.argv)
         else:
@@ -2150,7 +2258,7 @@ class getLidar_PrepChosenSetThread(QThread):
         IDToDownload = pickle.load(f)
         az = pickle.load(f1)
         sf = SurfRCaT.getLidar_GetShapefile(IDToDownload)
-        poly = SurfRCaT.getLidar_CalcViewArea(az,40,1000,self.cameraLoc_lat,self.cameraLoc_lon)
+        poly = SurfRCaT.getLidar_CalcViewArea(az,20,1000,self.cameraLoc_lat,self.cameraLoc_lon)
         
         tilesKeep = list()
         i = 0
@@ -2242,9 +2350,19 @@ class getLidar_FormatChosenSetThread(QThread):
         f = open(pth+'lidarDat.pkl','rb')
         lidarDat = pickle.load(f)
 
+        f2 = open(pth+'CameraName.pkl','rb')
+        camName = str(pickle.load(f2))
+
+        f3 = open(pth+'chosenLidarID.pkl','rb')
+        ID = str(pickle.load(f3))
+
         pc = SurfRCaT.getLidar_CreatePC(lidarDat,self.cameraLoc_lat,self.cameraLoc_lon)
-          
+
+        # Save to user input directory so they can see it and install directory so SurfRCaT pptk launcher can see it #  
         with open(pth+'lidarPC.pkl','wb') as f:
+            pickle.dump(pc,f)
+
+        with open(pth1+'lidarPC.pkl','wb') as f:
             pickle.dump(pc,f)
             
         self.finishSignal.emit(1)    
@@ -2262,12 +2380,13 @@ class pptkWindowWorker(QThread):
 
     def __init__(self):
         super().__init__()
+
         
     def run(self):
         
         print('Thread Started')
 
-        # Load the point cloud #        
+        # Load the point cloud #
         f = open(pth+'lidarPC.pkl','rb')
         pc = pickle.load(f)
 
@@ -2277,20 +2396,21 @@ class pptkWindowWorker(QThread):
             os.remove(pth+'GCPs_lidar.pkl')
             os.remove(pth+'GCPs_im.txt')
             os.remove(pth+'GCPs_im.pkl')
-            os.remove(pth+'Testing.txt')
+            os.remove(pth1+'Testing.txt')
         except OSError:
             pass
 
         # Call the viewer and let the user identify points (subprocess saves the output to file #
-        command = 'cmd.exe /C '+pth+'LaunchPPTKwin\LaunchPPTKwin.exe'
+        command = 'cmd.exe /C '+pth1+'LaunchPPTKwin\LaunchPPTKwin.exe'             
         print(command)
+        
         self.child = QProcess()
         self.child.start(command)
         self.child.waitForStarted(-1)
         self.child.waitForFinished(-1)
 
         # Load the output and create the GCPs from it #
-        f = open(pth+'Testing.txt','r')
+        f = open(pth1+'Testing.txt','r') # This is a list of point indicies- not important for the user. #
         iGCPs1 = f.read()
         iGCPs2 = iGCPs1[1:len(iGCPs1)-2]
         

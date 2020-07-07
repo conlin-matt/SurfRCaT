@@ -542,7 +542,7 @@ def getLidar_CalcViewArea(az,window,dmax,lat,lon):
     '''
     Function to calculate a polygon of the expected geographic view area of the camera. The polygon
     is calculated as a triangle extending dmax km in the azimuth direction of the camera +- a tolerance.
-    Any lidar dataset tiles that interect with this polygon will be kept.
+    Any lidar dataset tiles that intersect with this polygon will be kept.
 
     Inputs:
         az: (float) The estimated azimuth of the camera
@@ -670,6 +670,7 @@ def getLidar_SearchTiles(sf,poly,shapeNum,cameraLoc_lat,cameraLoc_lon):
     import utm
     import math
     import numpy
+    from matplotlib import path
     
     # Establish the location of the camera in UTM coordinates #
     cameraLoc_UTMx = utm.from_latlon(cameraLoc_lat,cameraLoc_lon)[0]
@@ -683,14 +684,23 @@ def getLidar_SearchTiles(sf,poly,shapeNum,cameraLoc_lat,cameraLoc_lon):
     bx_tl = utm.from_latlon(bx[3],bx[0])
     
     # If any verticies of the bounding box are within the polygon, keep the tile #
-    try:
-        rec = sf.record(shapeNum)
-        if poly.contains_points([(bx_bl[0],bx_bl[1])]) or poly.contains_points([(bx_br[0],bx_br[1])]) or poly.contains_points([(bx_tl[0],bx_tl[1])]) or poly.contains_points([(bx_tr[0],bx_tr[1])]):
-            return rec['Name']
-    except:
-        pass
 
+##    try:
+##        rec = sf.record(shapeNum)
+##        if poly.contains_points([(bx_bl[0],bx_bl[1])]) or poly.contains_points([(bx_br[0],bx_br[1])]) or poly.contains_points([(bx_tl[0],bx_tl[1])]) or poly.contains_points([(bx_tr[0],bx_tr[1])]):
+##            return rec['Name']
+##    except:
+##        pass
+    # If any of the tile edges intersect the bounding box, keep the tile #
+##    try:
 
+    rec = sf.record(shapeNum)
+    if poly.intersects_path(path.Path([(bx_bl[0],bx_bl[1]),(bx_br[0],bx_br[1])])) or poly.intersects_path(path.Path([(bx_tl[0],bx_tl[1]),(bx_tr[0],bx_tr[1])])) or poly.intersects_path(path.Path([(bx_bl[0],bx_bl[1]),(bx_tl[0],bx_tl[1])])) or poly.intersects_path(path.Path([(bx_br[0],bx_br[1]),(bx_tr[0],bx_tr[1])])):
+        return(rec['Name'])
+        
+##    except:
+##        pass
+##                        
 
 def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
     
@@ -739,8 +749,13 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
     gfile.close() # Close the remote file #
         
     # Construct the json PDAL pipeline to read the file and take only points within +-.5 degree x and y of the camera. Read the data in as an array #
+    utm_band = str((math.floor((cameraLoc_lon+180)/6)%60)+1)
+    if len(utm_band) == 1:
+        utm_band = '0'+utm_band
+    epsg = '326'+utm_band
+
     fullFileName = 'lazfile.laz'
-    pipeline=(json.dumps([{'type':'readers.las','filename':fullFileName},{'type':'filters.range','limits':'X['+str(cameraLoc_lon-.5)+':'+str(cameraLoc_lon+.5)+'],Y['+str(cameraLoc_lat-.5)+':'+str(cameraLoc_lat+.5)+']'}],sort_keys=False,indent=4))
+    pipeline=(json.dumps([{'type':'readers.las','filename':fullFileName},{'type':'filters.range','limits':'X['+str(cameraLoc_lon-.5)+':'+str(cameraLoc_lon+.5)+'],Y['+str(cameraLoc_lat-.5)+':'+str(cameraLoc_lat+.5)+']'},{'type':'filters.reprojection','in_srs':'EPSG:4326','out_srs':'EPSG:'+epsg}],sort_keys=False,indent=4))
         
     # Go through the pdal steps to use the pipeline
     r = pdal.Pipeline(pipeline)  
@@ -756,27 +771,28 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
     lidarY = datArrays['Y']
     lidarZ = datArrays['Z']
 
-    # Only take points within 500 m of the camera #
-    R = 6373000 # ~radius of Earth in m #
-    dist = list()
-    for px,py in zip(lidarX,lidarY):
-        dlon = math.radians(abs(px)) - math.radians(abs(cameraLoc_lon))
-        dlat = math.radians(abs(py)) - math.radians(abs(cameraLoc_lat))
-        a = math.sin(dlat/2)**2 + math.cos(math.radians(abs(py))) * math.cos(math.radians(abs(cameraLoc_lat))) * math.sin(dlon/2)**2
-        c = 2*math.atan2(math.sqrt(a),math.sqrt(1-a))
-        dist.append(R*c)
-
-    lidarXsmall = list()
-    lidarYsmall = list()
-    lidarZsmall = list()    
-    for xi,yi,zi,di in zip(lidarX,lidarY,lidarZ,dist):
-        if di<1000:
-            lidarXsmall.append(xi)
-            lidarYsmall.append(yi)
-            lidarZsmall.append(zi)
-    lidarXYZsmall = numpy.vstack((lidarXsmall,lidarYsmall,lidarZsmall))
-    lidarXYZsmall = numpy.transpose(lidarXYZsmall)
-    
+##    # Only take points within 500 m of the camera #
+##    R = 6373000 # ~radius of Earth in m #
+##    dist = list()
+##    for px,py in zip(lidarX,lidarY):
+##        dlon = math.radians(abs(px)) - math.radians(abs(cameraLoc_lon))
+##        dlat = math.radians(abs(py)) - math.radians(abs(cameraLoc_lat))
+##        a = math.sin(dlat/2)**2 + math.cos(math.radians(abs(py))) * math.cos(math.radians(abs(cameraLoc_lat))) * math.sin(dlon/2)**2
+##        c = 2*math.atan2(math.sqrt(a),math.sqrt(1-a))
+##        dist.append(R*c)
+##
+##    lidarXsmall = list()
+##    lidarYsmall = list()
+##    lidarZsmall = list()    
+##    for xi,yi,zi,di in zip(lidarX,lidarY,lidarZ,dist):
+##        if di<1000:
+##            lidarXsmall.append(xi)
+##            lidarYsmall.append(yi)
+##            lidarZsmall.append(zi)
+##    lidarXYZsmall = numpy.vstack((lidarXsmall,lidarYsmall,lidarZsmall))
+##    lidarXYZsmall = numpy.transpose(lidarXYZsmall)
+    lidarXYZsmall = numpy.vstack((lidarX,lidarY,lidarZ))
+    lidarXYZsmall = numpy.transpose(lidarXYZsmall)    
     return lidarXYZsmall
 
 
@@ -802,20 +818,24 @@ def getLidar_CreatePC(lidarDat,cameraLoc_lat,cameraLoc_lon):
     import pandas as pd
     
     pc = pd.DataFrame({'x':lidarDat[:,0],'y':lidarDat[:,1],'z':lidarDat[:,2]})
-
-    # Convert eveything to UTM and translate to camera at (0,0) #
-    utmCoords = utm.from_latlon(np.array(pc['y']),np.array(pc['x']))
-    utmCoords = np.hstack([np.reshape(utmCoords[0],[np.size(utmCoords[0]),1]),np.reshape(utmCoords[1],[np.size(utmCoords[1]),1])])
-        
-    utmCam = utm.from_latlon(cameraLoc_lat,cameraLoc_lon)
-
-    # Translate to camera position #
-    utmCoords[:,0] = utmCoords[:,0]-utmCam[0]
-    utmCoords[:,1] = utmCoords[:,1]-utmCam[1]
     
-    # Put these new coordinates into the point cloud %
-    pc['x'] = utmCoords[:,0]
-    pc['y'] = utmCoords[:,1]
+    utmCam = utm.from_latlon(cameraLoc_lat,cameraLoc_lon)
+    pc['x'] = pc['x']-utmCam[0]
+    pc['y'] = pc['y']-utmCam[1]
+
+##    # Convert eveything to UTM and translate to camera at (0,0) #
+##    utmCoords = utm.from_latlon(np.array(pc['y']),np.array(pc['x']))
+##    utmCoords = np.hstack([np.reshape(utmCoords[0],[np.size(utmCoords[0]),1]),np.reshape(utmCoords[1],[np.size(utmCoords[1]),1])])
+##        
+##    utmCam = utm.from_latlon(cameraLoc_lat,cameraLoc_lon)
+##
+##    # Translate to camera position #
+##    utmCoords[:,0] = utmCoords[:,0]-utmCam[0]
+##    utmCoords[:,1] = utmCoords[:,1]-utmCam[1]
+##    
+##    # Put these new coordinates into the point cloud %
+##    pc['x'] = utmCoords[:,0]
+##    pc['y'] = utmCoords[:,1]
     
     return pc
 
