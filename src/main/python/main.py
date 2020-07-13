@@ -37,7 +37,7 @@ import ftplib
 import csv
 
 
-# Establish and format the local installation directory. All outputs will be saved to this directory #
+# Establish and format the installation directory. Some background things will be saved to the installation directory #
 pth1 = os.path.dirname(os.path.realpath(__file__))
 pth1 = os.path.join(str(pth1),'')
 print(pth1)
@@ -244,7 +244,7 @@ class ChooseCameraWindow(QWidget):
         If WebCAT camera selected, this funciton will open new window (WebCATLocationWindow) to choose the WebCAT camera
         '''
         self.close()
-        self.ww = getWebCATImagery_WebCATLocationWindow()  
+        self.ww = getWebCATImagery()  
         self.ww.show()
         
     def Other_select(self):
@@ -260,7 +260,7 @@ class ChooseCameraWindow(QWidget):
 ##============================================================================## 
 # Get Imagery Module: Get the image to be used for the calibration #
 ##============================================================================##
-class getWebCATImagery_WebCATLocationWindow(QWidget):
+class getWebCATImagery(QWidget):
     '''
     Window allowing the user to choose desired WebCAT camera from dropdown menu.
     '''
@@ -300,59 +300,207 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
        ########################    
        
        # Right contents box setup #
+       intro = QLabel('The Webcamera Application Testbed (WebCAT) is a network of 7 surfcams spanning the southeastern U.S. coastline. '+
+                      'Live and historic feeds from the cameras are stored on servers and accessible in 10-minute video-clips. '+
+                      'Live feeds from each camera can be viewed at https://secoora.org/webcat/, and a summary of available historic video from each camera '+
+                      'can be found at http://webcat-video.axds.co/status/. If you wish to calibrate a WebCAT camera, please input the camera and '+
+                      'desired imagery date below, and a video will be downloaded automatically. Note: only 4 of the 7 cameras can be calibrated '+
+                      'via SurfRCaT; those are the only cameras available to select below.') 
+       intro.setWordWrap(True)
        txt = QLabel('Select WebCAT camera:')
        opt = QComboBox()
        opt.addItem('--')
-       opt.addItem('Buxton Coastal Hazard')
-       opt.addItem('Cherry Grove Pier (south)')
        opt.addItem('Folly Beach Pier (north)')
        opt.addItem('Folly Beach Pier (south)')
        opt.addItem('St. Augustine Pier')
-       opt.addItem('Twin Piers/Bradenton')
        opt.addItem('Miami 40th Street')
        opt.setCurrentIndex(0)
        backBut = QPushButton('< Back')
        contBut = QPushButton('Continue >')
-       useSavedBut = QRadioButton('Used saved image')
-       
-       self.rightGroupBox = QGroupBox()
+       lblDir1 = QLabel('Input desired imagery date below (in yyyy,mm,dd,HHHH format):')
+       lblDir1.setWordWrap(True)
+       self.bxYear = QLineEdit()
+       self.bxMonth = QLineEdit()
+       self.bxDay = QLineEdit()
+       self.bxHour = QLineEdit()
+       lblYear = QLabel('Year:')
+       lblMonth = QLabel('Month:')
+       lblDay = QLabel('Day:')
+       lblHour = QLabel('Hour:')
+       orLab = QLabel('Or')
+       useSavedBut = QRadioButton('Used saved video')
+     
+       rightGroupBox = QGroupBox()
+       rightGroupBox1 = QGroupBox()
+       rightGroupBox2 = QGroupBox()
        self.grd = QGridLayout()
-       self.grd.addWidget(txt,0,0,1,2)
-       self.grd.addWidget(opt,1,0,1,2)
-       self.grd.addWidget(useSavedBut,2,0,1,2)
-       self.grd.addWidget(backBut,3,0,1,1)
-       self.grd.addWidget(contBut,3,1,1,1)
-       self.grd.setAlignment(Qt.AlignCenter)
-       self.rightGroupBox.setLayout(self.grd)
-       ############################
-       
+       grd1 = QGridLayout()
+       grd2 = QGridLayout()
+                      
+       grd1.addWidget(txt,0,0,1,2)
+       grd1.addWidget(opt,1,0,1,2)
+       rightGroupBox1.setLayout(grd1)
+
+       grd2.addWidget(lblDir1,0,0,1,4)
+       grd2.addWidget(lblYear,1,0,1,2)
+       grd2.addWidget(self.bxYear,1,2,1,2)              
+       grd2.addWidget(lblMonth,2,0,1,2)
+       grd2.addWidget(self.bxMonth,2,2,1,2) 
+       grd2.addWidget(lblDay,3,0,1,2)
+       grd2.addWidget(self.bxDay,3,2,1,2)
+       grd2.addWidget(lblHour,4,0,1,2)
+       grd2.addWidget(self.bxHour,4,2,1,2)
+       grd2.addWidget(orLab,5,0,1,1)
+       grd2.addWidget(useSavedBut,6,0,1,4)
+       rightGroupBox2.setLayout(grd2)
+
+       self.grd.addWidget(intro,0,0,4,4)
+       self.grd.addWidget(rightGroupBox1,4,0,2,4)
+       self.grd.addWidget(rightGroupBox2,6,0,4,4)
+       self.grd.addWidget(backBut,10,0,1,2)
+       self.grd.addWidget(contBut,10,2,1,2)
+       rightGroupBox.setLayout(self.grd)
+
+              
        # Connect widgets with signals #
        useSavedBut.clicked.connect(self.useSaved)
-       opt.activated.connect(self.getSelected)
+       opt.activated.connect(self.getSelectedCam)
        backBut.clicked.connect(self.GoBack)
-       contBut.clicked.connect(self.DownloadVidAndExtractStills)
+       contBut.clicked.connect(self.getSelectedDateAndDownload)
        ################################
 
        # Full widget layout setup #
        fullLayout = QHBoxLayout()
        fullLayout.addWidget(leftGroupBox)
-       fullLayout.addWidget(self.rightGroupBox)
+       fullLayout.addWidget(rightGroupBox)
        self.setLayout(fullLayout)
 
        self.setWindowTitle('SurfRCaT')
        self.show()
        ############################
         
+        
+    def getSelectedCam(self,item):
+
+       WebCATdict = {'Placeholder':[0,0],
+                    'follypiernorthcam':[32.654731,-79.939322],
+                    'follypiersouthcam':[32.654645,-79.939597],
+                    'staugustinecam':[29.856559,-81.265545],
+                    'miami40thcam':[ 25.812227, -80.122400]}
+      
+       # Get location of selected camera #
+       cams = ['Placeholder','follypiernorthcam','follypiersouthcam','staugustinecam','miami40thcam']
+       cameraLocation = WebCATdict[cams[item]]
+       cameraName = cams[item]
+
+       # Add the pre-defined azimuth and elev for each WebCAT camera #
+       if cameraName == 'follypiernorthcam':
+           self.az = 150
+           self.ZL = 15
+       elif cameraName == 'follypiersouthcam':
+           self.az = 150
+           self.ZL = 15
+       elif cameraName == 'staugustinecam':
+           self.az = 80
+           self.ZL = 10
+       elif cameraName == 'miami40thcam':
+           self.az = 60
+           self.ZL = 40
+
+       # Save everything #
+       with open(pth+'CameraLocation.pkl','wb') as f:
+           pickle.dump(cameraLocation,f)
+       with open(pth+'CameraName.pkl','wb') as f:
+           pickle.dump(cameraName,f)
+       with open(pth+'az.pkl','wb') as f:
+           pickle.dump(self.az,f)
+       with open(pth+'ZL.pkl','wb') as f:
+           pickle.dump(self.ZL,f)
+
+           
+    def getSelectedDateAndDownload(self):
+        
+       yr = int(self.bxYear.text())
+       mo = int(self.bxMonth.text())
+       day = int(self.bxDay.text())
+       hour = int(self.bxHour.text())
+       
        # Instantiate worker threads #
-       self.worker = DownloadVidThread(None,None,None)
-       ##############################
+       self.worker = DownloadVidThread(yr,mo,day,hour)
+       self.worker2 = DecimateVidThread()
+       self.worker3 = getLidar_WebCATThread()
+         
+       lab1 = QLabel('Downloading Video...')
+       self.grd.addWidget(lab1,11,0,1,1)
+
+       self.loadlab = QLabel()
+       self.loadmovie = QMovie(pth1+'loading.gif')
+       self.loadlab.setMovie(self.loadmovie)
+       
+       self.worker.start()
+       self.grd.addWidget(self.loadlab,11,1,1,1)
+       self.loadmovie.start()
+       self.worker.finishSignal.connect(self.on_closeSignal)
+       
+
+    def on_closeSignal(self):
+         
+       '''
+       When download video thread is done, function shows a done label and starts the PTZ check worker thread
+       '''
+       self.loadlab.setParent(None)
+       self.loadmovie.stop()
+       labDone = QLabel('Done.')
+       self.grd.addWidget(labDone,11,1,1,1)
+
+       lab2 = QLabel('Extracting frames...')
+       self.grd.addWidget(lab2,12,0,1,1)
+       
+       self.loadlab = QLabel()
+       self.loadmovie = QMovie(pth1+'loading.gif')
+       self.loadlab.setMovie(self.loadmovie)
+       
+       self.worker2.start()
+       self.grd.addWidget(self.loadlab,12,1,1,1)
+       self.loadmovie.start()
+       self.worker2.finishSignal.connect(self.on_closeSignal2)
+
+    def on_closeSignal2(self):
+        
+       self.loadlab.setParent(None)
+       self.loadmovie.stop()        
+       labDone = QLabel('Done.')
+       self.grd.addWidget(labDone,12,1,1,1)
+
+       lab3 = QLabel('Cleaning up...')
+       self.grd.addWidget(lab3,13,0,1,1)
+       
+       self.loadlab = QLabel()
+       self.loadmovie = QMovie(pth1+'loading.gif')
+       self.loadlab.setMovie(self.loadmovie)
+       
+       self.worker3.start()
+       self.grd.addWidget(self.loadlab,13,1,1,1)
+       self.loadmovie.start()
+       self.worker3.finishSignal.connect(self.on_closeSignal3)
+
+    def on_closeSignal3(self):
+
+       self.loadlab.setParent(None)
+       self.loadmovie.stop()        
+       labDone = QLabel('Done.')
+       self.grd.addWidget(labDone,13,1,1,1)
+       
+       self.close()
+       self.cv = getWebCATImagery_ChooseFrameWindow()
+       self.cv.show()    
+       
 
     def useSaved(self):
 
-       # Get the saved lidar dataset IDs for the camera #
-       self.worker = getLidar_WebCATThread()
-       self.worker.finishSignal.connect(self.on_closeSignall)
-       self.worker.start()
+       self.close()
+       self.p = getWebCATImagery_ChooseFrameWindow()
+       self.p.show()
 
     def on_closeSignall(self):
         '''
@@ -366,126 +514,18 @@ class getWebCATImagery_WebCATLocationWindow(QWidget):
         self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
         self.lw.resize(900,350)
         self.lw.show()
-        
 
-    def getSelected(self,item):
-       '''
-       Function gets saved location of WebCAT camera when it is selected from the combobox
-       '''
-          
-       WebCATdict = {'Placeholder':[0,0],
-                    'buxtoncoastalcam':[35.267777,-75.518448],
-                    'cherrypiersouthcam':[ 33.829960, -78.633320],
-                    'follypiernorthcam':[32.654731,-79.939322],
-                    'follypiersouthcam':[32.654645,-79.939597],
-                    'staugustinecam':[29.856559,-81.265545],
-                    'twinpierscam':[27.466685,-82.699540],
-                    'miami40thcam':[ 25.812227, -80.122400]}
-      
-       # Get location of selected camera #
-       cams = ['Placeholder','buxtoncoastalcam','cherrypiersouthcam','follypiernorthcam','follypiersouthcam','staugustinecam','twinpierscam','miami40thcam']
-       cameraLocation = WebCATdict[cams[item]]
-       cameraName = cams[item]
-       # Save the WebCAT camera location and name #
-       with open(pth+'CameraLocation.pkl','wb') as f:
-           pickle.dump(cameraLocation,f)
-       with open(pth+'CameraName.pkl','wb') as f:
-           pickle.dump(cameraName,f)
-       
-       if cameraName == 'follypiersouthcam': # Need 1 erosion iter for Folly Pier South, 2 for other cams # 
-           self.worker2 = CheckPTZThread(1)
-       else:
-           self.worker2 = CheckPTZThread(2)
-
-        
-       # Add the pre-defined azimuth and elev for each WebCAT camera #
-       if cameraName == 'buxtoncoastalcam':
-           self.az = 5
-           self.ZL = 10
-       elif cameraName == 'cherrypiersouthcam':
-           self.az = 200
-           self.ZL = 15
-       elif cameraName == 'follypiernorthcam':
-           self.az = 150
-           self.ZL = 15
-       elif cameraName == 'follypiersouthcam':
-           self.az = 150
-           self.ZL = 15
-       elif cameraName == 'staugustinecam':
-           self.az = 80
-           self.ZL = 10
-       elif cameraName == 'twinpierscam':
-           self.az = 80
-           self.ZL = 5
-       elif cameraName == 'miami40thcam':
-           self.az = 60
-           self.ZL = 40
-       
-       with open(pth+'az.pkl','wb') as f:
-           pickle.dump(self.az,f)
-       with open(pth+'ZL.pkl','wb') as f:
-           pickle.dump(self.ZL,f) 
-           
     def GoBack(self):
        '''
        Function goes back to previous window when Back button is clicked
        '''
        self.close()
        self.backToOne = ChooseCameraWindow()
-          
-    def DownloadVidAndExtractStills(self):
-       '''
-       Sets a label that video is downloading when Continue is clicked, and starts a worker thread to download the video
-       '''
-       lab1 = QLabel('Downloading Video...')
-       self.grd.addWidget(lab1,3,0,1,1)
-
-       self.loadlab = QLabel()
-       self.loadmovie = QMovie(pth1+'loading.gif')
-       self.loadlab.setMovie(self.loadmovie)
-       
-       self.worker.start()
-       self.grd.addWidget(self.loadlab,3,1,1,1)
-       self.loadmovie.start()
-       self.worker.finishSignal.connect(self.on_closeSignal)
-
-    def on_closeSignal(self):
-       '''
-       When download video thread is done, function shows a done label and starts the PTZ check worker thread
-       '''
-       self.loadlab.setParent(None)
-       self.loadmovie.stop()
-       labDone = QLabel('Done.')
-       self.grd.addWidget(labDone,3,1,1,1)
-       
-       lab2 = QLabel('Checking different views...')
-       self.grd.addWidget(lab2,4,0,1,1)
-       
-       self.loadlab = QLabel()
-       self.loadmovie = QMovie(pth1+'loading.gif')
-       self.loadlab.setMovie(self.loadmovie)
-       
-       self.worker2.start()
-       self.grd.addWidget(self.loadlab,4,1,1,1)
-       self.loadmovie.start()
-       self.worker2.finishSignal.connect(self.on_closeSignal2)
-       
-    
-    def on_closeSignal2(self):
-       ''' 
-       After PTZ is checked, take user to view choice window.
-       '''
-       self.loadlab.setParent(None)
-       self.loadmovie.stop()        
-       labDone = QLabel('Done.')
-       self.grd.addWidget(labDone,4,1,1,1)
-       
-       self.close()
-       self.cv = getWebCATImagery_ChooseViewWindow()
-       self.cv.show()      
 
 
-class getWebCATImagery_ChooseViewWindow(QWidget):
+
+
+class getWebCATImagery_ChooseFrameWindow(QWidget):
     '''
     Window allowing the user to choose which view they want to calibrate from a PTZ camera.
     '''
@@ -526,54 +566,46 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
         
        # Right contents box setup #
        self.rightGroupBox = QGroupBox()
-       f1 = open(pth+'viewDF.pkl','rb')
        f2 = open(pth+'vidFile.pkl','rb')
-       f3 = open(pth+'CameraName.pkl','rb')
-       self.viewDF = pickle.load(f1)
-       vidFile = pickle.load(f2)
-       vidPth = vidFile
-       cameraName = pickle.load(f3)
-       
-       self.frameDF = SurfRCaT.getImagery_GetFrames(pth+vidPth,self.viewDF)
-       numViews = len(self.frameDF)
-       
-       # Set up the text label #
-       txt = QLabel('Automatically detected unique camera views are shown below. Choose the view which you would like to calibrate. If the image(s) are not clear enough to allow for feature extraction, press the Need New Images button.')
+       self.vidFile = pth+pickle.load(f2)
+
+       txt = QLabel('Choose a frame to use for the calibration by scrolling through extracted frames with the arrow buttons. Press Continue when your desired frame is displayed.')
        txt.setWordWrap(True)
-       txt2 = QLabel('Select view to calibrate:')
-       cb = QComboBox()
-       cb.addItem('--')
+       self.forward = QPushButton('->')
+       self.back = QPushButton('<-')
+       self.back.setEnabled(False)
+       contBut = QPushButton('Continue >')
+       backBut = QPushButton('< Back')
+
        
        self.grd = QGridLayout()
-       self.grd.addWidget(txt,0,0,1,numViews)
-       self.grd.addWidget(txt2,2,0,1,numViews)
-       
-       # Display image from each view #
-       for i in range(0,numViews):
-           im = self.frameDF['Image'][i]
-           cv2.imwrite(pth+'frame.png', im)
-           
-           img = mpimg.imread(pth+'frame.png')
-           self.canvas = FigureCanvas(Figure())
-           self.ax = self.canvas.figure.subplots()
-           self.ax.imshow(img)
-           self.canvas.draw()
-          
-           self.grd.addWidget(self.canvas,1,i,1,numViews-(numViews-i)+1)
-           cb.addItem('View'+str(i+1))
+       self.grd.addWidget(txt,0,0,1,6)
+       self.grd.addWidget(self.forward,5,3,1,1)
+       self.grd.addWidget(self.back,5,0,1,1)
+       self.grd.addWidget(backBut,6,1,1,1)
+       self.grd.addWidget(contBut,6,2,1,1)
 
-       self.grd.addWidget(cb,3,0,1,numViews)
-       orLab1 = QLabel('Or')
-       badBut2 = QPushButton('Need new images')
-       self.grd.addWidget(orLab1,4,0,1,numViews)
-       self.grd.addWidget(badBut2,5,0,1,numViews)
-       
+       # Display the first frame #
+       self.frames = os.listdir(self.vidFile.split('.')[0]+self.vidFile.split('.')[1]+'_frames/') 
+
+       self.frame = 0
+        
+       img = mpimg.imread(self.vidFile.split('.')[0]+self.vidFile.split('.')[1]+'_frames/'+self.frames[self.frame])
+       self.canvas = FigureCanvas(Figure())
+       self.ax = self.canvas.figure.subplots()
+       self.ax.imshow(img)
+       self.canvas.draw()
+          
+       self.grd.addWidget(self.canvas,1,0,4,4)
+              
        self.rightGroupBox.setLayout(self.grd)
        ########################################
        
        # Connect widgets with signals #
-       cb.activated.connect(self.viewSelected)
-       badBut2.clicked.connect(self.chooseNewDate)
+       self.forward.clicked.connect(self.onForwardClick)
+       self.back.clicked.connect(self.onBackClick)
+       contBut.clicked.connect(self.onContClick)
+       backBut.clicked.connect(self.onBackButClick)
        ################################
 
        # Full widget layout setup #
@@ -585,31 +617,47 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
        self.setWindowTitle('SurfRCaT')
        self.show()
        ############################
-       
-       # Instantiate worker threads #
-       if cameraName == 'follypiersouthcam': # Need 1 erosion iter for Folly Pier South, 2 for other cams # 
-           self.worker = CheckPTZThread(1)
+
+    def onForwardClick(self):
+       self.back.setEnabled(True)
+
+       if self.frame<len(self.frames)-1:
+           self.frame = self.frame+1
+
+           img = mpimg.imread(self.vidFile.split('.')[0]+self.vidFile.split('.')[1]+'_frames/'+self.frames[self.frame])
+           self.canvas = FigureCanvas(Figure())
+           self.ax = self.canvas.figure.subplots()
+           self.ax.imshow(img)
+           self.canvas.draw()
+          
+           self.grd.addWidget(self.canvas,1,0,4,4)
+           
        else:
-           self.worker = CheckPTZThread(2)
-       ##############################
-       
-    def viewSelected(self,item):
-       '''
-       Takes user to the lidar acquisition module on Yes click
-       '''
-       viewSel = item-1
-       im = self.frameDF['Image'][viewSel]
-       cv2.imwrite(pth+'frameUse.png', im)
+           self.forward.setEnabled(False)
 
-       # Get the saved lidar dataset IDs for the camera #
-       self.worker = getLidar_WebCATThread()
-       self.worker.finishSignal.connect(self.on_closeSignal)
-       self.worker.start()
 
-    def on_closeSignal(self):
-        '''
-        Moves to next window.
-        '''
+    def onBackClick(self):
+       self.forward.setEnabled(True)
+
+       if self.frame>0:
+           self.frame = self.frame-1
+
+           img = mpimg.imread(self.vidFile.split('.')[0]+self.vidFile.split('.')[1]+'_frames/'+self.frames[self.frame])
+           self.canvas = FigureCanvas(Figure())
+           self.ax = self.canvas.figure.subplots()
+           self.ax.imshow(img)
+           self.canvas.draw()
+              
+           self.grd.addWidget(self.canvas,1,0,4,4)
+       else:
+           self.back.setEnabled(False)
+
+
+    def onContClick(self):
+        
+        frameNumSel = self.frame
+        img = cv2.imread(self.vidFile.split('.')[0]+self.vidFile.split('.')[1]+'_frames/'+self.frames[frameNumSel])
+        cv2.imwrite(pth+'frameUse.png',img)
 
         f = open(pth+'lidarTable.pkl','rb')
         lidarTable = pickle.load(f)
@@ -618,160 +666,13 @@ class getWebCATImagery_ChooseViewWindow(QWidget):
         self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
         self.lw.resize(900,350)
         self.lw.show()
-       
+
+
+    def onBackButClick(self):
         
-    def chooseNewDate(self):
-       '''
-       Pops up window for user to input date for imagery download
-       '''
-       self.close()
-       self.newDate = getWebCATImagery_ChooseNewDateWindow()
-       self.newDate.show()
-
-
-class getWebCATImagery_ChooseNewDateWindow(QWidget):
-    '''
-    Window allowing the user to input desired date for WebCAT imagery, if defaults were not good
-    '''
-    
-    def __init__(self):
-        super().__init__()    
-        
-        if not QApplication.instance():
-            app = QApplication(sys.argv)
-        else:
-            app = QApplication.instance()             
-        self.initUI()
-        
-    def initUI(self):
-       
-       # Left menu box setup #
-       bf = QFont()
-       bf.setBold(True)
-       leftBar1 = QLabel('• Welcome!')
-       leftBar2 = QLabel('• Get imagery')
-       leftBar3 = QLabel('• Get lidar data')
-       leftBar4 = QLabel('• Pick GCPs')
-       leftBar5 = QLabel('• Calibrate')
-       leftBar6 = QLabel('• Rectify')
-       leftBar2.setFont(bf)
-
-       leftGroupBox = QGroupBox('Contents:')
-       vBox = QVBoxLayout()
-       vBox.addWidget(leftBar1)
-       vBox.addWidget(leftBar2)
-       vBox.addWidget(leftBar3)
-       vBox.addWidget(leftBar4)
-       vBox.addWidget(leftBar5)
-       vBox.addWidget(leftBar6)
-       vBox.addStretch(1)
-       leftGroupBox.setLayout(vBox)
-       ########################    
-       
-       # Right contents box setup #
-       lblDir1 = QLabel('Input desired date below (in yyyy,mm,dd format). Imagery dates of each WebCAT camera can be found at http://webcat-video.axds.co/status/')
-       lblDir1.setWordWrap(True)
-       self.bxYear = QLineEdit()
-       self.bxMonth = QLineEdit()
-       self.bxDay = QLineEdit()
-       lblYear = QLabel('Year:')
-       lblMonth = QLabel('Month:')
-       lblDay = QLabel('Day:')
-       contBut = QPushButton('Continue >')
-       
-       rightGroupBox = QGroupBox()
-       self.grd = QGridLayout()
-       self.grd.addWidget(lblDir1,0,0,1,4)
-       self.grd.addWidget(self.bxYear,1,2,1,2)
-       self.grd.addWidget(self.bxMonth,2,2,1,2)
-       self.grd.addWidget(self.bxDay,3,2,1,2)
-       self.grd.addWidget(lblYear,1,0,1,2)
-       self.grd.addWidget(lblMonth,2,0,1,2)
-       self.grd.addWidget(lblDay,3,0,1,2)
-       self.grd.addWidget(contBut,4,2,1,2)
-       #grd.setAlignment(Qt.AlignCenter)
-       rightGroupBox.setLayout(self.grd)
-       ##############################
-       
-       # Assign signals to widgets #
-       contBut.clicked.connect(self.getInputs)
-       #############################
-            
-       # Full widget layout setup #
-       fullLayout = QHBoxLayout()
-       fullLayout.addWidget(leftGroupBox)
-       fullLayout.addWidget(rightGroupBox)
-       self.setLayout(fullLayout)
-
-       self.setWindowTitle('SurfRCaT')
-       self.show()
-       ############################
-       
-       
-    def getInputs(self):
-       '''
-       Gets all the user inputs.
-       '''
-       
-       yr = int(self.bxYear.text())
-       mo = int(self.bxMonth.text())
-       day = int(self.bxDay.text())
-           
-       # Instantiate worker threads #
-       self.worker = DownloadVidThread(yr,mo,day)
-       
-       f = open(pth+'CameraName.pkl','rb')
-       cameraName = pickle.load(f)
-       print(cameraName)
-       if cameraName == 'follypiersouthcam': # Need 1 erosion iter for Folly Pier South, 2 for other cams # 
-           self.worker2 = CheckPTZThread(1)
-       else:
-           self.worker2 = CheckPTZThread(2)
-       ##############################
-       
-       lab1 = QLabel('Downloading Video...')
-       self.grd.addWidget(lab1,5,0,1,2)
-
-       self.loadlab = QLabel()
-       self.loadmovie = QMovie(pth1+'loading.gif')
-       self.loadlab.setMovie(self.loadmovie)
-       
-       self.worker.start()
-       self.grd.addWidget(self.loadlab,5,3,1,1)
-       self.loadmovie.start()
-       self.worker.finishSignal.connect(self.on_closeSignal)
-
-    def on_closeSignal(self):
-       '''
-       When download video thread is done, function shows a done label and starts the video decimation worker thread
-       '''
-       self.loadlab.setParent(None)
-       self.loadmovie.stop()
-       labDone = QLabel('Done.')
-       self.grd.addWidget(labDone,5,3,1,1)
-       
-       lab2 = QLabel('Checking different views...')
-       self.grd.addWidget(lab2,6,0,1,2)
-
-       self.loadlab = QLabel()
-       self.loadmovie = QMovie(pth1+'loading.gif')
-       self.loadlab.setMovie(self.loadmovie)
-       
-       self.worker2.start()
-       self.grd.addWidget(self.loadlab,6,3,1,1)
-       self.loadmovie.start()
-       self.worker2.finishSignal.connect(self.on_closeSignal2)       
-    
-    def on_closeSignal2(self):
-       '''
-       When PTZ check thread is complete, function shows a Done label and moves to the next window
-       '''
-       self.loadlab.setParent(None)
-       self.loadmovie.stop()
-
-       self.close()
-       self.cv = getWebCATImagery_ChooseViewWindow()
-       self.cv.show()
+        self.close()
+        self.ww = getWebCATImagery()  
+        self.ww.show()
 
 
 
@@ -908,13 +809,28 @@ class getOtherImagery_OtherCameraLocationInputWindow(QWidget):
            pickle.dump(az,f)
        with open(pth+'ZL.pkl','wb') as f:
            pickle.dump(ZL,f)
+
+       # Get and save the image into the working directory #
+       im = cv2.imread(pthToImage)
+
+       if im is not None:
+           cv2.imwrite(pth+'frameUse.png',im)
+
+           self.close()
+           self.ls = getLidar_FindUseableDatasetsWindow()
+           self.ls.show()
+       else:
+           msg = QMessageBox(self)
+           msg.setIcon(QMessageBox.Critical)
+           txt = ('Image not found.')
+           msg.setText(txt)
+           msg.setWindowTitle('Error')
+           msg.setStandardButtons(QMessageBox.Ok)
+           msg.show()
+           
+
        
-       im = cv2.imread(pthToImage) 
-       cv2.imwrite(pth+'frameUse.png',im)
-       
-       self.close()
-       self.ls = getLidar_FindUseableDatasetsWindow()
-       self.ls.show()
+
 
 
 
@@ -965,17 +881,11 @@ class getLidar_FindUseableDatasetsWindow(QWidget):
        # Right contents box setup #
        self.pb = QProgressBar()
        self.lab1 = QLabel('Looking for nearby datasets:')
-##       info = QLabel('Finding lidar datasets that cover this region:')
-##       self.val = QLabel('0%')
         
        rightGroupBox = QGroupBox()
        self.grd = QGridLayout()
        self.grd.addWidget(self.lab1,0,0,1,4)
        
-       
-##       self.grd.addWidget(info,0,0,1,6)
-##       self.grd.addWidget(self.val,1,0,1,1)
-##       self.grd.addWidget(self.pb,1,0,1,5)
        self.grd.setAlignment(Qt.AlignCenter)
        rightGroupBox.setLayout(self.grd)
        ##############################
@@ -1003,7 +913,7 @@ class getLidar_FindUseableDatasetsWindow(QWidget):
        self.worker.badSignal.connect(self.on_badSignal)
 
        self.loadlab = QLabel()
-       self.loadmovie = QMovie(pth+'loading.gif')
+       self.loadmovie = QMovie(pth1+'loading.gif')
        self.loadlab.setMovie(self.loadmovie)
        
        self.worker1.start()
@@ -1340,14 +1250,9 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         '''
         Move to next window.
         '''
-
-        f = open(pth+'CameraName.pkl','rb')
-        camName = pickle.load(f)
-        f2 = open(pth+'chosenLidarID.pkl','rb')
-        ID = pickle.load(f2)
         
         self.close()
-        self.nextWindow = PickGCPsWindow(camName,str(ID))        
+        self.nextWindow = PickGCPsWindow()        
         
     def GoBack(self):
         self.close()
@@ -2036,11 +1941,12 @@ class DownloadVidThread(QThread):
     threadSignal = pyqtSignal('PyQt_PyObject')
     finishSignal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self,year,month,day):
+    def __init__(self,year,month,day,hour):
         super().__init__()
         self.year = year
         self.month = month
         self.day = day
+        self.hour = hour
         
     def run(self):
         
@@ -2049,16 +1955,13 @@ class DownloadVidThread(QThread):
        f = open(pth+'CameraName.pkl','rb')      
        camToInput = pickle.load(f)
        
-       if self.year and self.month and self.day:
-           vidFile = SurfRCaT.getImagery_GetVideo(pth,camToInput,year=self.year,month=self.month,day=self.day)
-       else:
-           vidFile = SurfRCaT.getImagery_GetVideo(pth,camToInput)
+       vidFile = SurfRCaT.getImagery_GetVideo(pth,camToInput,year=self.year,month=self.month,day=self.day,hour=self.hour)
        
-       # Deal with Buxton camera name change #
-       fs = os.path.getsize(pth+vidFile) # Get size of video file #  
-       if camToInput == 'buxtoncoastalcam' and fs<1000:
-           vidFile = SurfRCaT.getImagery_GetVideo('buxtonnorthcam')
-       #######################################
+##       # Deal with Buxton camera name change #
+##       fs = os.path.getsize(pth+vidFile) # Get size of video file #  
+##       if camToInput == 'buxtoncoastalcam' and fs<1000:
+##           vidFile = SurfRCaT.getImagery_GetVideo('buxtonnorthcam')
+##       #######################################
        
        with open(pth+'vidFile.pkl','wb') as f:
            pickle.dump(vidFile,f)
@@ -2068,15 +1971,14 @@ class DownloadVidThread(QThread):
        print('Thread Done')
  
       
-class CheckPTZThread(QThread):
+class DecimateVidThread(QThread):
     ''' 
     Worker thread to check if camera is a PTZ camera.
     '''
     finishSignal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self,numIters):
+    def __init__(self):
         super().__init__()
-        self.numIters = numIters
         
     def run(self):
         
@@ -2084,13 +1986,9 @@ class CheckPTZThread(QThread):
        
        f = open(pth+'vidFile.pkl','rb')      
        vidFile = pickle.load(f)
-       
-       # Check if PTZ #       
+             
        fullVidPth = pth+vidFile           
-       viewDF,frameVec = SurfRCaT.getImagery_CheckPTZ(fullVidPth,self.numIters)
-       
-       with open(pth+'viewDF.pkl','wb') as f:
-           pickle.dump(viewDF,f)
+       SurfRCaT.getImagery_GetStills(fullVidPth)
            
        self.finishSignal.emit(1) 
         
@@ -2154,6 +2052,16 @@ class getLidar_FindCoveringDatasetsThread(QThread):
             ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
             ftp.login('anonymous','anonymous')
             
+            # Get a list of all lidar directories. These get updated through time so always need to check. #
+            ftp.cwd('/pub/DigitalCoast')
+            dirs = [i for i in ftp.nlst() if 'lidar' in i]
+            alldirs = []
+            for ii in dirs:
+                ftp.cwd(ii)
+                alldirs.append([ii+'/'+i for i in ftp.nlst() if 'geoid' in i])
+                ftp.cwd('../')  
+
+            
             appropID = list() # Initiate list of IDs which contain the camera location #
             i = 0
             for ID in IDs:
@@ -2161,8 +2069,8 @@ class getLidar_FindCoveringDatasetsThread(QThread):
                 i = i+1
                 perDone = i/len(IDs)
                 self.threadSignal.emit(perDone)  
-                
-                check = SurfRCaT.getLidar_TryID(ftp,ID,self.cameraLoc_lat,self.cameraLoc_lon)
+
+                check = SurfRCaT.getLidar_TryID(ftp,alldirs,ID,self.cameraLoc_lat,self.cameraLoc_lon)
                 
                 if check:
                     if len(check)>0:       
@@ -2523,12 +2431,16 @@ class calibrate_CalibrateThread(QThread):
         
         with open(pth+'calibVals.pkl','wb') as f:
             pickle.dump(calibVals,f)
-            
-##        ar1 = np.array(['Omega(rad)','Phi(rad)','Kappa(rad)','CamX(m)','CamY(m)','CamZ(m)','x0(pix)','y0(pix)','f(pix)'])
-##        ar2 = np.array([calibVals[0],calibVals[1],calibVals[2],calibVals[3],calibVals[4],calibVals[5],calibVals[6],calibVals[7],calibVals[8]])
-##        with open(pth+'calibVals2.txt','w') as f:
-##            writer = csv.writer(f,delimiter=',')
-##            writer.writerows(zip(ar1,ar2))
+
+        preamble1 = 'The optimized calibration parameter values are given below. Important notes:'
+        preamble2 = '   Omega, Phi, and Kappa are the three camera viewing angles. These can be converted'
+        preamble2_2 = '   to the azimuth, tilt, swing/roll conventions via...'
+        preamble3 = '   The input camera location has been set as the origin.'
+        ar1 = np.array(['Omega(rad)','Phi(rad)','Kappa(rad)','CamX(m)','CamY(m)','CamZ(m)','x0(pix)','y0(pix)','f(pix)'])
+        ar2 = np.array([calibVals[0],calibVals[1],calibVals[2],calibVals[3],calibVals[4],calibVals[5],calibVals[6],calibVals[7],calibVals[8]])
+        with open(pth+'calibVals2.txt','w') as f:
+            writer = csv.writer(f,delimiter=',')
+            writer.writerows(preamble1,preamble2,preamble2_2,preamble3,zip(ar1,ar2))
             
         np.savetxt(pth+'calibVals.txt',calibVals,fmt='%6f')            
       

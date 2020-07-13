@@ -68,174 +68,31 @@ def getImagery_GetVideo(pth,camToInput,year=2019,month=11,day=1,hour=1000):
 
 
 #=============================================================================#
-# Check if the camera is a PTZ camera #
+# Get camera stills #
 #=============================================================================#
-def getImagery_CheckPTZ(vidPth,numErosionIter):
-    
-    """
-    Function to check whether or not the desired camera is a pan-tilt-zoom (PTZ) camera. If it is,
-    it will cycle through multiple view-points. This function extracts the longest continuous line
-    from a series of video snaps and compares the angle of the line, utilizing the assumption that
-    unique view-points will contain uniquly angled lines. Canny edge detection followed by a Hough
-    Transform are used to find the longest line in each image. Function returns a data frame containing 
-    indicies of snaps at each view. Companion function getImagery_GetFrames seperates the frames.
-    The method definitely isn't perfect, but it typically does a good enough job to distinguish
-    between unique views if the horizon is visible.
-    
-    Inputs:
-        vidPth: (string) path to the video file that was obtained and saved by getImagery_GetVideo function
-        numErosionIter: (int) prior to Canny edge detection, the input image is "eroded" (blurred) to reduce
-                        the influence of smaller-scale edges. This number determines how many times this erosion is
-                        performed. 2 typically gives good results.
-    
-    Outputs:
-        viewDF: (DataFrame)Data frame containing indicies of snaps at each view-point
-        frameVec: (array) 1d array (vector) containing all the frame numbers.
-        
-    """
-    
-    import numpy as np
-    import math
-    import cv2 
-    import pandas as pd
+def getImagery_GetStills(vid):
 
-    # Get the video capture #
-    vid = cv2.VideoCapture(vidPth)
-    
-    # Find the number of frames in the video #
-    vidLen = int(vid.get(cv2.CAP_PROP_FRAME_COUNT))
-
-    # Calc horizon angle of each frame #
-    psis = np.array([])
-    frameNum = np.array([])
-    for count in range(0,vidLen-500,int(vidLen/1000)):
-        vid.set(1,count) #Set the property that we will pull the frame numbered by count #  
-        test,image = vid.read()
-        
-        # Erode the image (morphological erosion) #
-        kernel = np.ones((5,5),np.uint8)
-        imeroded = cv2.erode(image,kernel,iterations=numErosionIter)
-
-        # Find edges using Canny Edge Detector #
-        edges = cv2.Canny(imeroded,50,100)
-    
-        # Find longest straight edge with Hough Transform #
-        lines = cv2.HoughLines(edges,1,np.pi/180,200)
-        if lines is not None:
-            for rho,theta in lines[0]: # The first element is the longest edge #
-                a = np.cos(theta)
-                b = np.sin(theta)
-                x0 = a*rho
-                y0 = b*rho
-                x1 = int(x0 + 1000*(-b))
-                y1 = int(y0 + 1000*(a))
-                x2 = int(x0 - 1000*(-b))
-                y2 = int(y0 - 1000*(a))
-            
-            # Calc horizon angle (psi) #
-            psi = math.atan2(y1-y2,x2-x1)
-        
-            # Save horizon angle and the number of the frame #
-            psis = np.append(psis,psi)
-            frameNum = np.append(frameNum,count)
-        
-    
-    # Round angles to remove small fluctuations, and take abs val #
-    psis = np.round(abs(psis),3)
-
-    # Find the frames where calculated angle changes #
-    dif = np.diff(psis)
-    changes = np.array(np.where(dif!=0))
-
-    # Calculate the length of each angle segment between when the angle changes.
-    if np.size(changes)>0:
-        segLens = np.array([])
-        vals = np.array([])
-        for i in range(0,len(changes[0,:])+1):
-            if i == len(changes[0,:]):
-                segLen = len(psis)-(changes[0,i-1]+1)
-                val = psis[len(psis)-1]    
-            elif changes[0,i] == changes[0,0]:
-                segLen = changes[0,i]
-                val = psis[0]
-            else:
-                segLen = changes[0,i]-changes[0,i-1]
-                val = psis[changes[0,i-1]+1]
-                
-            segLens = np.append(segLens,segLen)
-            vals = np.append(vals,val)
-            
-        # Keep only chunks that are continuous over a threshold #    
-        IDs_good = np.array(np.where(segLens>=10)) # Using 10 seems to work, but this could be changed #
-        valsKeep = vals[IDs_good]
-    
-        # Find the unique views #
-        viewAngles = np.unique(valsKeep)
-
-        # Find and extract the frames contained within each view #
-        frameVec = np.array(range(0,vidLen-500,int(vidLen/1000)))
-        angles = []
-        frames = []
-        for i in viewAngles:
-            iFrames = frameVec[np.array(np.where(psis == i))]
-            angles.append(i)
-            frames.append([iFrames])
-        
-        viewDict = {'View Angles':angles,'Frames':frames}
-        viewDF = pd.DataFrame(viewDict)
-        
-        return viewDF,frameVec
-    
-    else:
-   
-        # Find the unique views #
-        viewAngles = np.unique(psis)
-    
-        # Find and extract the frames contained within each view #
-        frameVec = np.array(range(0,vidLen-500,int(vidLen/1000)))
-        angles = []
-        frames = []
-        for i in viewAngles:
-            iFrames = np.array(np.where(psis == i))
-            angles.append(i)
-            frames.append([iFrames])
-            
-        viewDict = {'View Angles':angles,'Frames':frames}
-        viewDF = pd.DataFrame(viewDict)
-        
-        return viewDF,frameVec
-
-
-def getImagery_GetFrames(vidPth,viewDF):
-    
-    '''
-    Function to put the frames from each view into a dataframe 
-    
-    Inputs:
-        vidPth: (string)  path to the video file that was obtained and saved by getImagery_GetVideo function
-        viewDF: (DataFrame) The dataframe of views returned by the checkPTZ function 
-    
-    Outputs:
-        frameDF: (DataFrame) dataframe of snaps in each view
-    
-    '''
-    
-    import pandas as pd
     import cv2
+    import numpy as np
+    import os
+
+    # Create new directory to house the stills #
+    os.mkdir(vid.split('.')[0]+vid.split('.')[1]+'_frames')
     
-    numViews = len(viewDF)
-    vid = cv2.VideoCapture(vidPth)
-    
-    frameDF = pd.DataFrame(columns=['View','Image'])
-    for i in range(0,numViews):
-        frameTake = viewDF['Frames'][i][0][0][1]
+
+    cap = cv2.VideoCapture(vid)
+    numFrames = int(cap.get(7))
+    framesKeep = np.round(np.linspace(0,numFrames,50)) # 50 frames from the 10 minute video = 1 frame every 12 seconds #
+
+    for i in framesKeep:
         
-        vid.set(1,frameTake) # Set the property that we will pull the desired frame #  
-        test,image = vid.read()
+        cap.set(1,int(i))
+        test,im = cap.read()
         
-        frameDF = frameDF.append({'View':i,'Image':image},ignore_index=True)
-        
-    return frameDF
+        if test:
+            cv2.imwrite(vid.split('.')[0]+vid.split('.')[1]+'_frames/frame'+str(int(i))+'.png',im)
+
+
 #=============================================================================#
 
 
@@ -422,7 +279,7 @@ def getLidar_FindPossibleIDs(cameraLoc_lat,cameraLoc_lon):
 
 
         
-def getLidar_TryID(ftp,ID,cameraLoc_lat,cameraLoc_lon):
+def getLidar_TryID(ftp,alldirs,ID,cameraLoc_lat,cameraLoc_lon):
     
     '''
     Function to go through a lidar dataset and determine if it covers the location of the camera. If
@@ -443,21 +300,15 @@ def getLidar_TryID(ftp,ID,cameraLoc_lat,cameraLoc_lon):
     from io import StringIO
     from pandas import read_csv
 
-    # Get into the correct NOAA FTP site- there are 5 of them. I'm sure this isn't the clenest way to do this... #
-    # "If at first you don't succeed..."
-    try:
-        ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12b/data/'+str(ID))
-    except:
-        try:
-            ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(ID))
-        except:
+    # Get into the correct NOAA FTP site ##
+    for i in alldirs:
+        for ii in i:
             try:
-                ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid12b/data/'+str(ID))
+                ftp.cwd(ii+'/data/'+str(ID))
             except:
-                try:
-                    ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12a/data/'+str(ID))
-                except:
-                    ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid18/data/'+str(ID))
+                pass
+            else:
+                break
                     
         
     # Find the minmax csv file which shows the min and max extents of each tile within the current dataset #
