@@ -70,27 +70,53 @@ def getImagery_GetVideo(pth,camToInput,year=2019,month=11,day=1,hour=1000):
 #=============================================================================#
 # Get camera stills #
 #=============================================================================#
-def getImagery_GetStills(vid):
+def getImagery_GetStills(vid,secondsPerFrame,rate,vidLen,fps,saveBasePth):
 
     import cv2
     import numpy as np
     import os
 
     # Create new directory to house the stills #
-    os.mkdir(vid.split('.')[0]+vid.split('.')[1]+'_frames')
+    os.mkdir(saveBasePth+'frames')
     
 
     cap = cv2.VideoCapture(vid)
-    numFrames = int(cap.get(7))
-    framesKeep = np.round(np.linspace(0,numFrames,50)) # 50 frames from the 10 minute video = 1 frame every 12 seconds #
 
-    for i in framesKeep:
-        
-        cap.set(1,int(i))
-        test,im = cap.read()
-        
-        if test:
-            cv2.imwrite(vid.split('.')[0]+vid.split('.')[1]+'_frames/frame'+str(int(i))+'.png',im)
+    
+    # If there was an input decimation rate (which means secondsPerFrame=1), determine the frame numbers to pull each second
+    # by evenly spacing the frame rate in the known frames per second. If there was an input number of frames (which means
+    # secondsPerFrame != 1), determine the middle frame for each second to be pulled based on the frames per second. #
+    if secondsPerFrame == 1:
+        framesEachSecond = np.round(np.linspace(0,fps,rate))
+    else:
+        framesEachSecond = [int(round(fps/2))]
+
+    
+    totalFrames = 0
+    for i in range(0,int(round(vidLen)),secondsPerFrame):
+        for ii in framesEachSecond:
+            frame = totalFrames+ii
+            cap.set(1,frame)
+            test,im = cap.read()
+            cv2.imwrite(saveBasePth+'frames/frame'+str(int(i))+'.png',im)
+        totalFrames = totalFrames+(fps*secondsPerFrame)
+
+
+
+
+
+    
+
+    
+##    framesKeep = np.round(np.linspace(0,numFrames,50)) # 50 frames from the 10 minute video = 1 frame every 12 seconds #
+##
+##    for i in framesKeep:
+##        
+##        cap.set(1,int(i))
+##        test,im = cap.read()
+##        
+##        if test:
+##            cv2.imwrite(vid.split('.')[0]+vid.split('.')[1]+'_frames/frame'+str(int(i))+'.png',im)
 
 
 #=============================================================================#
