@@ -47,6 +47,11 @@ def getImagery_GetVideo(pth,camToInput,year=2019,month=11,day=1,hour=1000):
         day = '0'+str(day)
     else:
         day = str(day)
+
+    if hour<1000:
+        hour = '0'+str(hour)
+    else:
+        hour = str(hour)
        
     # Get the video URL # 
     url = 'http://webcat-video.axds.co/{}/raw/{}/{}_{}/{}_{}_{}/{}.{}-{}-{}_{}.mp4'.format(camToInput,year,year,month,year,month,day,camToInput,year,month,day,hour)   
@@ -70,15 +75,12 @@ def getImagery_GetVideo(pth,camToInput,year=2019,month=11,day=1,hour=1000):
 #=============================================================================#
 # Get camera stills #
 #=============================================================================#
-def getImagery_GetStills(vid,secondsPerFrame,rate,vidLen,fps,saveBasePth):
+def getImagery_GetStills(vid,secondsPerFrame,rate,vidLen,fps,saveDir):
 
     import cv2
     import numpy as np
     import os
 
-    # Create new directory to house the stills #
-    os.mkdir(saveBasePth+'frames')
-    
 
     cap = cv2.VideoCapture(vid)
 
@@ -98,7 +100,7 @@ def getImagery_GetStills(vid,secondsPerFrame,rate,vidLen,fps,saveBasePth):
             frame = totalFrames+ii
             cap.set(1,frame)
             test,im = cap.read()
-            cv2.imwrite(saveBasePth+'frames/frame'+str(int(i))+'.png',im)
+            cv2.imwrite(saveDir+'/frame'+str(int(i))+'.png',im)
         totalFrames = totalFrames+(fps*secondsPerFrame)
 
 
@@ -1020,7 +1022,7 @@ def calibrate_CalcReprojPos(gcps_lidar,calibVals):
 #=============================================================================#
 # Perform Rectification #
 #=============================================================================#
-def rectify_RectifyImage(calibVals,img,xmin,xmax,dx,ymin,ymax,dy,z):
+def rectify_RectifyImage(calibVals,img,grd):
 
     '''
     Function to rectify an image using the resolved calibration parameters. User inputs a grid in real world space
@@ -1070,11 +1072,11 @@ def rectify_RectifyImage(calibVals,img,xmin,xmax,dx,ymin,ymax,dy,z):
     m33 = math.cos(omega)*math.cos(phi)
     
     # Set up object-space grid #
-    xg = np.arange(xmin,xmax,dx)
-    yg = np.arange(ymin,ymax,dy)
+    xg = np.arange(grd[0],grd[1],grd[2])
+    yg = np.arange(grd[3],grd[4],grd[5])
     xgrd,ygrd = np.meshgrid(xg,yg)
-    zgrd = np.zeros([len(xgrd[:,1]),len(xgrd[1,:])])+z
-    extents = np.array([(-.5*dx)+min(xg),max(xg)+(.5*dx),min(yg)-(.5*dy),max(yg)+(.5*dy)])
+    zgrd = np.zeros([len(xgrd[:,1]),len(xgrd[1,:])])+grd[6]
+    extents = np.array([(-.5*grd[2])+min(xg),max(xg)+(.5*grd[2]),min(yg)-(.5*grd[5]),max(yg)+(.5*grd[5])])
 
     # Get image coordinates of each desired world coordinate based on calib vals #
     x = x0 - (f*(((m11*(xgrd-XL)) + (m12*(ygrd-YL)) + (m13*(zgrd-ZL))) / ((m31*(xgrd-XL)) + (m32*(ygrd-YL)) + (m33*(zgrd-ZL)))))
