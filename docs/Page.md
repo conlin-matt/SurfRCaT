@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Example Page
+title: Example
 ---
 
 This is a test to see if I can create a new page on my site. I can make a list like this:
