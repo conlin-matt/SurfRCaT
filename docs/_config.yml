@@ -33,4 +33,4 @@ exclude: ["lib", "config.rb", "Capfile", "config", "log", "Rakefile", "Rakefile.
 
 
 
-theme: jekyll-theme-dinky
+remote_theme: christianezeani/panthera-jekyll
