@@ -3,7 +3,7 @@ remote_theme: christianezeani/panthera-jekyll
 title: SurfRCaT Homepage
 
 left_side:
-  background_image: "./_data/icon3.png"
+  background_image: "https://github.com/conlin-matt/SurfRCaT/blob/master/docs/_data/icon3.png"
   
 menu:
   - text: Home
