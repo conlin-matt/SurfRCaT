@@ -30,6 +30,7 @@ import os
 import cv2
 import matplotlib.image as mpimg 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5 import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 import numpy as np
 import time
@@ -493,7 +494,6 @@ class getImagery_GetWebCATImagery(QWidget):
            os.mkdir(pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/_binaries')
            
            pth = pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/'
-           print(pth)
            
            # Save everything #
            with open(pth+'_binaries/CameraLocation.pkl','wb') as f:
@@ -511,30 +511,44 @@ class getImagery_GetWebCATImagery(QWidget):
 
            self.downloadVid()
                
-       else:        
+       else:
+           print(pth)
            msg = QMessageBox(self)
            msg.setIcon(msg.Warning)
            msg.setText('A subdirectory for this video already exists in your working directory, making it appear that '+
                        'you are re-trying a calibration. If this is not true, please remove this subdirectory from your working directory or rename it. If it is, '+
                        ' do you want to use the same calibration image as before (select No if you do not have images yet)?')
            msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-           msg.buttonClicked.connect(self.onMsgBoxClick)
            msg.show()
+           msg.buttonClicked.connect(self.onMsgBoxClick)
+
            
            
     def onMsgBoxClick(self,i):
+
+        print('In function')
 
         global pth
         
         if i.text() == '&Yes':
  
             pth = pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/'
-
             self.worker = getLidar_WebCATThread()
-            self.worker.start()
             self.worker.finishSignal.connect(self.skipToLidar)
 
+            lab1 = QLabel('Getting lidar datasets...')
+            self.grd.addWidget(lab1,11,0,1,1)
+
+            self.loadlab = QLabel()
+            self.loadmovie = QMovie(pth1+'loading.gif')
+            self.loadlab.setMovie(self.loadmovie)
+       
+            self.worker.start()
+            self.grd.addWidget(self.loadlab,11,1,1,1)
+            self.loadmovie.start()
+
         elif i.text() == '&No':
+            print('In No clause')
 
             pth = pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/'
 
@@ -622,7 +636,7 @@ class getImagery_GetWebCATImagery(QWidget):
 
     def skipToLidar(self):
 
-       if os.path.exists(pth+'lidarPC.pkl'):
+       if os.path.exists(pth+'_binaries/lidarPC.pkl'):
            msg = QMessageBox(self)
            msg.setIcon(QMessageBox.Information)
            txt = ('Exisiting lidar point cloud for this camera found. Do you want to use it? \n' +
@@ -631,10 +645,10 @@ class getImagery_GetWebCATImagery(QWidget):
            msg.setText(txt)
            msg.setWindowTitle('Error')
            msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-           msg.buttonClicked.connect(self.onMsgBoxClick)
+           msg.buttonClicked.connect(self.onMsgBoxClick2)
            msg.show()
        else:
-           f = open(pth+'lidarTable.pkl','rb')
+           f = open(pth+'_binaries/lidarTable.pkl','rb')
            lidarTable = pickle.load(f)
 
            self.close()
@@ -642,7 +656,7 @@ class getImagery_GetWebCATImagery(QWidget):
            self.lw.resize(900,350)
            self.lw.show()
          
-    def onMsgBoxClick(self,i):
+    def onMsgBoxClick2(self,i):
        
        if i.text() == '&Yes':
             
@@ -650,7 +664,7 @@ class getImagery_GetWebCATImagery(QWidget):
            self.w = PickGCPsWindow()
            self.w.show()
        else:
-           f = open(pth+'lidarTable.pkl','rb')
+           f = open(pth+'_binaries/lidarTable.pkl','rb')
            lidarTable = pickle.load(f)
 
            self.close()
@@ -1789,13 +1803,17 @@ class PickGCPsWindow(QWidget):
         img = mpimg.imread(pth+'calibrationImage.png')
         self.canvas = FigureCanvas(Figure())
         self.ax = self.canvas.figure.subplots()
+        self.ax.format_coord = lambda x, y: ""
         self.ax.imshow(img)
+        self.origxlim = self.ax.get_xlim()
+        self.origylim = self.ax.get_ylim()
         self.canvas.draw()
             
         self.introLab = QLabel('Welcome to the GCP picking module! Here, you will be guided through the process of co-locating points in the image and the lidar observations. You must identify the correspondence of at least 3 unique points for the calibration to work.')
         self.introLab.setWordWrap(True)
         self.goLab = QLabel('Ready to co-locate points?')
         self.goBut = QPushButton('Go')
+        self.navBar = self.NavToolbar(self.canvas,self)
         
         self.rightGroupBox = QGroupBox()
         self.grd = QGridLayout()
@@ -1814,7 +1832,8 @@ class PickGCPsWindow(QWidget):
         self.worker = pptkWindowWorker()
         self.worker.finishSignal.connect(self.on_CloseSignal)
         self.worker.badSignal.connect(self.on_badSignal)
-        self.worker2 = pickGCPs_Image(self.canvas,gcps_im)
+        self.worker2 = pickGCPs_Image(self.canvas)
+        self.worker2.threadSignal.connect(self.on_ClickSignal)
         ##############################
         
         
@@ -1829,7 +1848,14 @@ class PickGCPsWindow(QWidget):
         self.show()
         ############################
 
-       
+
+   class NavToolbar(NavigationToolbar):
+   
+        toolitems = [t for t in NavigationToolbar.toolitems if
+                     t[0] in ('Home','Pan','Zoom')]
+
+ 
+
    def getPoints1(self):
        '''
        Start the lidar picking process.
@@ -1859,29 +1885,49 @@ class PickGCPsWindow(QWidget):
        self.grd.addWidget(self.loadlab,7,3,1,1)
        self.loadmovie.start()
 
-
-
                           
    def on_CloseSignal(self):
        '''
        Start the image picking process.
        '''
-
+       f = open(pth+'_binaries/GCPs_lidar.pkl','rb') 
+       iGCPs2 = pickle.load(f)
+       
        self.dirLab.setParent(None)
        self.loadlab.setParent(None)
+       self.helpBut.setParent(None)
 
        self.dirLab2 = QLabel('Real-world coordinates of points saved! Now, click on the points (in the same order) in the image. Press Done when finished.')
        self.dirLab2.setWordWrap(True)
+       self.clicksLab = QLabel('0 of '+str(int(len(iGCPs2)))+' points identified')
        self.doneBut = QPushButton('Done')
 
+       self.grd.addWidget(self.navBar,1,0,1,4)
        self.grd.addWidget(self.dirLab2,0,0,1,4)
-       self.grd.addWidget(self.doneBut,7,3,1,1)
+       self.grd.addWidget(self.clicksLab,7,3,1,1)
+       self.grd.addWidget(self.doneBut,8,3,1,1)
+       self.grd.addWidget(self.helpBut,8,0,1,1)
 
        self.doneBut.clicked.connect(self.on_DoneClick)
 
        # Launch the image GCP picking process #
        self.worker2.start()
  
+   def on_ClickSignal(self,clicks):
+
+       self.clicksLab.setParent(None)
+       
+       f = open(pth+'_binaries/GCPs_lidar.pkl','rb') 
+       iGCPs2 = pickle.load(f)
+
+       self.clicksLab = QLabel(str(int(clicks))+' of '+str(int(len(iGCPs2)))+' points identified')
+       self.grd.addWidget(self.clicksLab,7,3,1,1)
+
+       f = open(pth+'_binaries/GCPs_im.pkl','rb') 
+       gcps = pickle.load(f)
+       self.ax.plot(gcps[len(gcps[:,0])-1,0],gcps[len(gcps[:,0])-1,1],'ro')
+       
+
    def on_badSignal(self):
        
        msg = QMessageBox(self)
@@ -1919,11 +1965,14 @@ class PickGCPsWindow(QWidget):
        
        self.dirLab2.setParent(None)
        self.doneBut.setParent(None)
-       self.helpBut.setParent(None)       
+       self.helpBut.setParent(None)
+
+       self.ax.set_xlim(self.origxlim)
+       self.ax.set_ylim(self.origylim)
     
-       with open(pth+'_binaries/GCPs_im.pkl','rb') as f:
-           gcpS_im = pickle.load(f)
-       self.ax.plot(gcpS_im[:,0],gcpS_im[:,1],'ro')
+##       with open(pth+'_binaries/GCPs_im.pkl','rb') as f:
+##           gcpS_im = pickle.load(f)
+##       self.ax.plot(gcpS_im[:,0],gcpS_im[:,1],'ro')
        
        self.lab = QLabel('Your GCPs are shown on the image below. Are you happy with them? Press Continue to perform the calibration using these GCPs or select Retry to pick again.')
        self.lab.setWordWrap(True)
@@ -1943,8 +1992,9 @@ class PickGCPsWindow(QWidget):
        Go back to the start of the GCP picking module if the user wants to try again.
        '''
        
-       global gcps_im
-       gcps_im = []
+##       global gcps_im
+##       del gcps_im
+       
        self.close()
        self.a = PickGCPsWindow()
        self.a.show()
@@ -2763,8 +2813,6 @@ class getLidar_WebCATThread(QThread):
 
         print('Thread Started')
 
-        cams = ['staugustinecam','twinpierscam','miami40thcam']
-
         f = open(pth+'_binaries/CameraName.pkl','rb')
         name = pickle.load(f)
 
@@ -2966,53 +3014,75 @@ class pptkWindowWorker(QThread):
         self.child.waitForFinished(-1)
 
         # Load the output and create the GCPs from it #
-        f = open(pth1+'Testing.txt','r') # This is a list of point indicies- not important for the user. #
-        iGCPs1 = f.read()
-        iGCPs2 = iGCPs1[1:len(iGCPs1)-2]
-
         try:
-            iGCPs = list(map(int,iGCPs2.split(',')))
-        except ValueError:
+            f = open(pth1+'Testing.txt','r') # This is a list of point indicies- not important for the user. #
+        except FileNotFoundError:
             self.badSignal.emit(1)
         else:
-            GCPs_lidar = np.empty([0,3])
-            for i in iGCPs:
-                GCPs_lidar = np.vstack((GCPs_lidar,pc.iloc[i,:]))
-            
-            np.savetxt(pth+'GCPS_lidar.txt',GCPs_lidar)
+            iGCPs1 = f.read()
+            iGCPs2 = iGCPs1[1:len(iGCPs1)-2]
 
-            with open(pth+'_binaries/GCPs_lidar.pkl','wb') as f:
-                pickle.dump(GCPs_lidar,f)
+            try:
+                iGCPs = list(map(int,iGCPs2.split(',')))
+            except ValueError:
+                self.badSignal.emit(1)
+            else:
+                GCPs_lidar = np.empty([0,3])
+                for i in iGCPs:
+                    GCPs_lidar = np.vstack((GCPs_lidar,pc.iloc[i,:]))
+                
+                np.savetxt(pth+'GCPS_lidar.txt',GCPs_lidar)
 
-            self.finishSignal.emit(1)    
-            
-            print('Thread Done')        
+                with open(pth+'_binaries/GCPs_lidar.pkl','wb') as f:
+                    pickle.dump(GCPs_lidar,f)
+
+                self.finishSignal.emit(1)    
+                
+                print('Thread Done')        
 
 
-gcps_im = []
+
 class pickGCPs_Image(QThread):
 
     '''
     Worker thread to allow GCP identification in the image
     '''
-        
+
+    threadSignal = pyqtSignal('PyQt_PyObject')  
     finishSignal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self,canvas,gcps_im):
+    def __init__(self,canvas):
         super().__init__()
         self.canvas = canvas
+
+        self.press = False
+        self.move = False
         
     def run(self):
 
         print('Thread Started')
+        self.gcps_im = []
+
+        def onPress(event):
+            self.press = True
+        def onMove(event):
+            if self.press:
+                self.move = True
+        def onRelease(event):
+            if self.press and not self.move:
+                onclick(event)
+            self.press = False
+            self.move = False
+
 
         def onclick(event):
+            
 
            ix,iy = event.xdata,event.ydata
   
-           global gcps_im
-           gcps_im.append((ix,iy))
-           gcps_im2 = np.array(gcps_im)
+##           global gcps_im
+           self.gcps_im.append((ix,iy))
+           gcps_im2 = np.array(self.gcps_im)
            uVals = np.empty([0,2])
            for i in range(0,len(gcps_im2[:,0])):
                if gcps_im2[i,0] not in uVals[:,0] or gcps_im2[i,1] not in uVals[:,1]:
@@ -3025,14 +3095,21 @@ class pickGCPs_Image(QThread):
            with open(pth+'_binaries/GCPs_im.pkl','wb') as f:
                pickle.dump(gcps_im2,f)
 
+           clicks = len(gcps_im2)
+           self.threadSignal.emit(clicks)
+
            np.savetxt(pth+'GCPS_im.txt',gcps_im2)
 
+
            return
- 
+        
            
         while True:
-            cid = self.canvas.mpl_connect('button_press_event',lambda event: onclick(event))
+            cid1 = self.canvas.mpl_connect('button_press_event',onPress)
+            cid2 = self.canvas.mpl_connect('button_release_event',onRelease)
+            cid3 = self.canvas.mpl_connect('motion_notify_event',onMove)
             time.sleep(1)
+            
             
         self.finishSignal.emit(1)    
         
