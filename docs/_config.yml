@@ -2,6 +2,12 @@ remote_theme: conlin-matt/panthera-jekyll
 
 title: SurfRCaT Homepage
 
+left_side:
+  foreground_image: "./_data/icon3.png"
+  background_color: "#F00"
+  close_button_color: "#F00"
+  text_color: "#F00"
+  
 menu:
   - text: Home
     link: /
