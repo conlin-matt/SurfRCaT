@@ -91,6 +91,7 @@ class WelcomeWindow(QWidget):
         txt3 = QLabel('What would you like to do?')
         calibBut = QRadioButton('Calibrate a surfcam')
         rectifBut = QRadioButton('Rectify images (from already-calibrated camera)')
+        webcatBut = QRadioButton('Download imagery from WebCAT camera')
 
         rightGroupBox = QGroupBox()
         rightGroupBox1 = QGroupBox()
@@ -105,6 +106,7 @@ class WelcomeWindow(QWidget):
         grd2.addWidget(txt3,0,0,1,4)
         grd2.addWidget(calibBut,1,1,1,3)
         grd2.addWidget(rectifBut,2,1,1,3)
+        grd2.addWidget(webcatBut,3,1,1,3)
         rightGroupBox2.setLayout(grd2)
         grd.addWidget(rightGroupBox1,0,0,1,4)
         grd.addWidget(rightGroupBox2,1,0,1,4)
@@ -113,6 +115,7 @@ class WelcomeWindow(QWidget):
         # Connect widgets with signals #
         calibBut.clicked.connect(self.on_calibSelect)
         rectifBut.clicked.connect(self.on_rectifSelect)
+        webcatBut.clicked.connect(self.on_webcatSelect)
         ################################
 
         # Full widget layout setup #
@@ -135,6 +138,12 @@ class WelcomeWindow(QWidget):
         
         self.close()
         self.w = rectify_InputsWindow()
+        self.w.show()
+
+    def on_webcatSelect(self):
+        
+        self.close()
+        self.w = getImagery_GetWebCATImagery()
         self.w.show()
 
 
@@ -260,7 +269,7 @@ class StartCalibWindow(QWidget):
 ##============================================================================##
 class getImagery_InputCameraParams(QWidget):
     '''
-    Window allowing the user to input necessary info on any (non WebCAT) surfcam, such as location and name. 
+    Window allowing the user to input necessary info on any surfcam, such as location and name. 
     '''
     def __init__(self):
         super().__init__()
@@ -310,23 +319,36 @@ class getImagery_InputCameraParams(QWidget):
        self.bxElev = QLineEdit()
        self.bxAz = QLineEdit()
        self.azHelpBut = QPushButton('?')
-       lblPth = QLabel('Use the button below to select the video from your camera (.mp4 format):')
+       lblPth = QLabel('Select the video from your camera (.mp4 format):')
        lblPth.setWordWrap(True)
        browseBut = QPushButton('Browse')
        self.bxPth = QLineEdit()
-       line = QFrame()
-       line.setFrameShape(QFrame.HLine)
+       line = QFrame(); line.setFrameShape(QFrame.HLine)
+       line2 = QFrame(); line2.setFrameShape(QFrame.HLine)
        orLab = QLabel('Or')
-       self.webcatBut = QRadioButton('Calibrate camera from the WebCAT array')
+       webcatLab = QLabel('Select camera from the WebCAT array:')
+       opt = QComboBox()
+       opt.addItem('--')
+       opt.addItem('Folly Beach Pier (north)')
+       opt.addItem('Folly Beach Pier (south)')
+       opt.addItem('St. Augustine Pier')
+       opt.addItem('Miami 40th Street')
+       opt.setCurrentIndex(0)
+       lblPth2 = QLabel('Select video from this WebCAT camera:')
+       lblPth2.setWordWrap(True)
+       browseBut2 = QPushButton('Browse')
+       self.bxPth2 = QLineEdit()
        backBut = QPushButton('< Back')
-       contBut = QPushButton('Continue >')
+       contBut1 = QPushButton('Continue >')
+       contBut2 = QPushButton('Continue >')
+       qBut = QPushButton("What's this?")
 
        rightGroupBox = QGroupBox()
-       rightGroupBox1 = QGroupBox()
-       rightGroupBox5 = QGroupBox()
-       grd = QGridLayout()
+       rightGroupBox1 = QGroupBox('Any camera')
+       rightGroupBox2 = QGroupBox('WebCAT camera')
+       self.grd = QGridLayout()
        grd1 = QGridLayout()
-       grd5 = QGridLayout()
+       grd2 = QGridLayout()
        grd1.addWidget(lblDir1,0,0,1,3)
        grd1.addWidget(self.bxName,0,3,1,3)
        grd1.addWidget(lblDir,1,0,1,6)
@@ -342,27 +364,36 @@ class getImagery_InputCameraParams(QWidget):
        grd1.addWidget(lblPth,6,0,1,6)
        grd1.addWidget(browseBut,7,5,1,1)
        grd1.addWidget(self.bxPth,7,0,1,5)
+       grd1.addWidget(contBut1,8,4,1,2)
        rightGroupBox1.setLayout(grd1)
-       grd5.addWidget(self.webcatBut,0,0,1,4)
-       rightGroupBox5.setLayout(grd5)
-       grd.addWidget(rightGroupBox1,0,0,8,6)
-       grd.addWidget(line,8,0,1,8)
-       grd.addWidget(orLab,9,0,1,1)
-       grd.addWidget(rightGroupBox5,10,0,1,6)
-       grd.addWidget(backBut,11,0,1,2)
-       grd.addWidget(contBut,11,4,1,2)
-       grd.setAlignment(Qt.AlignCenter)
-       rightGroupBox.setLayout(grd)
+       grd2.addWidget(webcatLab,0,0,1,6)
+       grd2.addWidget(opt,1,0,1,4)
+       grd2.addWidget(lblPth2,2,0,1,6)
+       grd2.addWidget(self.bxPth2,3,0,1,5)
+       grd2.addWidget(browseBut2,3,5,1,1)
+       grd2.addWidget(contBut2,4,4,1,2)
+       rightGroupBox2.setLayout(grd2)
+
+       self.grd.addWidget(rightGroupBox1,0,0,4,6)
+       self.grd.addWidget(line,5,0,1,8)
+       self.grd.addWidget(orLab,6,0,1,1)
+       self.grd.addWidget(line2,7,0,1,8)
+       self.grd.addWidget(rightGroupBox2,8,0,3,6)
+       self.grd.addWidget(backBut,11,0,1,2)
+       self.grd.setAlignment(Qt.AlignCenter)
+       rightGroupBox.setLayout(self.grd)
        ##############################
        
        # Assign signals to widgets #
        browseBut.clicked.connect(self.onBrowseClick)
+       browseBut2.clicked.connect(self.onBrowseClick2)
        backBut.clicked.connect(self.GoBack)
-       contBut.clicked.connect(self.getInputs)
+       contBut1.clicked.connect(self.getInputs_NotWebCAT)
+       contBut2.clicked.connect(self.getInputs_WebCAT)
        self.azHelpBut.clicked.connect(self.onAzHelpClick)
+       opt.activated.connect(self.getInputs_WebCAT1)
        #############################
 
-       
        # Full widget layout setup #
        fullLayout = QHBoxLayout()
        fullLayout.addWidget(leftGroupBox)
@@ -381,6 +412,15 @@ class getImagery_InputCameraParams(QWidget):
            self.file = file[0]
             
            self.bxPth.setText(self.file)
+           
+    def onBrowseClick2(self):
+       dlg = QFileDialog()
+       dlg.setFileMode(QFileDialog.ExistingFile)
+       if dlg.exec_():
+           file2 = dlg.selectedFiles()
+           self.file2 = file2[0]
+            
+           self.bxPth2.setText(self.file2)
         
        
     def onAzHelpClick(self):
@@ -399,92 +439,85 @@ class getImagery_InputCameraParams(QWidget):
        Go back to camera choice window on Back click
        '''
        self.close()
-       self.backToOne = WelcomeWindow()    
+       self.backToOne = WelcomeWindow()
        
-    def getInputs(self):
+       
+    def getInputs_NotWebCAT(self):
        '''
        Get user-input information on Continue click
        '''
+
+       global pth
        
-       if self.webcatBut.isChecked():
-           self.close()
-           self.w = getImagery_GetWebCATImagery()
-           self.w.show()
-       else:
-
-           global pth
+       cameraName = self.bxName.text()
+       fileName = self.bxPth.text()
+       if cameraName == '':
+           msg = QMessageBox(self)
+           msg.setIcon(msg.Critical)
+           msg.setText('Please input a name for the camera.')
+           msg.setStandardButtons(msg.Ok)
+           msg.show()
+       elif fileName == '':
+           msg = QMessageBox(self)
+           msg.setIcon(msg.Critical)
+           msg.setText('Please input a video file.')
+           msg.setStandardButtons(msg.Ok)
+           msg.show()
            
-           cameraName = self.bxName.text()
-           fileName = self.bxPth.text()
-           if cameraName == '':
-               msg = QMessageBox(self)
-               msg.setIcon(msg.Critical)
-               msg.setText('Please input a name for the camera.')
-               msg.setStandardButtons(msg.Ok)
-               msg.show()
-           elif fileName == '':
-               msg = QMessageBox(self)
-               msg.setIcon(msg.Critical)
-               msg.setText('Please input a video file.')
-               msg.setStandardButtons(msg.Ok)
-               msg.show()
+       try:
+           cameraLocation = [float(self.bxLat.text()),float(self.bxLon.text())]
+           az = float(self.bxAz.text())     
+           ZL = float(self.bxElev.text())
+       except ValueError:
+           msg = QMessageBox(self)
+           msg.setIcon(msg.Question)
+           msg.setText('Please input numeric values for camera parameters.')
+           msg.setStandardButtons(msg.Ok)
+           msg.show()
+           
+
+       fileName = self.file.split('/')[len(self.file.split('/'))-1]
+       self.fileName_NoExt = os.path.splitext(fileName)[0]
+
+       if os.path.exists(pth+'calibration_'+self.fileName_NoExt) == 0:
+            os.mkdir(pth+'calibration_'+self.fileName_NoExt)
+            os.mkdir(pth+'calibration_'+self.fileName_NoExt+'/_binaries')
+            os.mkdir(pth+'calibration_'+self.fileName_NoExt+'/products')
+            os.mkdir(pth+'calibration_'+self.fileName_NoExt+'/results')
+            pth = pth+'calibration_'+self.fileName_NoExt+'/'
+
+            # Save the camera name and location #
+            with open(pth+'_binaries/CameraLocation.pkl','wb') as f:
+                pickle.dump(cameraLocation,f)
+            with open(pth+'_binaries/CameraName.pkl','wb') as f:
+                pickle.dump(cameraName,f)
+            with open(pth+'_binaries/az.pkl','wb') as f:
+                pickle.dump(az,f)
+            with open(pth+'_binaries/ZL.pkl','wb') as f:
+                pickle.dump(ZL,f)
+            with open(pth+'_binaries/vidFile.pkl','wb') as f:
+                pickle.dump(self.file,f)
+            camType = 0
+            with open(pth+'_binaries/camType.pkl','wb') as f:
+                pickle.dump(camType,f)
                
-           try:
-               cameraLocation = [float(self.bxLat.text()),float(self.bxLon.text())]
-               az = float(self.bxAz.text())     
-               ZL = float(self.bxElev.text())
-           except ValueError:
-               msg = QMessageBox(self)
-               msg.setIcon(msg.Question)
-               msg.setText('Please input numeric values for camera parameters.')
-               msg.setStandardButtons(msg.Ok)
-               msg.show()
-               
+            os.mkdir(pth+'frames')
+            saveDir = pth+'frames'
 
-           fileName = self.file.split('/')[len(self.file.split('/'))-1]
-           self.fileName_NoExt = os.path.splitext(fileName)[0]
+            self.close()
+            self.d = getImagery_VideoDecimatorWindow(self.file,saveDir)
+            self.d.show()
 
-           if os.path.exists(pth+'calibration_'+self.fileName_NoExt) == 0:
-                os.mkdir(pth+'calibration_'+self.fileName_NoExt)
-                os.mkdir(pth+'calibration_'+self.fileName_NoExt+'/_binaries')
-                os.mkdir(pth+'calibration_'+self.fileName_NoExt+'/products')
-                os.mkdir(pth+'calibration_'+self.fileName_NoExt+'/results')
-                pth = pth+'calibration_'+self.fileName_NoExt+'/'
-
-
-                # Save the camera name and location #
-                with open(pth+'_binaries/CameraLocation.pkl','wb') as f:
-                    pickle.dump(cameraLocation,f)
-                with open(pth+'_binaries/CameraName.pkl','wb') as f:
-                    pickle.dump(cameraName,f)
-                with open(pth+'_binaries/az.pkl','wb') as f:
-                    pickle.dump(az,f)
-                with open(pth+'_binaries/ZL.pkl','wb') as f:
-                    pickle.dump(ZL,f)
-                with open(pth+'_binaries/VidOrImage.pkl','wb') as f:
-                    pickle.dump(self.file,f)
-
-                camType = 0
-                with open(pth+'_binaries/camType.pkl','wb') as f:
-                    pickle.dump(camType,f)
-                   
-                os.mkdir(pth+'frames')
-                saveDir = pth+'frames'
-
-                self.close()
-                self.d = getImagery_VideoDecimatorWindow(self.file,saveDir)
-                self.d.show()
-
-                
-           else:
-                msg = QMessageBox(self)
-                msg.setIcon(msg.Warning)
-                msg.setText('A subdirectory for this video already exists in your working directory, making it appear that '+
-                           'you are re-trying a calibration. If this is not true, please remove this subdirectory from your working directory or rename it. If it is, '+
-                           ' do you want to use the same calibration image as before?')
-                msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-                msg.buttonClicked.connect(self.onMsgBoxClick)
-                msg.show()
+            
+       else:
+            msg = QMessageBox(self)
+            msg.setIcon(msg.Warning)
+            msg.setText('A subdirectory for this video already exists in your working directory, making it appear that '+
+                       'you are re-trying a calibration. If this is not true, please remove this subdirectory from your working directory or rename it. If it is, '+
+                       'do you want to use the same calibration image as before?')
+            msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+            msg.buttonClicked.connect(self.onMsgBoxClick)
+            msg.show()
            
            
     def onMsgBoxClick(self,i):
@@ -506,167 +539,55 @@ class getImagery_InputCameraParams(QWidget):
             self.close()
             self.w = getImagery_ChooseFrameWindow()
             self.w.show()
-            
 
 
-class getImagery_GetWebCATImagery(QWidget):
-    '''
-    Window allowing the user to choose desired WebCAT camera from dropdown menu.
-    '''
-   
-    def __init__(self):
-        super().__init__()
+    def getInputs_WebCAT1(self,item):
         
-        if not QApplication.instance():
-            app = QApplication(sys.argv)
-        else:
-            app = QApplication.instance()
-
-        self.initUI()
-
-        
-    def initUI(self):
-       
-       # Left menu box setup #
-       bf = QFont()
-       bf.setBold(True)
-       leftBar1 = QLabel('• Welcome!')
-       leftBar2 = QLabel('• Get imagery')
-       leftBar3 = QLabel('• Get lidar data')
-       leftBar4 = QLabel('• Pick GCPs')
-       leftBar5 = QLabel('• Calibrate')
-       leftBar6 = QLabel('• Rectify')
-       leftBar2.setFont(bf)
-
-       leftGroupBox = QGroupBox('Contents:')
-       vBox = QVBoxLayout()
-       vBox.addWidget(leftBar1)
-       vBox.addWidget(leftBar2)
-       vBox.addWidget(leftBar3)
-       vBox.addWidget(leftBar4)
-       vBox.addWidget(leftBar5)
-       vBox.addWidget(leftBar6)
-       vBox.addStretch(1)
-       leftGroupBox.setLayout(vBox)
-       ########################    
-       
-       # Right contents box setup #
-       intro = QLabel('The Webcamera Application Testbed (WebCAT) is a network of 7 surfcams spanning the southeastern U.S. coastline. '+
-                      'Live and historic feeds from the cameras are stored on servers and accessible in 10-minute video-clips. '+
-                      'Live feeds from each camera can be viewed at https://secoora.org/webcat/, and a summary of available historic video from each camera '+
-                      'can be found at http://webcat-video.axds.co/status/. If you wish to calibrate a WebCAT camera, please input the camera and '+
-                      'desired imagery date below, and a video will be downloaded automatically. Note: only 4 of the 7 cameras can be calibrated '+
-                      'via SurfRCaT; those are the only cameras available to select below.') 
-       intro.setWordWrap(True)
-       txt = QLabel('Select WebCAT camera:')
-       opt = QComboBox()
-       opt.addItem('--')
-       opt.addItem('Folly Beach Pier (north)')
-       opt.addItem('Folly Beach Pier (south)')
-       opt.addItem('St. Augustine Pier')
-       opt.addItem('Miami 40th Street')
-       opt.setCurrentIndex(0)
-       backBut = QPushButton('< Back')
-       contBut = QPushButton('Continue >')
-       lblDir1 = QLabel('Input desired imagery date below (in yyyy,mm,dd,HHHH format):')
-       lblDir1.setWordWrap(True)
-       self.bxYear = QLineEdit()
-       self.bxMonth = QLineEdit()
-       self.bxDay = QLineEdit()
-       self.bxHour = QLineEdit()
-       lblYear = QLabel('Year:')
-       lblMonth = QLabel('Month:')
-       lblDay = QLabel('Day:')
-       lblHour = QLabel('Hour:')
-     
-       rightGroupBox = QGroupBox()
-       rightGroupBox1 = QGroupBox()
-       rightGroupBox2 = QGroupBox()
-       self.grd = QGridLayout()
-       grd1 = QGridLayout()
-       grd2 = QGridLayout()
-                      
-       grd1.addWidget(txt,0,0,1,2)
-       grd1.addWidget(opt,1,0,1,2)
-       rightGroupBox1.setLayout(grd1)
-
-       grd2.addWidget(lblDir1,0,0,1,4)
-       grd2.addWidget(lblYear,1,0,1,2)
-       grd2.addWidget(self.bxYear,1,2,1,2)              
-       grd2.addWidget(lblMonth,2,0,1,2)
-       grd2.addWidget(self.bxMonth,2,2,1,2) 
-       grd2.addWidget(lblDay,3,0,1,2)
-       grd2.addWidget(self.bxDay,3,2,1,2)
-       grd2.addWidget(lblHour,4,0,1,2)
-       grd2.addWidget(self.bxHour,4,2,1,2)
-       rightGroupBox2.setLayout(grd2)
-
-       self.grd.addWidget(intro,0,0,4,4)
-       self.grd.addWidget(rightGroupBox1,4,0,2,4)
-       self.grd.addWidget(rightGroupBox2,6,0,4,4)
-       self.grd.addWidget(backBut,10,0,1,2)
-       self.grd.addWidget(contBut,10,2,1,2)
-       rightGroupBox.setLayout(self.grd)
-
-              
-       # Connect widgets with signals #
-       opt.activated.connect(self.getSelectedCam)
-       backBut.clicked.connect(self.GoBack)
-       contBut.clicked.connect(self.saveSelected)
-       ################################
-
-       # Full widget layout setup #
-       fullLayout = QHBoxLayout()
-       fullLayout.addWidget(leftGroupBox)
-       fullLayout.addWidget(rightGroupBox)
-       self.setLayout(fullLayout)
-
-       self.setWindowTitle('SurfRCaT')
-       self.show()
-       ############################
-        
-        
-    def getSelectedCam(self,item):
-
-       WebCATdict = {'Placeholder':[0,0],
+        WebCATdict = {'Placeholder':[0,0],
                     'follypiernorthcam':[32.654731,-79.939322],
                     'follypiersouthcam':[32.654645,-79.939597],
                     'staugustinecam':[29.856559,-81.265545],
                     'miami40thcam':[ 25.812227, -80.122400]}
       
-       # Get location of selected camera #
-       cams = ['Placeholder','follypiernorthcam','follypiersouthcam','staugustinecam','miami40thcam']
-       self.cameraLocation = WebCATdict[cams[item]]
-       self.cameraName = cams[item]
+        # Get location of selected camera #
+        cams = ['Placeholder','follypiernorthcam','follypiersouthcam','staugustinecam','miami40thcam']
+        self.cameraLocation = WebCATdict[cams[item]]
+        self.cameraName = cams[item]
 
-       # Add the pre-defined azimuth and elev for each WebCAT camera #
-       if self.cameraName == 'follypiernorthcam':
+        # Add the pre-defined azimuth and elev for each WebCAT camera #
+        if self.cameraName == 'follypiernorthcam':
            self.az = 150
            self.ZL = 15
-       elif self.cameraName == 'follypiersouthcam':
+        elif self.cameraName == 'follypiersouthcam':
            self.az = 150
            self.ZL = 15
-       elif self.cameraName == 'staugustinecam':
+        elif self.cameraName == 'staugustinecam':
            self.az = 80
            self.ZL = 10
-       elif self.cameraName == 'miami40thcam':
+        elif self.cameraName == 'miami40thcam':
            self.az = 60
            self.ZL = 40
-
-
-
            
-    def saveSelected(self):
+
+    def getInputs_WebCAT(self):
         
        global pth
 
-       if os.path.exists(pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()) == 0:
+       vidName = self.file2.split('/')[len(self.file2.split('/'))-1]
+       vidName2 = vidName.split('.')[1]
+       yr = vidName2.split('-')[0]
+       mo = vidName2.split('-')[1]
+       day = vidName2.split('-')[2].split('_')[0]
+       hr = vidName2.split('-')[2].split('_')[1]
+       
+       if os.path.exists(pth+'calibration_'+self.cameraName+'.'+yr+'-'+mo+'-'+day+'_'+hr) == 0:
            
-           os.mkdir(pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text())
-           os.mkdir(pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/_binaries')
-           os.mkdir(pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/products')
-           os.mkdir(pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/results')
-           pth = pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/'
+           os.mkdir(pth+'calibration_'+self.cameraName+'.'+yr+'-'+mo+'-'+day+'_'+hr)
+           os.mkdir(pth+'calibration_'+self.cameraName+'.'+yr+'-'+mo+'-'+day+'_'+hr+'/_binaries')
+           os.mkdir(pth+'calibration_'+self.cameraName+'.'+yr+'-'+mo+'-'+day+'_'+hr+'/products')
+           os.mkdir(pth+'calibration_'+self.cameraName+'.'+yr+'-'+mo+'-'+day+'_'+hr+'/results')
+           pth = pth+'calibration_'+self.cameraName+'.'+yr+'-'+mo+'-'+day+'_'+hr+'/'
+           os.mkdir(pth+'frames');self.saveDir = pth+'frames'
            
            # Save everything #
            with open(pth+'_binaries/CameraLocation.pkl','wb') as f:
@@ -677,15 +598,29 @@ class getImagery_GetWebCATImagery(QWidget):
                pickle.dump(self.az,f)
            with open(pth+'_binaries/ZL.pkl','wb') as f:
                pickle.dump(self.ZL,f)
-
+           with open(pth+'_binaries/vidFile.pkl','wb') as f:
+               pickle.dump(self.file2,f)
            camType = 1
            with open(pth+'_binaries/camType.pkl','wb') as f:
                pickle.dump(camType,f)
 
-           self.downloadVid()
+
+           self.worker = getLidar_WebCATThread()
+           self.worker.finishSignal.connect(self.moveToDecimator)
+
+           lab1 = QLabel('Getting lidar datasets...')
+           self.grd.addWidget(lab1,12,0,1,1)
+
+           self.loadlab = QLabel()
+           self.loadmovie = QMovie(pth1+'loading.gif')
+           self.loadlab.setMovie(self.loadmovie)
+       
+           self.worker.start()
+           self.grd.addWidget(self.loadlab,12,1,1,1)
+           self.loadmovie.start()
+
                
        else:
-           print(pth)
            msg = QMessageBox(self)
            msg.setIcon(msg.Warning)
            msg.setText('A subdirectory for this video already exists in your working directory, making it appear that '+
@@ -693,116 +628,74 @@ class getImagery_GetWebCATImagery(QWidget):
                        ' do you want to use the same calibration image as before (select No if you do not have images yet)?')
            msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
            msg.show()
-           msg.buttonClicked.connect(self.onMsgBoxClick)
+           msg.buttonClicked.connect(self.onMsgBoxClick1)
+
+
+    def moveToDecimator(self):
+        
+        self.loadmovie.stop()
+        self.close()
+        self.w = getImagery_VideoDecimatorWindow(self.file2,self.saveDir)
+        self.w.show()
 
            
            
-    def onMsgBoxClick(self,i):
+    def onMsgBoxClick1(self,i):
 
         global pth
         
         if i.text() == '&Yes':
+
+            vidName = self.file2.split('/')[len(self.file2.split('/'))-1]
+            vidName2 = vidName.split('.')[1]
+            yr = vidName2.split('-')[0]
+            mo = vidName2.split('-')[1]
+            day = vidName2.split('-')[2].split('_')[0]
+            hr = vidName2.split('-')[2].split('_')[1]
  
-            pth = pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/'
+            pth = pth+'calibration_'+self.cameraName+'.'+yr+'-'+mo+'-'+day+'_'+hr+'/'
             self.worker = getLidar_WebCATThread()
             self.worker.finishSignal.connect(self.skipToLidar)
 
             lab1 = QLabel('Getting lidar datasets...')
-            self.grd.addWidget(lab1,11,0,1,1)
+            self.grd.addWidget(lab1,12,0,1,1)
 
             self.loadlab = QLabel()
             self.loadmovie = QMovie(pth1+'loading.gif')
             self.loadlab.setMovie(self.loadmovie)
        
             self.worker.start()
-            self.grd.addWidget(self.loadlab,11,1,1,1)
+            self.grd.addWidget(self.loadlab,12,1,1,1)
             self.loadmovie.start()
 
         elif i.text() == '&No':
 
-            pth = pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/'
+           pth = pth+'calibration_'+self.cameraName+'.'+yr+'-'+mo+'-'+day+'_'+hr+'/'
 
-            if os.path.exists(pth+'frames'):
-                self.close()
-                self.w = getImagery_ChooseFrameWindow()
-                self.w.show()
-            else:
-                files = os.listdir(pth+'products/')
-                vid = [i for i in files if self.cameraName in i]
-                pthToVid = pth+'products/'+vid[0]
-                
-                self.close()
-                self.w = getImagery_VideoDecimatorWindow(pthToVid)
-                self.w.show()
+           try:
+               ims = os.listdir(pth+'frames')
+               for i in ims:
+                   os.remove(pth+'frames/'+i)
+           except:
+               pass
+            
+           self.saveDir = pth+'frames'
+               
+           
+           self.worker = getLidar_WebCATThread()
+           self.worker.finishSignal.connect(self.moveToDecimator)
 
+           lab1 = QLabel('Getting lidar datasets...')
+           self.grd.addWidget(lab1,12,0,1,1)
 
-    
-    def downloadVid(self):   
-
-       self.yr = int(self.bxYear.text())
-       self.mo = int(self.bxMonth.text())
-       self.day = int(self.bxDay.text())
-       self.hour = int(self.bxHour.text())
-
-       # Instantiate worker threads #
-       self.worker = DownloadVidThread(self.yr,self.mo,self.day,self.hour)
-         
-       lab1 = QLabel('Downloading Video...')
-       self.grd.addWidget(lab1,11,0,1,1)
-
-       self.loadlab = QLabel()
-       self.loadmovie = QMovie(pth1+'loading.gif')
-       self.loadlab.setMovie(self.loadmovie)
+           self.loadlab = QLabel()
+           self.loadmovie = QMovie(pth1+'loading.gif')
+           self.loadlab.setMovie(self.loadmovie)
        
-       self.worker.start()
-       self.grd.addWidget(self.loadlab,11,1,1,1)
-       self.loadmovie.start()
-       self.worker.finishSignal.connect(self.on_closeSignal)
-       
+           self.worker.start()
+           self.grd.addWidget(self.loadlab,12,1,1,1)
+           self.loadmovie.start()
 
-    def on_closeSignal(self):
-         
-       '''
-       When download video thread is done, function shows a done label and moves on
-       '''
-       files = os.listdir(pth+'/products')
-       vid = [i for i in files if self.bxYear.text() in i and self.bxMonth.text() in i and self.bxDay.text() in i and self.bxHour.text() in i]
-       self.pthToVid = pth+'products/'+vid[0]
-       
-       self.loadlab.setParent(None)
-       self.loadmovie.stop()
-       labDone = QLabel('Done.')
-       self.grd.addWidget(labDone,11,1,1,1)
-
-
-       self.worker2 = getLidar_WebCATThread()
-         
-       lab1 = QLabel('Cleaning up...')
-       self.grd.addWidget(lab1,12,0,1,1)
-
-       self.loadlab = QLabel()
-       self.loadmovie = QMovie(pth1+'loading.gif')
-       self.loadlab.setMovie(self.loadmovie)
-       
-       self.worker2.start()
-       self.grd.addWidget(self.loadlab,12,1,1,1)
-       self.loadmovie.start()
-       self.worker2.finishSignal.connect(self.on_closeSignal2)
-
-    def on_closeSignal2(self):
-        
-       self.loadlab.setParent(None)
-       self.loadmovie.stop()
-       labDone = QLabel('Done.')
-       self.grd.addWidget(labDone,12,1,1,1)
-
-       os.mkdir(pth+'frames')
-       saveDir = pth+'frames'
-
-       self.close()
-       self.w = getImagery_VideoDecimatorWindow(self.pthToVid,saveDir)
-       self.w.show()
-       
 
     def skipToLidar(self):
 
@@ -815,7 +708,7 @@ class getImagery_GetWebCATImagery(QWidget):
            msg.setText(txt)
            msg.setWindowTitle('Error')
            msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-           msg.buttonClicked.connect(self.onMsgBoxClick2)
+           msg.buttonClicked.connect(self.onMsgBoxClick3)
            msg.show()
        else:
            f = open(pth+'_binaries/lidarTable.pkl','rb')
@@ -826,13 +719,14 @@ class getImagery_GetWebCATImagery(QWidget):
            self.lw.resize(900,350)
            self.lw.show()
          
-    def onMsgBoxClick2(self,i):
+    def onMsgBoxClick3(self,i):
        
        if i.text() == '&Yes':
             
            self.close()
            self.w = PickGCPsWindow()
            self.w.show()
+           
        else:
            f = open(pth+'_binaries/lidarTable.pkl','rb')
            lidarTable = pickle.load(f)
@@ -841,15 +735,7 @@ class getImagery_GetWebCATImagery(QWidget):
            self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
            self.lw.resize(900,350)
            self.lw.show()
-           
-
-    def GoBack(self):
-       '''
-       Function goes back to previous window when Back button is clicked
-       '''
-       self.close()
-       self.backToOne = getImagery_InputCameraParams()
-
+        
 
 
 
@@ -1257,6 +1143,377 @@ class getImagery_ChooseFrameWindow(QWidget):
         self.ww.show()
 
 
+class getImagery_GetWebCATImagery(QWidget):
+    '''
+    Window allowing the user to download imagery from WebCAT camera
+    '''
+   
+    def __init__(self):
+        super().__init__()
+        
+        if not QApplication.instance():
+            app = QApplication(sys.argv)
+        else:
+            app = QApplication.instance()
+
+        self.initUI()
+
+        
+    def initUI(self):
+       
+       # Left menu box setup #
+       bf = QFont()
+       bf.setBold(True)
+       leftBar1 = QLabel('• Welcome!')
+       leftBar2 = QLabel('• Get imagery')
+       leftBar3 = QLabel('• Get lidar data')
+       leftBar4 = QLabel('• Pick GCPs')
+       leftBar5 = QLabel('• Calibrate')
+       leftBar6 = QLabel('• Rectify')
+       leftBar2.setFont(bf)
+
+       leftGroupBox = QGroupBox('Contents:')
+       vBox = QVBoxLayout()
+       vBox.addWidget(leftBar1)
+       vBox.addWidget(leftBar2)
+       vBox.addWidget(leftBar3)
+       vBox.addWidget(leftBar4)
+       vBox.addWidget(leftBar5)
+       vBox.addWidget(leftBar6)
+       vBox.addStretch(1)
+       leftGroupBox.setLayout(vBox)
+       ########################    
+       
+       # Right contents box setup #
+       intro = QLabel('The Webcamera Application Testbed (WebCAT) is a network of 7 surfcams spanning the southeastern U.S. coastline. '+
+                      'Historic feeds from the cameras are stored on servers and accessible in 10-minute video-clips. '+
+                      'Live feeds from each camera can be viewed at https://secoora.org/webcat/, and a summary of available historic video from each camera '+
+                      'can be found at http://webcat-video.axds.co/status/. Please input the camera and '+
+                      'desired imagery date(s) to download below, and a video will be downloaded automatically. You can input multiple dates by separating them with '+
+                      'a comma, but you must input the same number of values in each field. For example, if you wanted to download imagery from both 1000 '+
+                      'and 1010 on January 1 2020, you would input 2020,2020 ; 01,01 ; 01,01 ; 1000,1010. Note: only 4 of the 7 cameras can be calibrated '+
+                      'via SurfRCaT; those are the only cameras available to select below.') 
+       intro.setWordWrap(True)
+       txt = QLabel('Select WebCAT camera:')
+       opt = QComboBox()
+       opt.addItem('--')
+       opt.addItem('Folly Beach Pier (north)')
+       opt.addItem('Folly Beach Pier (south)')
+       opt.addItem('St. Augustine Pier')
+       opt.addItem('Miami 40th Street')
+       opt.setCurrentIndex(0)
+       self.backBut = QPushButton('< Back')
+       self.contBut = QPushButton('Download')
+       lblDir = QLabel('Select directory to save video(s) to:')
+       self.bxDir = QLineEdit()
+       browseBut = QPushButton('Browse')
+       lblDir1 = QLabel('Input desired imagery date(s) below (in yyyy,mm,dd,HHHH format; separate multiple with commas):')
+       lblDir1.setWordWrap(True)
+       self.bxYear = QLineEdit()
+       self.bxMonth = QLineEdit()
+       self.bxDay = QLineEdit()
+       self.bxHour = QLineEdit()
+       lblYear = QLabel('Year:')
+       lblMonth = QLabel('Month:')
+       lblDay = QLabel('Day:')
+       lblHour = QLabel('Hour:')
+     
+       rightGroupBox = QGroupBox()
+       rightGroupBox1 = QGroupBox()
+       rightGroupBox2 = QGroupBox()
+       self.grd = QGridLayout()
+       grd1 = QGridLayout()
+       grd2 = QGridLayout()
+                      
+       grd1.addWidget(txt,0,0,1,2)
+       grd1.addWidget(opt,1,0,1,2)
+       rightGroupBox1.setLayout(grd1)
+       grd2.addWidget(lblDir,0,0,1,4)
+       grd2.addWidget(self.bxDir,1,0,1,3)
+       grd2.addWidget(browseBut,1,3,1,1)
+       grd2.addWidget(lblDir1,2,0,1,4)
+       grd2.addWidget(lblYear,3,0,1,2)
+       grd2.addWidget(self.bxYear,3,2,1,2)              
+       grd2.addWidget(lblMonth,4,0,1,2)
+       grd2.addWidget(self.bxMonth,4,2,1,2) 
+       grd2.addWidget(lblDay,5,0,1,2)
+       grd2.addWidget(self.bxDay,5,2,1,2)
+       grd2.addWidget(lblHour,6,0,1,2)
+       grd2.addWidget(self.bxHour,6,2,1,2)
+       rightGroupBox2.setLayout(grd2)
+
+       self.grd.addWidget(intro,0,0,4,4)
+       self.grd.addWidget(rightGroupBox1,4,0,2,4)
+       self.grd.addWidget(rightGroupBox2,6,0,4,4)
+       self.grd.addWidget(self.backBut,10,0,1,2)
+       self.grd.addWidget(self.contBut,10,2,1,2)
+       rightGroupBox.setLayout(self.grd)
+
+              
+       # Connect widgets with signals #
+       opt.activated.connect(self.getSelectedCam)
+       browseBut.clicked.connect(self.onBrowseClick)
+       self.backBut.clicked.connect(self.GoBack)
+       self.contBut.clicked.connect(self.downloadVid)
+       ################################
+
+       # Full widget layout setup #
+       fullLayout = QHBoxLayout()
+       fullLayout.addWidget(leftGroupBox)
+       fullLayout.addWidget(rightGroupBox)
+       self.setLayout(fullLayout)
+
+       self.setWindowTitle('SurfRCaT')
+       self.show()
+       ############################
+        
+        
+    def getSelectedCam(self,item):
+
+       WebCATdict = {'Placeholder':[0,0],
+                    'follypiernorthcam':[32.654731,-79.939322],
+                    'follypiersouthcam':[32.654645,-79.939597],
+                    'staugustinecam':[29.856559,-81.265545],
+                    'miami40thcam':[ 25.812227, -80.122400]}
+      
+       # Get location of selected camera #
+       cams = ['Placeholder','follypiernorthcam','follypiersouthcam','staugustinecam','miami40thcam']
+       self.cameraLocation = WebCATdict[cams[item]]
+       self.cameraName = cams[item]
+
+       # Add the pre-defined azimuth and elev for each WebCAT camera #
+       if self.cameraName == 'follypiernorthcam':
+           self.az = 150
+           self.ZL = 15
+       elif self.cameraName == 'follypiersouthcam':
+           self.az = 150
+           self.ZL = 15
+       elif self.cameraName == 'staugustinecam':
+           self.az = 80
+           self.ZL = 10
+       elif self.cameraName == 'miami40thcam':
+           self.az = 60
+           self.ZL = 40
+           
+
+    def onBrowseClick(self):
+       dlg = QFileDialog()
+       dlg.setFileMode(QFileDialog.Directory)
+       if dlg.exec_():
+           direc = dlg.selectedFiles()
+           self.direc = direc[0]
+            
+           self.bxDir.setText(self.direc)
+
+
+
+           
+##    def saveSelected(self):
+##        
+##       global pth
+##
+##       if os.path.exists(pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()) == 0:
+##           
+##           os.mkdir(pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text())
+##           os.mkdir(pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/_binaries')
+##           os.mkdir(pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/products')
+##           os.mkdir(pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/results')
+##           pth = pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/'
+##           
+##           # Save everything #
+##           with open(pth+'_binaries/CameraLocation.pkl','wb') as f:
+##               pickle.dump(self.cameraLocation,f)
+##           with open(pth+'_binaries/CameraName.pkl','wb') as f:
+##               pickle.dump(self.cameraName,f)
+##           with open(pth+'_binaries/az.pkl','wb') as f:
+##               pickle.dump(self.az,f)
+##           with open(pth+'_binaries/ZL.pkl','wb') as f:
+##               pickle.dump(self.ZL,f)
+##
+##           camType = 1
+##           with open(pth+'_binaries/camType.pkl','wb') as f:
+##               pickle.dump(camType,f)
+##
+##           self.downloadVid()
+##               
+##       else:
+##           print(pth)
+##           msg = QMessageBox(self)
+##           msg.setIcon(msg.Warning)
+##           msg.setText('A subdirectory for this video already exists in your working directory, making it appear that '+
+##                       'you are re-calibrating and previously-calibrated camera. If this is not true, please remove this subdirectory from your working directory or rename it. If it is, '+
+##                       ' do you want to use the same calibration image as before (select No if you do not have images yet)?')
+##           msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+##           msg.show()
+##           msg.buttonClicked.connect(self.onMsgBoxClick)
+##
+##           
+##           
+##    def onMsgBoxClick(self,i):
+##
+##        global pth
+##        
+##        if i.text() == '&Yes':
+## 
+##            pth = pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/'
+##            self.worker = getLidar_WebCATThread()
+##            self.worker.finishSignal.connect(self.skipToLidar)
+##
+##            lab1 = QLabel('Getting lidar datasets...')
+##            self.grd.addWidget(lab1,11,0,1,1)
+##
+##            self.loadlab = QLabel()
+##            self.loadmovie = QMovie(pth1+'loading.gif')
+##            self.loadlab.setMovie(self.loadmovie)
+##       
+##            self.worker.start()
+##            self.grd.addWidget(self.loadlab,11,1,1,1)
+##            self.loadmovie.start()
+##
+##        elif i.text() == '&No':
+##
+##            pth = pth+'calibration_'+self.cameraName+'.'+self.bxYear.text()+'-'+self.bxMonth.text()+'-'+self.bxDay.text()+'_'+self.bxHour.text()+'/'
+##
+##            if os.path.exists(pth+'frames'):
+##                self.close()
+##                self.w = getImagery_ChooseFrameWindow()
+##                self.w.show()
+##            else:
+##                files = os.listdir(pth+'products/')
+##                vid = [i for i in files if self.cameraName in i]
+##                pthToVid = pth+'products/'+vid[0]
+##                
+##                self.close()
+##                self.w = getImagery_VideoDecimatorWindow(pthToVid)
+##                self.w.show()
+
+
+    
+    def downloadVid(self):   
+
+       self.yr = self.bxYear.text(); self.yr = self.yr.split(',')
+       self.mo = self.bxMonth.text(); self.mo = self.mo.split(',')
+       self.day = self.bxDay.text(); self.day = self.day.split(',')
+       self.hour = self.bxHour.text(); self.hour = self.hour.split(',')
+
+       # Instantiate worker threads #
+       self.worker = DownloadVidThread(self.cameraName,self.yr,self.mo,self.day,self.hour,self.direc)
+         
+       self.lab1 = QLabel('Downloading Videos...')
+       self.grd.addWidget(self.lab1,11,0,1,1)
+
+       self.loadlab = QLabel()
+       self.loadmovie = QMovie(pth1+'loading.gif')
+       self.loadlab.setMovie(self.loadmovie)
+       
+       self.worker.start()
+       self.grd.addWidget(self.loadlab,11,1,1,1)
+       self.loadmovie.start()
+       self.worker.threadSignal.connect(self.on_threadSignal)
+       self.worker.finishSignal.connect(self.on_closeSignal)
+
+    def on_threadSignal(self,numVid):
+        self.lab1.setParent(None)
+        self.lab1 = QLabel('Downloading video '+str(numVid)+' of '+str(len(self.yr)))
+        self.grd.addWidget(self.lab1,11,0,1,1)
+       
+
+    def on_closeSignal(self):
+         
+       '''
+       When download video(s) thread is done, function shows a done label and moves on
+       '''
+       
+       self.loadlab.setParent(None)
+       self.backBut.setParent(None)
+       self.contBut.setParent(None)
+       self.loadmovie.stop()
+       labDone = QLabel('Done.')
+       self.grd.addWidget(labDone,11,1,1,1)
+
+       beginBut = QPushButton('Back to start')
+       self.grd.addWidget(beginBut,11,3,1,1)
+
+       beginBut.clicked.connect(self.GoBack)
+
+    def GoBack(self):
+        
+        self.close()
+        self.w = WelcomeWindow()
+        self.w.show()
+       
+
+##
+##       self.worker2 = getLidar_WebCATThread()
+##         
+##       lab1 = QLabel('Cleaning up...')
+##       self.grd.addWidget(lab1,12,0,1,1)
+##
+##       self.loadlab = QLabel()
+##       self.loadmovie = QMovie(pth1+'loading.gif')
+##       self.loadlab.setMovie(self.loadmovie)
+##       
+##       self.worker2.start()
+##       self.grd.addWidget(self.loadlab,12,1,1,1)
+##       self.loadmovie.start()
+##       self.worker2.finishSignal.connect(self.on_closeSignal2)
+##
+##    def on_closeSignal2(self):
+##        
+##       self.loadlab.setParent(None)
+##       self.loadmovie.stop()
+##       labDone = QLabel('Done.')
+##       self.grd.addWidget(labDone,12,1,1,1)
+##
+##       os.mkdir(pth+'frames')
+##       saveDir = pth+'frames'
+##
+##       self.close()
+##       self.w = getImagery_VideoDecimatorWindow(self.pthToVid,saveDir)
+##       self.w.show()
+##       
+##
+##    def skipToLidar(self):
+##
+##       if os.path.exists(pth+'products/lidarPC.pkl'):
+##           msg = QMessageBox(self)
+##           msg.setIcon(QMessageBox.Information)
+##           txt = ('Exisiting lidar point cloud for this camera found. Do you want to use it? \n' +
+##                  'WARNING: The lidar point cloud has coordinates relative to the input camera location. If you have changed the input '+
+##                  'location of this camera since the point cloud was created, you need to create a new one.')
+##           msg.setText(txt)
+##           msg.setWindowTitle('Error')
+##           msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+##           msg.buttonClicked.connect(self.onMsgBoxClick2)
+##           msg.show()
+##       else:
+##           f = open(pth+'_binaries/lidarTable.pkl','rb')
+##           lidarTable = pickle.load(f)
+##
+##           self.close()
+##           self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
+##           self.lw.resize(900,350)
+##           self.lw.show()
+##         
+##    def onMsgBoxClick2(self,i):
+##       
+##       if i.text() == '&Yes':
+##            
+##           self.close()
+##           self.w = PickGCPsWindow()
+##           self.w.show()
+##       else:
+##           f = open(pth+'_binaries/lidarTable.pkl','rb')
+##           lidarTable = pickle.load(f)
+##
+##           self.close()
+##           self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
+##           self.lw.resize(900,350)
+##           self.lw.show()
+##           
+
+
+       
 ##============================================================================##
 # Get lidar module #
 ##============================================================================##
@@ -2187,7 +2444,7 @@ class calibrate_ShowCalibResultsWindow(QWidget):
         f_az = open(pth+'_binaries/az.pkl','rb')
         az = str(pickle.load(f_az))
         f_fl = open(pth+'_binaries/fl.pkl','rb')
-        fl = str(pickle.load(f_fl))
+        fl = pickle.load(f_fl)
         f_vidFile = open(pth+'_binaries/vidFile.pkl','rb')
         vidFile = pickle.load(f_vidFile)
         f_lidarID = open(pth+'_binaries/chosenLidarID.pkl','rb')
@@ -2320,7 +2577,7 @@ class rectify_InputsWindow(QWidget):
         browseBut1 = QPushButton('Browse')
         browseBut2 = QPushButton('Browse')
         browseBut3 = QPushButton('Browse')
-        introLab2 = QLabel('Real-world grid (x,y relative to camera location):')
+        introLab2 = QLabel('Real-world grid (x,y relative to camera location; one z-value per image separated with commas):')
         introLab2.setWordWrap(True)
         xminLab = QLabel('xmin:')
         self.xminBx = QLineEdit()
@@ -2490,7 +2747,8 @@ class rectify_InputsWindow(QWidget):
         ymin = self.yminBx.text()
         ymax = self.ymaxBx.text()
         dy = self.dyBx.text()
-        z = self.zBx.text()
+        z1 = self.zBx.text()
+        z1 = z1.split(',')
 
         if self.browsePresses<3 or self.xminBx.text()=='' or self.xmaxBx.text()=='' or self.dxBx.text()==''  or self.yminBx.text()=='' or self.ymaxBx.text()=='' or self.dyBx.text()=='' or self.zBx.text()=='':
             msg = QMessageBox(self)
@@ -2512,25 +2770,32 @@ class rectify_InputsWindow(QWidget):
             ymin = float(ymin)
             ymax = float(ymax)
             dy = float(dy)
-            z = float(z)
+            z = [float(i) for i in z1]
             grd = [xmin,xmax,dx,ymin,ymax,dy,z]
             self.numIms = len(os.listdir(self.inputDirec))
 
-            # Start the worker #
-            self.worker = performRectificationThread(self.calibFile,self.inputDirec,self.outputDirec,grd)
-            self.worker.threadSignal.connect(self.on_threadSignal)
+            if len(z) != self.numIms:
+                msg = QMessageBox(self)
+                msg.setIcon(msg.Critical)
+                msg.setText('Please input the same number of z-values as images ('+str(self.numIms)+')')
+                msg.setStandardButtons(msg.Ok)
+                msg.show()
+            else:
+                # Start the worker #
+                self.worker = performRectificationThread(self.calibFile,self.inputDirec,self.outputDirec,grd)
+                self.worker.threadSignal.connect(self.on_threadSignal)
 
-            self.lab1 = QLabel('Performing rectification...')
-            self.grd.addWidget(self.lab1,15,0,1,3)
+                self.lab1 = QLabel('Performing rectification...')
+                self.grd.addWidget(self.lab1,15,0,1,3)
 
-            self.loadlab = QLabel()
-            self.loadmovie = QMovie(pth1+'loading.gif')
-            self.loadlab.setMovie(self.loadmovie)
-           
-            self.worker.start()
-            self.grd.addWidget(self.loadlab,15,3,1,3)
-            self.loadmovie.start()
-            self.worker.finishSignal.connect(self.on_closeSignal)
+                self.loadlab = QLabel()
+                self.loadmovie = QMovie(pth1+'loading.gif')
+                self.loadlab.setMovie(self.loadmovie)
+               
+                self.worker.start()
+                self.grd.addWidget(self.loadlab,15,3,1,3)
+                self.loadmovie.start()
+                self.worker.finishSignal.connect(self.on_closeSignal)
 
             
 
@@ -2681,30 +2946,36 @@ class DownloadVidThread(QThread):
     threadSignal = pyqtSignal('PyQt_PyObject')
     finishSignal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self,year,month,day,hour):
+    def __init__(self,cam,year,month,day,hour,direc):
         super().__init__()
+        self.cam = cam
         self.year = year
         self.month = month
         self.day = day
         self.hour = hour
+        self.direc = direc
         
     def run(self):
         
        print('Thread Started')
+
+       vidNum = 0
+       for i in range(0,len(self.year)):
+           vidNum = vidNum+1
+           self.threadSignal.emit(vidNum)
+           
+           yr = int(self.year[i])
+           mo = int(self.month[i])
+           d = int(self.day[i])
+           hr = int(self.hour[i])
        
-       f = open(pth+'_binaries/CameraName.pkl','rb')      
-       camToInput = pickle.load(f)
-       
-       vidFile = SurfRCaT.getImagery_GetVideo(pth+'products/',camToInput,year=self.year,month=self.month,day=self.day,hour=self.hour)
+           vidFile = SurfRCaT.getImagery_GetVideo(self.direc+'/',self.cam,yr,mo,d,hr)
        
 ##       # Deal with Buxton camera name change #
 ##       fs = os.path.getsize(pth+vidFile) # Get size of video file #  
 ##       if camToInput == 'buxtoncoastalcam' and fs<1000:
 ##           vidFile = SurfRCaT.getImagery_GetVideo('buxtonnorthcam')
 ##       #######################################
-       
-       with open(pth+'_binaries/vidFile.pkl','wb') as f:
-           pickle.dump(vidFile,f)
            
        self.finishSignal.emit(1)   
         
@@ -3256,8 +3527,9 @@ class performRectificationThread(QThread):
             num = num+1
             self.threadSignal.emit(num)
             
+            grdUse = [self.grd[0],self.grd[1],self.grd[2],self.grd[3],self.grd[4],self.grd[5],self.grd[6][num-1]] # Get this image's z-value #
             img = mpimg.imread(self.inputDirec+'/'+im)
-            im_rectif,extents = SurfRCaT.rectify_RectifyImage(calibVals,img,self.grd) # Perform the rectification #
+            im_rectif,extents = SurfRCaT.rectify_RectifyImage(calibVals,img,grdUse) # Perform the rectification #
 
             self.canvas = FigureCanvas(Figure()) # Save the rectified image #
             self.ax = self.canvas.figure.subplots()
