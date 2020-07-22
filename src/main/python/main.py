@@ -125,8 +125,13 @@ class WelcomeWindow(QWidget):
         self.setLayout(fullLayout)
 
         self.setWindowTitle('SurfRCaT')
+        qr = self.frameGeometry()
+        lp = QDesktopWidget().availableGeometry().topLeft()
+        qr.moveTopLeft(lp)
+        self.move(qr.topLeft())        
         self.show()
         ###############################
+
 
     def on_calibSelect(self):
         
@@ -225,6 +230,10 @@ class StartCalibWindow(QWidget):
         self.setLayout(fullLayout)
 
         self.setWindowTitle('SurfRCaT')
+        qr = self.frameGeometry()
+        lp = QDesktopWidget().availableGeometry().topLeft()
+        qr.moveTopLeft(lp)
+        self.move(qr.topLeft())        
         self.show()
         ###############################
         
@@ -323,6 +332,12 @@ class getImagery_InputCameraParams(QWidget):
        lblPth.setWordWrap(True)
        browseBut = QPushButton('Browse')
        self.bxPth = QLineEdit()
+       useSavedLidarLab1 = QLabel('Use saved lidar point cloud?')
+       useSavedLidarButYes1 = QRadioButton('Yes')
+       useSavedLidarButNo1 = QRadioButton('No')
+       useSavedLidarButNo1.setChecked(True)
+       self.useSavedLidarButLine1 = QLineEdit()
+       self.useSavedLidarButBrowse1 = QPushButton('Browse')
        line = QFrame(); line.setFrameShape(QFrame.HLine)
        line2 = QFrame(); line2.setFrameShape(QFrame.HLine)
        orLab = QLabel('Or')
@@ -338,6 +353,12 @@ class getImagery_InputCameraParams(QWidget):
        lblPth2.setWordWrap(True)
        browseBut2 = QPushButton('Browse')
        self.bxPth2 = QLineEdit()
+       useSavedLidarLab2 = QLabel('Use saved lidar point cloud?')
+       useSavedLidarButYes2 = QRadioButton('Yes')
+       useSavedLidarButNo2 = QRadioButton('No')
+       useSavedLidarButNo2.setChecked(True)
+       self.useSavedLidarButLine2 = QLineEdit()
+       self.useSavedLidarButBrowse2 = QPushButton('Browse')
        backBut = QPushButton('< Back')
        contBut1 = QPushButton('Continue >')
        contBut2 = QPushButton('Continue >')
@@ -347,32 +368,38 @@ class getImagery_InputCameraParams(QWidget):
        rightGroupBox1 = QGroupBox('Any camera')
        rightGroupBox2 = QGroupBox('WebCAT camera')
        self.grd = QGridLayout()
-       grd1 = QGridLayout()
-       grd2 = QGridLayout()
-       grd1.addWidget(lblDir1,0,0,1,3)
-       grd1.addWidget(self.bxName,0,3,1,3)
-       grd1.addWidget(lblDir,1,0,1,6)
-       grd1.addWidget(lblLat,2,1,1,3)
-       grd1.addWidget(self.bxLat,2,4,1,2)
-       grd1.addWidget(lblLon,3,1,1,3)
-       grd1.addWidget(self.bxLon,3,4,1,2)
-       grd1.addWidget(lblElev,4,1,1,3)
-       grd1.addWidget(self.bxElev,4,4,1,2)
-       grd1.addWidget(self.azHelpBut,5,0,1,1)
-       grd1.addWidget(lblAz,5,1,1,3)
-       grd1.addWidget(self.bxAz,5,4,1,2)
-       grd1.addWidget(lblPth,6,0,1,6)
-       grd1.addWidget(browseBut,7,5,1,1)
-       grd1.addWidget(self.bxPth,7,0,1,5)
-       grd1.addWidget(contBut1,8,4,1,2)
-       rightGroupBox1.setLayout(grd1)
-       grd2.addWidget(webcatLab,0,0,1,6)
-       grd2.addWidget(opt,1,0,1,4)
-       grd2.addWidget(lblPth2,2,0,1,6)
-       grd2.addWidget(self.bxPth2,3,0,1,5)
-       grd2.addWidget(browseBut2,3,5,1,1)
-       grd2.addWidget(contBut2,4,4,1,2)
-       rightGroupBox2.setLayout(grd2)
+       self.grd1 = QGridLayout()
+       self.grd2 = QGridLayout()
+       self.grd1.addWidget(lblDir1,0,0,1,3)
+       self.grd1.addWidget(self.bxName,0,3,1,3)
+       self.grd1.addWidget(lblDir,1,0,1,6)
+       self.grd1.addWidget(lblLat,2,1,1,3)
+       self.grd1.addWidget(self.bxLat,2,4,1,2)
+       self.grd1.addWidget(lblLon,3,1,1,3)
+       self.grd1.addWidget(self.bxLon,3,4,1,2)
+       self.grd1.addWidget(lblElev,4,1,1,3)
+       self.grd1.addWidget(self.bxElev,4,4,1,2)
+       self.grd1.addWidget(self.azHelpBut,5,0,1,1)
+       self.grd1.addWidget(lblAz,5,1,1,3)
+       self.grd1.addWidget(self.bxAz,5,4,1,2)
+       self.grd1.addWidget(lblPth,6,0,1,6)
+       self.grd1.addWidget(browseBut,7,5,1,1)
+       self.grd1.addWidget(self.bxPth,7,0,1,5)
+       self.grd1.addWidget(useSavedLidarLab1,8,0,1,6)
+       self.grd1.addWidget(useSavedLidarButNo1,9,0,1,1)
+       self.grd1.addWidget(useSavedLidarButYes1,9,1,1,1)
+       self.grd1.addWidget(contBut1,11,4,1,2)
+       rightGroupBox1.setLayout(self.grd1)
+       self.grd2.addWidget(webcatLab,0,0,1,6)
+       self.grd2.addWidget(opt,1,0,1,4)
+       self.grd2.addWidget(lblPth2,2,0,1,6)
+       self.grd2.addWidget(self.bxPth2,3,0,1,5)
+       self.grd2.addWidget(browseBut2,3,5,1,1)
+       self.grd2.addWidget(useSavedLidarLab2,4,0,1,4)
+       self.grd2.addWidget(useSavedLidarButNo2,5,0,1,1)
+       self.grd2.addWidget(useSavedLidarButYes2,5,1,1,1)
+       self.grd2.addWidget(contBut2,7,4,1,2)
+       rightGroupBox2.setLayout(self.grd2)
 
        self.grd.addWidget(rightGroupBox1,0,0,4,6)
        self.grd.addWidget(line,5,0,1,8)
@@ -392,6 +419,13 @@ class getImagery_InputCameraParams(QWidget):
        contBut2.clicked.connect(self.getInputs_WebCAT)
        self.azHelpBut.clicked.connect(self.onAzHelpClick)
        opt.activated.connect(self.getInputs_WebCAT1)
+       useSavedLidarButYes1.clicked.connect(self.useSavedLidarSet1)
+       useSavedLidarButNo1.clicked.connect(self.useSavedLidarSet1_no)
+       useSavedLidarButYes2.clicked.connect(self.useSavedLidarSet2)
+       useSavedLidarButNo2.clicked.connect(self.useSavedLidarSet2_no)
+       self.useSavedLidarButBrowse1.clicked.connect(self.onLidarBrowseClick1)
+       self.useSavedLidarButBrowse2.clicked.connect(self.onLidarBrowseClick2)
+       self.lidarFile = None
        #############################
 
        # Full widget layout setup #
@@ -401,6 +435,10 @@ class getImagery_InputCameraParams(QWidget):
        self.setLayout(fullLayout)
 
        self.setWindowTitle('SurfRCaT')
+       qr = self.frameGeometry()
+       lp = QDesktopWidget().availableGeometry().topLeft()
+       qr.moveTopLeft(lp)
+       self.move(qr.topLeft())        
        self.show()
        ############################
 
@@ -421,8 +459,43 @@ class getImagery_InputCameraParams(QWidget):
            self.file2 = file2[0]
             
            self.bxPth2.setText(self.file2)
+           
         
-       
+    def useSavedLidarSet1(self):
+        self.grd1.addWidget(self.useSavedLidarButLine1,10,0,1,5)
+        self.grd1.addWidget(self.useSavedLidarButBrowse1,10,5,1,1)
+        
+    def useSavedLidarSet1_no(self):
+        self.useSavedLidarButLine1.setParent(None)
+        self.useSavedLidarBrowse1.setParent(None)
+
+    def onLidarBrowseClick1(self):
+       dlg = QFileDialog()
+       dlg.setFileMode(QFileDialog.ExistingFile)
+       if dlg.exec_():
+           file3 = dlg.selectedFiles()
+           self.lidarFile = file3[0]
+            
+           self.useSavedLidarButLine1.setText(self.lidarFile)
+
+    def useSavedLidarSet2(self):
+        self.grd2.addWidget(self.useSavedLidarButLine2,6,0,1,5)
+        self.grd2.addWidget(self.useSavedLidarButBrowse2,6,5,1,1)
+        
+    def useSavedLidarSet2_no(self):
+        self.useSavedLidarButLine2.setParent(None)
+        self.useSavedLidarBrowse2.setParent(None)
+
+    def onLidarBrowseClick2(self):
+       dlg = QFileDialog()
+       dlg.setFileMode(QFileDialog.ExistingFile)
+       if dlg.exec_():
+           file3 = dlg.selectedFiles()
+           self.lidarFile = file3[0]
+            
+           self.useSavedLidarButLine2.setText(self.lidarFile)  
+        
+
     def onAzHelpClick(self):
        '''
        Display help box for azimuth.
@@ -503,6 +576,11 @@ class getImagery_InputCameraParams(QWidget):
                
             os.mkdir(pth+'frames')
             saveDir = pth+'frames'
+
+            if self.lidarFile:
+                with open(pth+'_binaries/linkToLidar.pkl','wb') as f:
+                    pickle.dump(self.lidarFile,f)
+            
 
             self.close()
             self.d = getImagery_VideoDecimatorWindow(self.file,saveDir)
@@ -603,6 +681,10 @@ class getImagery_InputCameraParams(QWidget):
            camType = 1
            with open(pth+'_binaries/camType.pkl','wb') as f:
                pickle.dump(camType,f)
+
+           if self.lidarFile:
+               with open(pth+'_binaries/linkToLidar.pkl','wb') as f:
+                    pickle.dump(self.lidarFile,f)
 
 
            self.worker = getLidar_WebCATThread()
@@ -855,6 +937,10 @@ class getImagery_VideoDecimatorWindow(QWidget):
        self.setLayout(fullLayout)
 
        self.setWindowTitle('SurfRCaT')
+       qr = self.frameGeometry()
+       lp = QDesktopWidget().availableGeometry().topLeft()
+       qr.moveTopLeft(lp)
+       self.move(qr.topLeft())        
        self.show()
        ############################       
 
@@ -1091,30 +1177,48 @@ class getImagery_ChooseFrameWindow(QWidget):
         f = open(pth+'_binaries/camType.pkl','rb')
         camType = pickle.load(f)
         if camType == 0: # Not WebCAT #
-            self.close()
-            self.w = getLidar_FindUseableDatasetsWindow()
-            self.w.show()
-        else: # WebCAT #
-            
-            if os.path.exists(pth+'products/lidarPC.pkl'):
-                msg = QMessageBox(self)
-                msg.setIcon(QMessageBox.Information)
-                txt = ('Exisiting lidar point cloud for this camera found. Do you want to use it? \n' +
-                  'WARNING: The lidar point cloud has coordinates relative to the input camera location. If you have changed the input '+
-                  'location of this camera since the point cloud was created, you need to create a new one.')
-                msg.setText(txt)
-                msg.setWindowTitle('Error')
-                msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-                msg.buttonClicked.connect(self.onMsgBoxClick)
-                msg.show()
-            else:
-                f = open(pth+'_binaries/lidarTable.pkl','rb')
-                lidarTable = pickle.load(f)
+            if os.path.exists(pth+'_binaries/linkToLidar.pkl'):
+                f = open(pth+'_binaries/linkToLidar.pkl','rb')
+                linkToLidar = pickle.load(f)
 
                 self.close()
-                self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
-                self.lw.resize(900,350)
-                self.lw.show()
+                self.w = PickGCPsWindow(linkToLidar)
+                self.w.show()
+            else:
+                self.close()
+                self.w = getLidar_FindUseableDatasetsWindow()
+                self.w.show()
+                
+        else: # WebCAT #
+
+            if os.path.exists(pth+'_binaries/linkToLidar.pkl'):
+                f = open(pth+'_binaries/linkToLidar.pkl','rb')
+                linkToLidar = pickle.load(f)
+
+                self.close()
+                self.w = PickGCPsWindow(linkToLidar)
+                self.w.show()
+            else:
+            
+                if os.path.exists(pth+'products/lidarPC.pkl'):
+                    msg = QMessageBox(self)
+                    msg.setIcon(QMessageBox.Information)
+                    txt = ('Exisiting lidar point cloud for this camera found. Do you want to use it? \n' +
+                      'WARNING: The lidar point cloud has coordinates relative to the input camera location. If you have changed the input '+
+                      'location of this camera since the point cloud was created, you need to create a new one.')
+                    msg.setText(txt)
+                    msg.setWindowTitle('Error')
+                    msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+                    msg.buttonClicked.connect(self.onMsgBoxClick)
+                    msg.show()
+                else:
+                    f = open(pth+'_binaries/lidarTable.pkl','rb')
+                    lidarTable = pickle.load(f)
+
+                    self.close()
+                    self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
+                    self.lw.resize(900,350)
+                    self.lw.show()
          
     def onMsgBoxClick(self,i):
        
@@ -1581,6 +1685,7 @@ class getLidar_FindUseableDatasetsWindow(QWidget):
        self.show()
        ############################
 
+
        if os.path.exists(pth+'products/lidarPC.pkl'):
            msg = QMessageBox(self)
            msg.setIcon(QMessageBox.Information)
@@ -1624,24 +1729,33 @@ class getLidar_FindUseableDatasetsWindow(QWidget):
             self.w.show()
             
         else:
-            # Instantiate worker threads #
-            f = open(pth+'_binaries/CameraLocation.pkl','rb')
-            cameraLocation = pickle.load(f)
 
-            self.worker1 = getLidar_FindCloseDatasetIDsThread(cameraLocation[0],cameraLocation[1])
-            self.worker1.finishSignal.connect(self.on_closeSignal1)
-            self.worker = getLidar_FindCoveringDatasetsThread(cameraLocation[0],cameraLocation[1])
-            self.worker.threadSignal.connect(self.on_threadSignal)
-            self.worker.finishSignal.connect(self.on_closeSignal)
-            self.worker.badSignal.connect(self.on_badSignal)
+            f = open(pth+'_binaries/lidarTable.pkl','rb')
+            lidarTable = pickle.load(f)
 
-            self.loadlab = QLabel()
-            self.loadmovie = QMovie(pth1+'loading.gif')
-            self.loadlab.setMovie(self.loadmovie)
+            self.close()
+            self.lw = getLidar_ChooseLidarSetWindow(lidarTable,lidarTable.shape[0],lidarTable.shape[1])
+            self.lw.resize(900,350)
+            self.lw.show()
            
-            self.worker1.start()
-            self.grd.addWidget(self.loadlab,0,4,1,4)
-            self.loadmovie.start()
+##            # Instantiate worker threads #
+##            f = open(pth+'_binaries/CameraLocation.pkl','rb')
+##            cameraLocation = pickle.load(f)
+##
+##            self.worker1 = getLidar_FindCloseDatasetIDsThread(cameraLocation[0],cameraLocation[1])
+##            self.worker1.finishSignal.connect(self.on_closeSignal1)
+##            self.worker = getLidar_FindCoveringDatasetsThread(cameraLocation[0],cameraLocation[1])
+##            self.worker.threadSignal.connect(self.on_threadSignal)
+##            self.worker.finishSignal.connect(self.on_closeSignal)
+##            self.worker.badSignal.connect(self.on_badSignal)
+##
+##            self.loadlab = QLabel()
+##            self.loadmovie = QMovie(pth1+'loading.gif')
+##            self.loadlab.setMovie(self.loadmovie)
+##           
+##            self.worker1.start()
+##            self.grd.addWidget(self.loadlab,0,4,1,4)
+##            self.loadmovie.start()
 
 
      def on_closeSignal1(self):
@@ -1724,6 +1838,7 @@ class getLidar_ChooseLidarSetWindow(QWidget):
     
     def __init__(self, data, rows, columns):
         QWidget.__init__(self)
+
         
         # Left menu box setup #
         bf = QFont()
@@ -1797,21 +1912,29 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         self.setWindowTitle('SurfRCaT')
         self.show()
         ############################
-        
-        # Instantiate worker threads #
-        f = open(pth+'_binaries/CameraLocation.pkl','rb')
-        cameraLocation = pickle.load(f)
-        
-        self.worker = getLidar_PrepChosenSetThread(cameraLocation[0],cameraLocation[1])
-        self.worker.threadSignal.connect(self.on_threadSignal)
-        
-        self.worker2 = getLidar_DownloadChosenSetThread(cameraLocation[0],cameraLocation[1])
-        self.worker2.threadSignal.connect(self.on_threadSignal2)
-        
-        self.worker3 = getLidar_FormatChosenSetThread(cameraLocation[0],cameraLocation[1])
-        ##############################
-        
 
+        if os.path.exists(pth+'_binaries/linkToLidar.pkl'):
+            f = open(pth+'_binaries/linkToLidar.pkl','rb')
+            pthToLidar = pickle.load(f)
+            
+            self.close()
+            self.w = PickGCPsWindow(pthToLidar)
+            self.w.show()
+        else:
+        
+            # Instantiate worker threads #
+            f = open(pth+'_binaries/CameraLocation.pkl','rb')
+            cameraLocation = pickle.load(f)
+            
+            self.worker = getLidar_PrepChosenSetThread(cameraLocation[0],cameraLocation[1])
+            self.worker.threadSignal.connect(self.on_threadSignal)
+            
+            self.worker2 = getLidar_DownloadChosenSetThread(cameraLocation[0],cameraLocation[1])
+            self.worker2.threadSignal.connect(self.on_threadSignal2)
+            
+            self.worker3 = getLidar_FormatChosenSetThread(cameraLocation[0],cameraLocation[1])
+            ##############################
+    
 
     def onMsgBoxClick(self,i):
         if i.text() == '&Yes':
@@ -1838,7 +1961,7 @@ class getLidar_ChooseLidarSetWindow(QWidget):
         '''
         Begin the download of the chosen dataset.
         '''
-        
+
         lab1 = QLabel('Sorting tiles:')
         self.pb1 = QProgressBar()
         
@@ -1931,9 +2054,7 @@ class getLidar_ChooseLidarSetWindow(QWidget):
     def on_closeSignal3(self):
         '''
         Finish when point cloud is created.
-        '''
-        time.sleep(10) # Let the computer rest for 10 seconds here. This helps to avaoid what seems to be memory swap issues that cause the pptk window in the next step to open very slowly. #
-        
+        '''        
         self.loadlab.setParent(None)
         labDone = QLabel('Done')
         self.layout.addWidget(labDone,8,2,1,2)
@@ -1971,8 +2092,13 @@ class PickGCPsWindow(QWidget):
    Window introducing the PickGCPs module and allowing the user to perform the GCP picking.
    '''
    
-   def __init__(self):
+   def __init__(self,pthToSavedLidar=None):
         super().__init__()
+
+        if pthToSavedLidar:
+            self.pthToLidar = pthToSavedLidar
+        else:
+            self.pthToLidar = pth+'products/lidarPC.pkl'
 
         if not QApplication.instance():
             app = QApplication(sys.argv)
@@ -2037,7 +2163,7 @@ class PickGCPsWindow(QWidget):
         ################################
         
         # Instantiate worker threads #
-        self.worker = pptkWindowWorker()
+        self.worker = pptkWindowWorker(self.pthToLidar)
         self.worker.finishSignal.connect(self.on_CloseSignal)
         self.worker.badSignal.connect(self.on_badSignal)
         self.worker2 = pickGCPs_Image(self.canvas)
@@ -2147,9 +2273,17 @@ class PickGCPsWindow(QWidget):
 
 
    def onOkClick(self):
-       self.close()
-       self.w = PickGCPsWindow()
-       self.w.show()
+       if os.path.exists(pth+'_binaries/linkToLidar.pkl'):
+           f = open(pth+'_binaries/linkToLidar.pkl','rb')
+           linkToLidar = pickle.load(f)
+
+           self.close()
+           self.w = PickGCPsWindow(linkToLidar)
+           self.w.show()
+       else:
+           self.close()
+           self.w = PickGCPsWindow()
+           self.w.show()
        
    def onHelpClick(self):
        '''
@@ -3303,8 +3437,9 @@ class pptkWindowWorker(QThread):
     finishSignal = pyqtSignal('PyQt_PyObject')
     badSignal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self):
+    def __init__(self,pthToSavedLidar):
         super().__init__()
+        self.pthToSavedLidar = pthToSavedLidar
 
         
     def run(self):
@@ -3312,7 +3447,7 @@ class pptkWindowWorker(QThread):
         print('Thread Started')
 
         # Load the point cloud #
-        f = open(pth+'products/lidarPC.pkl','rb')
+        f = open(self.pthToSavedLidar,'rb')
         pc = pickle.load(f)
 
         # Delete any pre-existing GCP files if they exist #
@@ -3321,9 +3456,13 @@ class pptkWindowWorker(QThread):
             os.remove(pth+'_binaries/GCPs_lidar.pkl')
             os.remove(pth+'results/GCPs_im.txt')
             os.remove(pth+'_binaries/GCPs_im.pkl')
+        except OSError:
+            pass
+        try:
             os.remove(pth1+'Testing.txt')
         except OSError:
             pass
+
 
         # Call the viewer and let the user identify points (subprocess saves the output to file #
         command = 'cmd.exe /C '+pth1+'LaunchPPTKwin\LaunchPPTKwin.exe'             
