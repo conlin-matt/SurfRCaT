@@ -1,3 +1,8 @@
+---
+layout: page
+title: Tutorials
+---
+
 ## Tutorial 1- Quantify morphology with a pre-exisiting camera ##
 In this tutorial, we will calibrate a pre-existing surfcam on the east coast of Florida and rectify some of its imagery in order to determine the dimensions
 of a unique morphological feature. This tutorial is intended to get you familiar with the primary facilities and nuances of SurfRCaT in terms of calibrating 
