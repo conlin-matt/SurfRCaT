@@ -1,6 +1,6 @@
 remote_theme: pmarsceill/just-the-docs
     
-logo: "https://github.com/conlin-matt/SurfRCaT/blob/master/docs/_data/icon3.png"    
+logo: "/_data/icon3.png"    
     
 search_enabled: true
 
