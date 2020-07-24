@@ -1,3 +1,8 @@
+---
+layout: page
+title: About
+---
+
 ## What is SurfRCaT? ##
 The Surf-camera Remote Calibration Tool (SurfRCaT) is a python-based, graphical user interface-driven tool that was designed 
 to exploit imagery from an extensive network of recreational surfcams operating on the U.S. coastline for studies of coastal geophysical processes.
@@ -13,7 +18,7 @@ co-location of points in an image from the camera and airborne lidar observation
 
 SurfRCaT can export rectified image products into Matlab and Python files for further analysis. (See the EXTENSIONS page).
  
-SurfRCaT can interface with cameras from the [Webcamera Application Testbed](link) to download historical imagery and perform acccurate calibrbations
+SurfRCaT can interface with cameras from the [Webcamera Application Testbed](https://secoora.org/webcat/) to download historical imagery and perform acccurate calibrbations
 and image rectifications for 4 of these cameras.
 
 These processes also mean that:
@@ -42,7 +47,7 @@ surfcams with substantial lens distortion (e.g. fisheye lenses).
 
 
 ## Integration with the WebCAT array ##
-The [Webcamera Application Testbed]() is a network of 7 surfcams spanning the southeastern U.S. that have continuous video streams archived on servers made
+The [Webcamera Application Testbed](https://secoora.org/webcat/) is a network of 7 surfcams spanning the southeastern U.S. that have continuous video streams archived on servers made
 available to the public. SurfRCaT contains built-in options to download historical imagery from, calibrate, and rectify imagery from the 4 WebCAT cameras 
 that meet SurfRCaT's usage requirments (see item 1 in CONSIDERATIONS FOR USING SURFRCAT). TUTORIAL 2 focuses on using a WebCAT camera to observe shoreline 
 change in South Carolina. 

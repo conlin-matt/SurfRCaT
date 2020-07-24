@@ -1,3 +1,8 @@
+---
+layout: page
+title: Extensions
+---
+
 ## Exporting products to Python/Matlab ##
 
 For the purposes of precise analyses (e.g. automatic shoreline extraction), SurfRCaT saves rectified images as .mat (Matlab) and .pkl (Python) files. These
@@ -34,23 +39,23 @@ The facilities within SurfRCaT may be useful for applications that it was not sp
 
 	Alternatively, to do this programmatically in Python for 2 frames/second you can run:
 
-	```python
-	import SurfRCaT
-	import cv2
+```python
+import SurfRCaT
+import cv2
 	
-	vid = 'C:/path/to/video.mp4'
-	saveDir = 'C:/directory/to/save/frames/to'
+vid = 'C:/path/to/video.mp4'
+saveDir = 'C:/directory/to/save/frames/to'
 
-        cap = cv2.VideoCapture(vid)
-        numFrames = int(cap.get(7))
-        fps = cap.get(5)
-        vidLen = int(numFrames/fps)
+cap = cv2.VideoCapture(vid)
+numFrames = int(cap.get(7))
+fps = cap.get(5)
+vidLen = int(numFrames/fps)
 
-	secondsPerFrame = 1 # Leave as 1 to ignore this parameter #
-	rate = 2 # 2 frames/second #
+secondsPerFrame = 1 # Leave as 1 to ignore this parameter #
+rate = 2 # 2 frames/second #
 
-	SurfRCaT.getImagery_GetStills(vid,secondsPerFrame,rate,vidLen,saveDir)
-	```
+SurfRCaT.getImagery_GetStills(vid,secondsPerFrame,rate,vidLen,saveDir)
+```
 
 
 2) Automatic assesment of airborne lidar datasets for a location
@@ -61,61 +66,61 @@ The facilities within SurfRCaT may be useful for applications that it was not sp
 
 	This could also be done programmatically using the following code:
 
-	```python  
-	import SurfRCaT
-	import ftplib
-	import numpy as np
+```python  
+import SurfRCaT
+import ftplib
+import numpy as np
 
-	camera_latitude = <input latitude (WGS84) here>
-	camera_longitude = <input longitude (WGS84) here>
+camera_latitude = <input latitude (WGS84) here>
+camera_longitude = <input longitude (WGS84) here>
 
-	# Get the IDs of datasets that are near this location (same state and/or coast) #
-	closeIDs = SurfRCaT.getLidar_FindPossibleIDs(camera_latitude,camera_longitude)
+# Get the IDs of datasets that are near this location (same state and/or coast) #
+closeIDs = SurfRCaT.getLidar_FindPossibleIDs(camera_latitude,camera_longitude)
 
-	# Search these close datasets to find those that cover this location #
-        ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
-        ftp.login('anonymous','anonymous')
-	ftp.cwd('/pub/DigitalCoast')
-        dirs = [i for i in ftp.nlst() if 'lidar' in i]
-        alldirs = []
-        for ii in dirs:
-            ftp.cwd(ii)
-            alldirs.append([ii+'/'+i for i in ftp.nlst() if 'geoid' in i])
-            ftp.cwd('../')  
+# Search these close datasets to find those that cover this location #
+ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
+ftp.login('anonymous','anonymous')
+ftp.cwd('/pub/DigitalCoast')
+dirs = [i for i in ftp.nlst() if 'lidar' in i]
+alldirs = []
+for ii in dirs:
+    ftp.cwd(ii)
+    alldirs.append([ii+'/'+i for i in ftp.nlst() if 'geoid' in i])
+    ftp.cwd('../')  
 
-        appropID = list() # Initiate list of IDs that contain the camera location #
-        i = 0
-        for ID in IDs:  
-            i = i+=1
-            check = SurfRCaT.getLidar_TryID(ftp,alldirs,ID,camera_latitude,camera_longitude)
-            ftp.cwd('../../../../')
+appropID = list() # Initiate list of IDs that contain the camera location #
+i = 0
+for ID in IDs:  
+i = i+=1
+    check = SurfRCaT.getLidar_TryID(ftp,alldirs,ID,camera_latitude,camera_longitude)
+    ftp.cwd('../../../../')
 
-            if check:
-                if len(check)>0:       
-                    appropID.append(ID)
+    if check:
+        if len(check)>0:       
+            appropID.append(ID)
 
-	# Choose a dataset #
-	IDToDownload = appropID[<Choose which dataset you want>]
+# Choose a dataset #
+IDToDownload = appropID[<Choose which dataset you want>]
 
-	# Determine the tiles that are close enough to the camera to download #
-	sf = SurfRCaT.getLidar_GetShapefile(IDToDownload)
-        poly = SurfRCaT.getLidar_CalcViewArea(30,20,1000,camera_latitude,camera_longitude)
+# Determine the tiles that are close enough to the camera to download #
+sf = SurfRCaT.getLidar_GetShapefile(IDToDownload)
+poly = SurfRCaT.getLidar_CalcViewArea(30,20,1000,camera_latitude,camera_longitude)
         
-        tilesKeep = list()
-        for shapeNum in range(0,len(sf)):
-            out = SurfRCaT.getLidar_SearchTiles(sf,poly,shapeNum,camera_latitude,camera_longitude)
-            if out:
-                tilesKeep.append(out)
+tilesKeep = list()
+for shapeNum in range(0,len(sf)):
+    out = SurfRCaT.getLidar_SearchTiles(sf,poly,shapeNum,camera_latitude,camera_longitude)
+    if out:
+        tilesKeep.append(out)
 
-	# Download the portion of the dataset close to the camera #
-        lidarDat = np.empty([0,3])
-        for thisFile in tilesKeep:
-            lidarXYZsmall = SurfRCaT.getLidar_Download(thisFile,IDToDownload,camera_latitude,camera_longitude)
-            lidarDat = np.append(lidarDat,lidarXYZsmall,axis=0)
+# Download the portion of the dataset close to the camera #
+lidarDat = np.empty([0,3])
+for thisFile in tilesKeep:
+    lidarXYZsmall = SurfRCaT.getLidar_Download(thisFile,IDToDownload,camera_latitude,camera_longitude)
+    lidarDat = np.append(lidarDat,lidarXYZsmall,axis=0)
 
-	# Format the point cloud as a Pandas DataFrame (coordinates relative to input location) #
-        pc = SurfRCaT.getLidar_CreatePC(lidarDat,camera_latitude,camera_longitude)
-	```
+# Format the point cloud as a Pandas DataFrame (coordinates relative to input location) #
+pc = SurfRCaT.getLidar_CreatePC(lidarDat,camera_latitude,camera_longitude)
+```
 
 3) Others? Let us know if you have ideas!
 

@@ -1,10 +1,15 @@
+---
+layout: page
+title: Scientific Overview
+---
+
 ## Overview of processes and assumptions ##
 The study of geophysical processes from images requires transformation of image information into real-world space. This transformation, known
 as **rectification**, requires knowledge of a number of camera parameters such as camera location and view angles, camera focal length, and lens 
 distortion characteristics, as well as the co-location of ground control points (GCPs) in the image and real-world coordinates.
-Estimation of these parameters is known as **camera calibration**. Camera calibration is completed through the photogrammetric process known as 
-space resection, which utilizes a non-linear least squares optimization to adjust initial camera parameter approximations so as to minimze error.
-For more details the user is referred to the references given below.
+Estimation of camera parameters from observations of GCPs is known as **camera calibration** (or space resection, in classical photogrammetry),
+and is completed through a non-linear least squares adjustment of initial approximations to minimize transformation error. For more details the user 
+is referred to the references given below.
 
 SurfRCaT completes the calibration and rectification processes in 5 stages. An overview of each stage, along with important assumptions made at each, 
 are presented below:
@@ -18,19 +23,19 @@ are presented below:
 	and azimuth viewing angle. In the absence of a site visit, we recommend using Google Earth to obtain these estimates (TUTORIAL 1
 	provides an example). SurfRCaT assumes initial approximations for all other camera parameters as follows:
 
-		+ SurfRCaT assumes lens distorion to be 0, i.e. does not account for it.
-		+ SurfRCaT assumes camera focal length by assuming a 60 degree camera horizontal field of view
-		+ SurfRCaT assumes the principal point coodinates to be the center of the image.
-		+ SurfRCaT assumes the tilt of the camera to be 80 degrees
-		+ SurfRCaT assumes the roll of the camera to be negligable. 
+	+ SurfRCaT assumes lens distorion to be 0, i.e. does not account for it.
+	+ SurfRCaT assumes camera focal length by assuming a 60 degree camera horizontal field of view
+	+ SurfRCaT assumes the principal point coodinates to be the center of the image.
+	+ SurfRCaT assumes the tilt of the camera to be 80 degrees
+	+ SurfRCaT assumes the roll of the camera to be negligable. 
 
-			> **Note**
-			>
-			> If your camera deviates largely from any of these assumptions (e.g. fisheye lens, small tilt), SurfRCaT may
-			> not work well out of the box. Camera parameter assumptions are easy to change if you download the source code,
-			> however the lens distortion assumption is not.
+		> **Note**
+		>
+		> If your camera deviates largely from any of these assumptions (e.g. fisheye lens, small tilt), SurfRCaT may
+		> not work well out of the box. Camera parameter assumptions are easy to change if you download the source code,
+		> however the lens distortion assumption is not.
 
-	SurfRCat extracts fromes from the user-input video at a user=specified rate, and allows the user to choose a frame to use in the remote-GCP
+	SurfRCat extracts frames from the user-input video at a user-specified rate, and allows the user to choose a frame to use in the remote-GCP
 	extraction (step 3). 
 
 2) Lidar acquisition
@@ -64,8 +69,10 @@ are presented below:
 
 ### References ###
 
-[1] Textbook
-[2] Holland and Holman
+[1] Wolf, P. R., Dewitt, B., & Wilkinson, B. (2014). Elements of Photogrammetry with Applications in GIS. McGraw and Hill education.
+
+[2] Holland, K. T., Holman, R. A., Lippmann, T. C., Stanley, J., & Plant, N. (1997). 
+Practical use of video imagery in nearshore oceanographic field studies. IEEE Journal of oceanic engineering, 22(1), 81-92.
 
 
 

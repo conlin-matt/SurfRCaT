@@ -1,9 +1,14 @@
+---
+layout: page
+title: Download
+---
+
 SurfRCaT can be obtained in one of two ways: by downloading a pre-compiled application or by building it from the source code. Below, 
 instructions for downloading and using the tool in each of these ways are given. 
 
 ## SurfRCaT via precompiled app ##
 You can download and use the precompiled SurfRCaT application following the steps below: 
-1) [Download](https://www.dropbox.com/s/vinq5h6un5k47qy/SurfRCaT.exe?dl=1) the tool.
+1) [Download](placeholder) the tool.
 2) When the tool has finished downloading, click on it (Chrome) or select Run (Edge) to launch the installer.
 3) Follow the prompts to install SurfRCaT. 
 4) Launch SurfRCaT the same way you launch any other application 
