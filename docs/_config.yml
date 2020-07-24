@@ -28,7 +28,7 @@ search:
   # Supports true or false (default)
   button: false
   
-  aux_links:
+aux_links:
   "SurfRCaT on GitHub":
     - "//github.com/conlin-matt/SurfRCaT"
 
