@@ -1,4 +1,31 @@
-remote_theme: tomjoht/documentation-theme-jekyll  
+remote_theme: christianezeani/panthera-jekyll
+
+title: SurfRCaT
+
+menu:
+  - text: Home
+    link: /
+    icon: ""
+
+  - text: About
+    link: /about
+    icon: ""
+
+  - text: Scientific Overview
+    link: /overview
+    icon: ""
+
+  - text: Download
+    link: /download
+    icon: ""
+
+  - text: Tutorials
+    link: /tutorials
+    icon: ""
+
+  - text: Extensions
+    link: /extensions
+    icon: "" 
     
     
     
