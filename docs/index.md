@@ -4,7 +4,7 @@
 SurfRCaT is a graphical user interface-driven tool to help you transform pre-exisiting cameras on the United States' coastline
 into quantitative coastal monitoring tools without leaving your computer.
 
-![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/_data/icon3.png)
+<img src="_data/icon3.png" alt="SurfRCaT logo" class="inline"/>
 
 More information about SurfRCaT can be found on the ABOUT page.
 
