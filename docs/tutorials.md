@@ -78,7 +78,7 @@ GCPs you identified, you can re-do it using the Retry button. Otherwise, click C
 FUNDAMENTAL PRINCIPALS for more details). SurfRCaT will show the reprojected positions of each GCP in the next window. You should get results
 resembling those shown below.  You can retry the Calibration by clicking the Retry button. Otherwise, press Continue.
 
-![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/_data/calibResults_Tutorial1.png)
+![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/images/calibResults_Tutorial1.png)
 
 14) A summary of the calibration process and results can be found in the file ../SurfRCaT_Example1/calibration_StLucie_202005120849/
 results/calibrationSummary.csv.
@@ -112,7 +112,7 @@ The images should look similar to that shown below.
    > coordinate system transformation to one that is cross-shore distance (x) and long-shore distance (y). If you need to do this, add the 	   
    > camera location back to the coordinates in Matlab/Python and perform your transformation. 	           
 	
-![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/_data/rectif_Tutorial1.png)
+![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/images/rectif_Tutorial1.png)
 
 17) Based on the rectified products, we will visually (and very roughly) estimate the dimensions of the sandbar in real-world space. By treating the 
 left-most section of the bar as a triangle, and the right-most section as a rectangle, an overall area of the feature can be estimated as ~8000 m^2. 
@@ -236,8 +236,8 @@ window will close.
 25) Press continue, and the image will be rectified and saved. Then press 'Rectify more images'.
 26) Follow steps 22-25 for the April video to rectify a frame from that video as well. You should get results resembling those below. 
 
-![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/_data/rectif_Tutorial2_jan.png)
-![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/_data/rectif_Tutorial2_apr.png)
+![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/images/rectif_Tutorial2_jan.png)
+![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/images/rectif_Tutorial2_apr.png)
 
 27) Based on these products, there was shoreline advance between January 1 2019 and April 22 2019. While the tidal elevation was the same for both images,
 this apparant advance could be driven by morpholgoical changes and/or differences in wave setup, which has not been accounted for. Additionally, it is apparent than the view
