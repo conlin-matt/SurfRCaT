@@ -1,7 +1,7 @@
 remote_theme: pmarsceill/just-the-docs
 markdown: GFM
     
-logo: "/_data/icon3.png"    
+logo: "/images/icon3.png"    
     
 search_enabled: true
 
