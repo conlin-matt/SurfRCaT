@@ -19,4 +19,4 @@ Useage tutorials are provided in the TUTORIALS page.
 
 The EXTENSIONS page provides information on extensions of the tool including interfacing output with Python/Matlab and other potential applications.
 
-![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/images/icon3.png)
+<img src="images/icon3.png" class="img-responsive" alt=""> </div>
