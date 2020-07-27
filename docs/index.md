@@ -19,4 +19,4 @@ Useage tutorials are provided in the TUTORIALS page.
 
 The EXTENSIONS page provides information on extensions of the tool including interfacing output with Python/Matlab and other potential applications.
 
-<img src="images/icon3.png" class="img-responsive" alt=""> </div>
+<img src="images/icon_medium.png" class="img-responsive" alt=""> </div>
