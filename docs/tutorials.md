@@ -1,9 +1,10 @@
 ---
-layout: page
+layout: default
 title: Tutorials
+nav_order: 5
 ---
 
-## Tutorial 1- Quantify morphology with a pre-exisiting camera ##
+# Tutorial 1- Quantify morphology with a pre-exisiting camera #
 In this tutorial, we will calibrate a pre-existing surfcam on the east coast of Florida and rectify some of its imagery in order to determine the dimensions
 of a unique morphological feature. This tutorial is intended to get you familiar with the primary facilities and nuances of SurfRCaT in terms of calibrating 
 a camera and then rectifying its imagery for geophysical applications. It is also intented to illustrate many of the considerations for using imagery from
@@ -124,7 +125,7 @@ of ~4000 m^3, equivalent to approximately 440 standard dump trucks-worth of sedi
    > can be imported into Python or Matlab for more detailed/precise analyses. See the EXTENSIONS page for more info. 
 	
 
-## Tutorial 2- prepare to analyze shoreline change from a WebCAT surfcam ##
+# Tutorial 2- prepare to analyze shoreline change from a WebCAT surfcam #
 In this tutorial, we will obtain videos from a surfcam in the WebCAT array, calibrate the camera, and then rectify an image from each video  
 to analyze shoreline change over time. This tutorial is intended to illustrate the integration of WebCAT cameras within SurfRCaT and 
 how they can be exploited for geophysical applications (see INTEGRATION WITH THE WEBCAT ARRAY for more information). No external files are needed 

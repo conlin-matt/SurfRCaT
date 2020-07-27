@@ -1,9 +1,23 @@
 ---
-layout: page
+layout: default
 title: Extensions
+nav_order: 6
 ---
+# Re-calibration #
 
-## Exporting products to Python/Matlab ##
+Perhaps you have completed a calibration for a camera, but you are unhappy with it. SurfRCaT facilitates re-calibrations by allowing you to load products
+from when you previously calibrated the camera. If you want to begin the re-calibration with the same video as when you initially calibrated the camera, make
+sure you set your working directory as the directory in which the subdirectory *caibration_<video_name>* lives. Enter all the user inputs as you
+did during the initial calibration. When you click "Continue" in the Inputs and Imagery window, SurfRCaT will recognize that a calibration has been completed
+previously using this video, and will give you the options to use the same calibration image and/or lidar point cloud as the initial calibration.
+
+Alternatively, you may have videos from many different times for a single camera, and wish to calibrate the camera for each video time. TUTORIAL 2
+provides an example of this situation. In this case, you can load the lidar point cloud that was downloaded for the first camera calibration by 
+checking Yes in the "Used saved lidar point cloud?" field in the Imagery and Inputs window. This way, you only need to take the time to download
+a lidar point cloud once. 
+ 
+
+# Exporting products to Python/Matlab #
 
 For the purposes of precise analyses (e.g. automatic shoreline extraction), SurfRCaT saves rectified images as .mat (Matlab) and .pkl (Python) files. These
 can be imported into your preferred programming language for analysis. 
@@ -29,15 +43,15 @@ frameRect = pickle.load(f)
 '''
 
 
-## Other potential applications ##
+# Other potential applications #
 The facilities within SurfRCaT may be useful for applications that it was not specifically designed for. These could include:
-1) Extraction of frames from any video at a user specified rate.
+### Extraction of frames from any video at a user specified rate ###
 
-	To do this for any video, simply invoke the tool, choose the 'Rectify images' option in the first window and input the video file
-	and save directory in the Step 1 box. This will open the video decimator window where you can specify the decimation rate. You can
-	repeat this process for as many video as you want.
+To do this for any video, simply invoke the tool, choose the 'Rectify images' option in the first window and input the video file
+and save directory in the Step 1 box. This will open the video decimator window where you can specify the decimation rate. You can
+repeat this process for as many video as you want.
 
-	Alternatively, to do this programmatically in Python for 2 frames/second you can run:
+Alternatively, to do this programmatically in Python for 2 frames/second you can run:
 
 ```python
 import SurfRCaT
@@ -58,13 +72,13 @@ SurfRCaT.getImagery_GetStills(vid,secondsPerFrame,rate,vidLen,saveDir)
 ```
 
 
-2) Automatic assesment of airborne lidar datasets for a location
+### Automatic assesment of airborne lidar datasets for a location ###
 
-	SurfRCaT could be used to determine available/download airborne lidar datasets for a given coastal location. The graphical
-	user interface was not designed for this directly, however it is possible. You'll have to provide a video and extract a frame 
-	from it, however you won't actually care about these in this case.
+SurfRCaT could be used to determine available/download airborne lidar datasets for a given coastal location. The graphical
+user interface was not designed for this directly, however it is possible. You'll have to provide a video and extract a frame 
+from it, however you won't actually care about these in this case.
 
-	This could also be done programmatically using the following code:
+This could also be done programmatically using the following code:
 
 ```python  
 import SurfRCaT
@@ -122,7 +136,7 @@ for thisFile in tilesKeep:
 pc = SurfRCaT.getLidar_CreatePC(lidarDat,camera_latitude,camera_longitude)
 ```
 
-3) Others? Let us know if you have ideas!
+### Others? Let us know if you have ideas! ###
 
 
 

@@ -1,10 +1,15 @@
+---
+layout: default
+title: Home
+nav_order: 1
+---
 
-## The Surf-camera Remote Calibration Tool (SurfRCaT) ##
+# The Surf-camera Remote Calibration Tool (SurfRCaT) #
 
 SurfRCaT is a graphical user interface-driven tool to help you transform pre-exisiting cameras on the United States' coastline
 into quantitative coastal monitoring tools without leaving your computer.
 
-![](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/_data/icon3.png)
+![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/_data/icon3.png)
 
 More information about SurfRCaT can be found on the ABOUT page.
 
