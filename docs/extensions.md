@@ -25,27 +25,28 @@ can be imported into your preferred programming language for analysis.
 The .mat file is intended to be structured the same way as rectified products from the [Coastal Imaging Research Network (CIRN) routines](link). To import 
 the .mat file into Matlab:
 
-'''matlab
+```matlab
 load('<path_to_image>/<im>_rectif.mat');
 frameRect.x = x; frameRect.y = y; frameRect.I = I;
-'''
+```
 This will produce a frameRect struct that is similar in structure to those returned and read by the CIRN codes.
 ___
 
 The Python .pkl file is a compressed binary verison of a Python dict that contains the rectified product. The dict is structured similarly to the Matlab 
 struct produced by the above code. To import the .pkl file in Python:
 
-'''python
+```python
 import pickle
 
 f = open('<path_to_image>/<im>_rectif.pkl','rb')
 frameRect = pickle.load(f)
-'''
+```
 
 
 # Other potential applications #
 The facilities within SurfRCaT may be useful for applications that it was not specifically designed for. These could include:
-### Extraction of frames from any video at a user specified rate ###
+
+## Extraction of frames from any video at a user specified rate ##
 
 To do this for any video, simply invoke the tool, choose the 'Rectify images' option in the first window and input the video file
 and save directory in the Step 1 box. This will open the video decimator window where you can specify the decimation rate. You can
@@ -72,7 +73,7 @@ SurfRCaT.getImagery_GetStills(vid,secondsPerFrame,rate,vidLen,saveDir)
 ```
 
 
-### Automatic assesment of airborne lidar datasets for a location ###
+## Automatic assesment of airborne lidar datasets for a location ##
 
 SurfRCaT could be used to determine available/download airborne lidar datasets for a given coastal location. The graphical
 user interface was not designed for this directly, however it is possible. You'll have to provide a video and extract a frame 
@@ -136,7 +137,7 @@ for thisFile in tilesKeep:
 pc = SurfRCaT.getLidar_CreatePC(lidarDat,camera_latitude,camera_longitude)
 ```
 
-### Others? Let us know if you have ideas! ###
+## Others? Let us know if you have ideas! ##
 
 
 

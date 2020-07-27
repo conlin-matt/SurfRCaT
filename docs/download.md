@@ -10,13 +10,13 @@ instructions for downloading and using the tool in each of these ways are given.
 ## SurfRCaT via precompiled app ##
 You can download and use the precompiled SurfRCaT application following the steps below: 
 
-1) [Download](placeholder) the tool.
+1. [Download](placeholder) the tool.
 
-2) When the tool has finished downloading, click on it (Chrome) or select Run (Edge) to launch the installer.
+2. When the tool has finished downloading, click on it (Chrome) or select Run (Edge) to launch the installer.
 
-3) Follow the prompts to install SurfRCaT. 
+3. Follow the prompts to install SurfRCaT. 
 
-4) Launch SurfRCaT the same way you launch any other application 
+4. Launch SurfRCaT the same way you launch any other application 
 
 
 ## SurfRCaT from source ##
@@ -24,15 +24,15 @@ If you want a bit more control over the code, you can create SurfRCaT via the so
 
 Steps for building SurfRCaT from source:
 
-1) Clone or download the SurfRCaT repository into a folder of your choosing.
+1. Clone or download the SurfRCaT repository into a folder of your choosing.
 
-2) If you don't already have it, download the appropriate Anaconda distribution for your machine from 
+2. If you don't already have it, download the appropriate Anaconda distribution for your machine from 
 [here](https://www.anaconda.com/distribution/). Use the Python 3.7 64-bit version. Anaconda is an all-in-one package and environment manager, 
 and makes downloading and dealing with Python packages relatively painless.
 
-3) Open an Anaconda prompt by searching for 'Anaconda' in the Windows search bar and selecting the prompt.
+3. Open an Anaconda prompt by searching for 'Anaconda' in the Windows search bar and selecting the prompt.
 
-4) Create a new environment called SurfRCaT_env containing Python 3.6 and most of the package dependencies by running the following two commands 
+4. Create a new environment called SurfRCaT_env containing Python 3.6 and most of the package dependencies by running the following two commands 
 in the Anaconda prompt (with an 'Enter' press between the commands):
 
 ```bash
@@ -40,19 +40,19 @@ conda create -n SurfRCaT_env -c conda-forge python=3.6 python-pdal pyqt numpy pa
 conda activate SurfRCaT_env
 ```
 
-5) Pip install fbs, the package for running the GUI, pptk, the Point Processing Toolkit and reverse_geocoder, by executing:
+5. Pip install fbs, the package for running the GUI, pptk, the Point Processing Toolkit and reverse_geocoder, by executing:
 
 ```bash
 pip install fbs pptk reverse_geocoder
 ```
 
-6) cd to the directory containing the contents of this repository by executing:
+6. cd to the directory containing the contents of this repository by executing:
 
 ```bash
 cd <your directory>
 ```
 
-7) Invoke the tool by running:
+7. Invoke the tool by running:
 
 ```bash
 fbs run 
