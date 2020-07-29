@@ -1,5 +1,5 @@
 remote_theme: pmarsceill/just-the-docs
-markdown: kramdown
+markdown: GFM
     
 logo: "/images/icon3.png"    
     
