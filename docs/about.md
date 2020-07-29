@@ -5,19 +5,19 @@ nav_order: 2
 ---
 
 # What is SurfRCaT? #
-The Surf-camera Remote Calibration Tool (SurfRCaT) is a python-based, graphical user interface-driven tool that was designed 
+The Surf-camera Remote Calibration Tool (SurfRCaT) is a Python-based, graphical user interface-driven tool that was designed 
 to exploit imagery from an extensive network of recreational surfcams operating on the U.S. coastline for studies of coastal geophysical processes.
-It does this by facilitating the calibration of, and rectification of images from, any video camera on the U.S. coastline the views structures 
+It does this by facilitating the remote calibration of, and rectification of images from, any video camera on the U.S. coastline that views structures 
 identifiable in airborne lidar data.
 
 
 # What can SurfRCaT do? #
- + SurfRCaT can help you remotely calibrate and rectify images from many pre-existing cameras on the U.S. coastline (see CONSIDERATIONS FOR USING SURFRCAT)
+ + SurfRCaT can help you remotely calibrate and rectify images from many pre-existing cameras on the U.S. coastline by facilitating the co-location
+of points in an image from the camera and airborne lidar observations that it automatically obtains.
 
- + SurfRCaT can guide you through the calibration and rectification processes in a self-contained graphical user interface. It does this by facilitating the
-co-location of points in an image from the camera and airborne lidar observations that it automatically obtains.
+ + SurfRCaT can guide you through the calibration and rectification processes in a self-contained graphical user interface. 
 
- + SurfRCaT can export rectified image products into Matlab and Python files for further analysis. (See the EXTENSIONS page).
+ + SurfRCaT can export rectified image products into Matlab and Python files for further analysis. (See the [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html) page).
  
  + SurfRCaT can interface with cameras from the [Webcamera Application Testbed](https://secoora.org/webcat/) to download historical imagery and perform acccurate calibrbations
 and image rectifications for 4 of these cameras.
@@ -33,25 +33,26 @@ These processes also mean that:
  
 
 # Considerations for using SurfRCaT #
-1) SurfRCaT can only be applied to a camera if:
-   + You have video(s) from the camera 
+1. SurfRCaT can only be applied to a camera if:
+   + You have video(s) from the camera (see Point 1 in the [Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) page) 
    + The camera views structures that can be identified in airborne lidar observations (e.g. piers, buildings, lifeguard towers)
 
-2) SurfRCaT must be run on a Windows 10 machine.
-3) SurfRCaT requires a reliable internet connection during runtime. 
-4) Airborne lidar datasets can be extremely large. While SurfRCaT goes to great lengths to reduce the amount of lidar data that are
+2. SurfRCaT must be run on a Windows 10 machine.
+3. SurfRCaT requires a reliable internet connection during runtime. 
+4. Airborne lidar datasets can be extremely large. While SurfRCaT works to reduce the amount of lidar data that are
 downloaded and saved locally, this process can still be slow. Speed depends greatly on the lidar dataset being downloaded, though this 
 process could concievably take upwards of 30 minutes or more depending on the dataset and internet connection. 
-5) Using images from surfcams to study the coast requires a number of specific considerations. The TUTORIALS illustrate these. 
-6) SurfRCaT does not account/correct for lens distortion (see OVERVIEW OF PROCESSES AND ASSUMPTIONS). SurfRCaT may therefore not be applicable to 
-surfcams with substantial lens distortion (e.g. fisheye lenses). 
+5. Using images from surfcams to study the coast requires a number of specific considerations. The TUTORIALS illustrate these. 
+6. SurfRCaT does not account/correct for lens distortion and makes a few *a priori* assumptions about the camera (see the [Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) page). 
+SurfRCaT may therefore not be applicable to surfcams with substantial lens distortion (e.g. fisheye lenses) or which deviate substantially from these
+assumptions. 
 
 
 
 ## Integration with the WebCAT array ##
 The [Webcamera Application Testbed](https://secoora.org/webcat/) is a network of 7 surfcams spanning the southeastern U.S. that have continuous video streams archived on servers made
 available to the public. SurfRCaT contains built-in options to download historical imagery from, calibrate, and rectify imagery from the 4 WebCAT cameras 
-that meet SurfRCaT's usage requirments (see item 1 in CONSIDERATIONS FOR USING SURFRCAT). TUTORIAL 2 focuses on using a WebCAT camera to observe shoreline 
+that meet SurfRCaT's usage requirments (see item 1 above). [Tutorial 2](https://conlin-matt.github.io/SurfRCaT/tutorials.html) focuses on using a WebCAT camera to observe shoreline 
 change in South Carolina. 
 
 

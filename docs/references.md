@@ -1,17 +1,14 @@
 ---
 layout: default
-title: References
+title: Acknowledgements
 nav_order: 7
 ---
 
-## References ##
-In addition to many other Python libraries, SurfRCaT leverages a few wonderful open-source tools:
+In addition to many other Python libraries, SurfRCaT is built on the work of a few wonderful open-source tools (incomplete list):
 
 + [PyQT](https://riverbankcomputing.com/software/pyqt/intro)
-+ [pptk](https://heremaps.github.io/pptk/)
 + [fbs](https://build-system.fman.io/manual/)
-+ [reverse_geocoder](https://github.com/thampiman/reverse-geocoder)
-+ [pyinstaller](https://www.pyinstaller.org/)
++ [pptk](https://heremaps.github.io/pptk/)
 + [PDAL](https://pdal.io/index.html)
 
 	> **Note**

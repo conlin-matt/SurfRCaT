@@ -55,7 +55,8 @@ process, which is completed in three steps: sorting tiles, downloading data, and
 
    > **Note**
    >
-   > The lidar download process can be relatively time- and memory-intensive due to the large size of some datasets. See [Considerations for using SurfRCaT](https://conlin-        > matt.github.io/SurfRCaT/about.html) for more information. This dataset was downloaded in <3 minutes with a relatively slow internet connection, however dataset 8950          > required 20 minutes to download with the same connection. 
+   > The lidar download process can be relatively time- and memory-intensive due to the large size of some datasets. See [Considerations for using SurfRCaT](https://conlin-matt.github.io/SurfRCaT/about.html) 
+   > for more information. This dataset was downloaded in <3 minutes with a relatively slow internet connection, however dataset 8950 required 20 minutes to download with the same connection. 
 
 
 10. You have now entered the GCP picking module, the heart of SurfRCaT. Here you will co-locate features in the camera image and lidar point cloud. First,
@@ -77,7 +78,7 @@ GCPs you identified, you can re-do it using the Retry button. Otherwise, click C
 SurfRCaT will show the reprojected positions of each GCP in the next window. You should get results resembling those shown below.  You can retry 
 the Calibration by clicking the Retry button. Otherwise, press Continue.
 
-    <img src="images/calibResults_Tutorial1.png" class="img-responsive" alt=""> </div>
+    <img src="images/calibResults_Tutorial1.png" class="img-responsive" alt="">
 
 14. A summary of the calibration process and results can be found in the file `../SurfRCaT_Example1/calibration_StLucie_202005120849/results/calibrationSummary.csv`.
 15. The Rectification Module will now open. We will rectify the 5 frames that we extracted from the video. Since we have already extracted frames from this
@@ -112,7 +113,7 @@ facilitate further analysis (see [Extensions](https://conlin-matt.github.io/Surf
     > coordinate system transformation to one that is cross-shore distance (x) and long-shore distance (y). If you need to do this, add the 	   
     > camera location back to the coordinates in Matlab/Python and perform your transformation. 	           
 
-    <img src="images/rectif_Tutorial1.png" class="img-responsive" alt=""> </div>	
+    <img src="images/rectif_Tutorial1.png" class="img-responsive" alt="">	
 
 17. Based on the rectified products, we will visually (and very roughly) estimate the dimensions of the sandbar in real-world space. By treating the 
 left-most section of the bar as a triangle, and the right-most section as a rectangle, an overall area of the feature can be estimated as ~8000 square meters. 
@@ -122,7 +123,7 @@ of ~4000 cubic meters, equivalent to approximately 440 standard dump trucks-wort
 ---
 
 # Tutorial 2- prepare to analyze shoreline change from a WebCAT surfcam #
-In this tutorial, we will obtain videos from a surfcam in the WebCAT array, calibrate the camera, and then rectify an image from each video  
+In this tutorial, we will obtain videos from a surfcam in the WebCAT array, calibrate the camera, and then rectify an image from each video 
 to analyze shoreline change over time. This tutorial is intended to illustrate the integration of WebCAT cameras within SurfRCaT and 
 how they can be exploited for geophysical applications (see [Integration with the WebCAT array](https://conlin-matt.github.io/SurfRCaT/about.html) for more information). No external files are needed 
 for this tutorial.
@@ -186,7 +187,7 @@ and you are unhappy with the GCPs you identified, you can re-do it using the Ret
 SurfRCaT will show the reprojected positions of each GCP in the next window. You should get results
 resembling those shown below. You can retry the Calibration by clicking the Retry button. Otherwise, press Continue. 
 
-    <img src="images/calibResults_Tutorial2.png" class="img-responsive" alt=""> </div>
+    <img src="images/calibResults_Tutorial2.png" class="img-responsive" alt=""> 
 
 17. A summary of the calibration process and results can be found in the file `../SurfRCaT_Tutorial2/FPS_Jan2019/calibration_follypiersouthcam.2020-01-01_1600/results/calibrationSummary.csv.`
 18. The Rectification Module will now open. 
@@ -232,7 +233,7 @@ window will close.
     <img src="images/rectif_Tutorial2_jan.png" class="img-responsive" alt="">
     <img src="images/rectif_Tutorial2_apr.png" class="img-responsive" alt="">
 
-27) Based on these products, there was shoreline advance between January 1 2019 and April 22 2019. While the tidal elevation was the same for both images,
+29. Based on these products, there was shoreline advance between January 1 2019 and April 22 2019. While the tidal elevation was the same for both images,
 this apparant advance could be driven by morpholgoical changes and/or differences in wave setup, which has not been accounted for. Additionally, it is apparent than the view
 angle of the camera changed slightly, illustrating the importance of performing separate calibrations for both videos.
 
