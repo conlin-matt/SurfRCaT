@@ -16,4 +16,7 @@ Contributions to the source code are welcome. Please create a new branch for you
 Issues should be reported to the Issue tracker. 
 
 ![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/SurfRCaT_PickGCPs.PNG)
-     ![alt text](https://github.com/conlin-matt/SurfRCaT/blob/master/docs/images/icon3.png)
+<p align="center">
+  <img width="200" height="200" src="https://github.com/conlin-matt/SurfRCaT/blob/master/docs/images/icon3.png">
+</p>
+
