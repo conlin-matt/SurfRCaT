@@ -55,7 +55,7 @@ process, which is completed in three steps: sorting tiles, downloading data, and
 
    > **Note**
    >
-   > The lidar download process can be relatively time- and memory-intensive due to the large size of some datasets. See [Considerations for using SurfRCaT](https://conlin-matt.github.io/SurfRCaT/about.html) for more information. This dataset was downloaded in <3 minutes with a relatively slow internet connection, however dataset 8950 required 20 minutes to download with the same connection. 
+   > The lidar download process can be relatively time- and memory-intensive due to the large size of some datasets. See [Considerations for using SurfRCaT](https://conlin-        > matt.github.io/SurfRCaT/about.html) for more information. This dataset was downloaded in <3 minutes with a relatively slow internet connection, however dataset 8950          > required 20 minutes to download with the same connection. 
 
 
 10. You have now entered the GCP picking module, the heart of SurfRCaT. Here you will co-locate features in the camera image and lidar point cloud. First,
@@ -65,9 +65,9 @@ this tutorial.
 minutes to do so- please be patient. The Help button, when clicked, will display the steps necessary for identifying GCPs in the lidar data. First, zoom out
 slightly, and then follow the steps in the Help menu to identify the five GCPs (in this order) shown in the video.
 
-   > **Note**
-   >
-   > There is a bug with the viewer window that causes the view to get thrown off if you attempt to rotate it before first zooming in/out. 
+    > **Note**
+    >
+    > There is a bug with the viewer window that causes the view to get thrown off if you attempt to rotate it before first zooming in/out. 
 	
 12. Close the lidar viewer window, and identify the five corresponding points in the image (in the same order, as in the video). You can zoom and pan
 the image with the navigation bar at the top. Press Done when done. If something happened during the GCP picking process and you are unhappy with the
@@ -77,41 +77,42 @@ GCPs you identified, you can re-do it using the Retry button. Otherwise, click C
 SurfRCaT will show the reprojected positions of each GCP in the next window. You should get results resembling those shown below.  You can retry 
 the Calibration by clicking the Retry button. Otherwise, press Continue.
 
-<img src="images/calibResults_Tutorial1.png" class="img-responsive" alt=""> </div>
+    <img src="images/calibResults_Tutorial1.png" class="img-responsive" alt=""> </div>
 
 14. A summary of the calibration process and results can be found in the file `../SurfRCaT_Example1/calibration_StLucie_202005120849/results/calibrationSummary.csv`.
 15. The Rectification Module will now open. We will rectify the 5 frames that we extracted from the video. Since we have already extracted frames from this
 video, we can skip Step 1. In Step 2, use the following for the inputs:
 
-   + **Calibration results binary file**: browse to and select the calibration results binary file that is stored at `../SurfRCaT_Example1/calibration_StLucie_202005120849/_binaries/calibVals.pkl`
-   + **Input image directory**: browse to and select the frames subdirectory at `../SurfRCaT_Example1/calibration_StLucie_202005120849/frames`
-   + **Save directory**: browse to and select the frames subdirectory at `../SurfRCaT_Example1/calibration_StLucie_202005120849/frames`
-   + **xmin**: 100
-   + **xmax**: 350
-   + **dx**: 1
-   + **ymin**: -200
-   + **ymax**: -50
-   + **dy**: 1
-   + **z**: -0.4,-0.4,-0.4,-0.4,-0.4
+    + **Calibration results binary file**: browse to and select the calibration results binary file that is stored at `../SurfRCaT_Example1/calibration_StLucie_202005120849/_binaries/calibVals.pkl`
+    + **Input image directory**: browse to and select the frames subdirectory at `../SurfRCaT_Example1/calibration_StLucie_202005120849/frames`
+    + **Save directory**: browse to and select the frames subdirectory at `../SurfRCaT_Example1/calibration_StLucie_202005120849/frames`
+    + **xmin**: 100
+    + **xmax**: 350
+    + **dx**: 1
+    + **ymin**: -200
+    + **ymax**: -50
+    + **dy**: 1
+    + **z**: -0.4,-0.4,-0.4,-0.4,-0.4
 
-   > **Note** 
-   >
-   > Images are typically rectified to an elevation (z) equal to the observed tidal elevation (see REFERENCE). The closest NOAA water level station
-   > indicates that -0.4 m (NAVD88) was the approximate observed tide level at the time of collection of these images (0850 LST). The [NOAA site](https://tidesandcurrents.noaa.gov/)
-   > can help you determine tide level at the time of image collection at your site. See [Scientific Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) for more information.
+    > **Note** 
+    >
+    > Images are typically rectified to an elevation (z) equal to the observed tidal elevation. The closest NOAA water level station
+    > indicates that -0.4 m (NAVD88) was the approximate observed tide level at the time of collection of these images (0850 LST). The [NOAA site](https://tidesandcurrents.noaa.gov/)
+    > can help you determine tide level at the time of image collection at your site. See [Scientific Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) for more information.
 	
+
 16. Press Continue, and SurfRCaT will rectify the five images. Products will be saved to the `../SurfRCaT_Example1/calibration_StLucie_202005120849/frames` directory.
 The images should look similar to that shown below. `.pkl` (Python) and `.mat` (Matlab) files containing the image data will also be saved to this directory to
 facilitate further analysis (see [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html))
 
-   > **Note**
-   >
-   > The rectified images are given a coordinate system relative to the user-input camera location. The y-axis is in meters north of the input camera 
-   > location and the x-axis is in meters east of the input camera location. Analyses of images for geophysical applications often require a 
-   > coordinate system transformation to one that is cross-shore distance (x) and long-shore distance (y). If you need to do this, add the 	   
-   > camera location back to the coordinates in Matlab/Python and perform your transformation. 	           
+    > **Note**
+    >
+    > The rectified images are given a coordinate system relative to the user-input camera location. The y-axis is in meters north of the input camera 
+    > location and the x-axis is in meters east of the input camera location. Analyses of images for geophysical applications often require a 
+    > coordinate system transformation to one that is cross-shore distance (x) and long-shore distance (y). If you need to do this, add the 	   
+    > camera location back to the coordinates in Matlab/Python and perform your transformation. 	           
 
-<img src="images/rectif_Tutorial1.png" class="img-responsive" alt=""> </div>	
+    <img src="images/rectif_Tutorial1.png" class="img-responsive" alt=""> </div>	
 
 17. Based on the rectified products, we will visually (and very roughly) estimate the dimensions of the sandbar in real-world space. By treating the 
 left-most section of the bar as a triangle, and the right-most section as a rectangle, an overall area of the feature can be estimated as ~8000 square meters. 
@@ -121,7 +122,9 @@ of ~4000 cubic meters, equivalent to approximately 440 standard dump trucks-wort
 ---
 
 # Tutorial 2- prepare to analyze shoreline change from a WebCAT surfcam #
-In this tutorial, we will obtain videos from a surfcam in the WebCAT array, calibrate the camera, and then rectify an image from each video to analyze shoreline change over time. This tutorial is intended to illustrate the integration of WebCAT cameras within SurfRCaT and how they can be exploited for geophysical applications (see [Integration with the WebCAT array](https://conlin-matt.github.io/SurfRCaT/about.html) for more information). No external files are needed 
+In this tutorial, we will obtain videos from a surfcam in the WebCAT array, calibrate the camera, and then rectify an image from each video  
+to analyze shoreline change over time. This tutorial is intended to illustrate the integration of WebCAT cameras within SurfRCaT and 
+how they can be exploited for geophysical applications (see [Integration with the WebCAT array](https://conlin-matt.github.io/SurfRCaT/about.html) for more information). No external files are needed 
 for this tutorial.
 
    > **Note**
@@ -161,10 +164,10 @@ favorite frame of the 25 in the next window. Press Go.
 in the remote-GCP extraction. Select dataset 5184 by checking its box, and then hit Continue. This will initiate the lidar download
 process, which is completed in three steps: sorting tiles, downloading data, and formatting data. Press Continue when the processes finish. 
 
-   > **Note**
-   >
-   > The lidar download process can be relatively time- and memory-intensive due to the large size of some datasets. See [Considerations for using SurfRCaT](https://conlin-matt.github.io/SurfRCaT/about.html) 
-   > for more information. This dataset was downloaded in 7 minutes with a relatively slow internet connection.
+    > **Note**
+    >
+    > The lidar download process can be relatively time- and memory-intensive due to the large size of some datasets. See [Considerations for using SurfRCaT](https://conlin-matt.github.io/SurfRCaT/about.html) 
+    > for more information. This dataset was downloaded in 7 minutes with a relatively slow internet connection.
 	
 13. You have now entered the GCP picking module, the heart of SurfRCaT. Here you will co-locate features in the camera image and lidar point cloud. First,
 watch [this](https://drive.google.com/file/d/1Sq65MTyFD9HnrRiAlChNMk7LZlYeAb-U/view?usp=sharing) video showing the remote GCP-identification process.
@@ -172,9 +175,9 @@ watch [this](https://drive.google.com/file/d/1Sq65MTyFD9HnrRiAlChNMk7LZlYeAb-U/v
 minutes to do so- please be patient. The Help button, when clicked, will display the steps necessary for identifying GCPs in the lidar data. First, zoom out
 slightly, and then follow the steps in the Help menu to identify the four GCPs (in this order) shown in the video.
 
-   > **Note**
-   >
-   > There is a bug with the viewer window that causes the view to get thrown off if you attempt to rotate it before first zooming in/out. 
+    > **Note**
+    >
+    > There is a bug with the viewer window that causes the view to get thrown off if you attempt to rotate it before first zooming in/out. 
 
 15. Close the lidar viewer window, and identify the four corresponding points in the image (in the same order, as in the video) by clicking on
 them. You can zoom and pan the image with the navigation bar at the top. Press Done when done. If something happened during the GCP picking process 
@@ -183,10 +186,9 @@ and you are unhappy with the GCPs you identified, you can re-do it using the Ret
 SurfRCaT will show the reprojected positions of each GCP in the next window. You should get results
 resembling those shown below. You can retry the Calibration by clicking the Retry button. Otherwise, press Continue. 
 
-<img src="images/calibResults_Tutorial2.png" class="img-responsive" alt=""> </div>
+    <img src="images/calibResults_Tutorial2.png" class="img-responsive" alt=""> </div>
 
-17. A summary of the calibration process and results can be found in the file `../SurfRCaT_Tutorial2/FPS_Jan2019/calibration_follypiersouthcam.2020-01-01_1600/
-results/calibrationSummary.csv.`
+17. A summary of the calibration process and results can be found in the file `../SurfRCaT_Tutorial2/FPS_Jan2019/calibration_follypiersouthcam.2020-01-01_1600/results/calibrationSummary.csv.`
 18. The Rectification Module will now open. 
 19. Now, we need to calibrate the camera for the other video that we downloaded. Click the Back button to go back to the first window of the tool.
 20. Like before, select Calibrate a surfcam, but this time browse to and select the `../SurfRCaT_Tutorial2/FPS_Apr2019` directory as your working
@@ -197,8 +199,7 @@ to browse to and select the lidar point cloud that was downloaded for the last v
 calibration_follypiersouthcam.2020-01-01_1600/products/lidarPC.pkl.` Press Continue.
 22. Follow steps 9-16 again to calibrate the camera for this video, but this time the lidar download process (step 11) will not appear, and you'll have to select
 slightly different GCPs since the camera moved slightly relative to January. 
-23. The summary file for this calibration will be loacted at `../SurfRCaT_Tutorial1/FPS_Apr2019/calibration_follypiersouthcam.2020-04-22_1200/results/
-calibrationSummary.csv`.
+23. The summary file for this calibration will be loacted at `../SurfRCaT_Tutorial1/FPS_Apr2019/calibration_follypiersouthcam.2020-04-22_1200/results/calibrationSummary.csv`.
 24. Now we will rectify a frame from each video. We will first extract a single frame from each video to rectify. In the Step 1 box, browse to and 
 select the January video as the Video file. Browse to and select the `../SurfRCat_Tutorial2/FPS_Jan2019` folder as the save directory. Click the Extract
 Frames Button.
@@ -206,48 +207,48 @@ Frames Button.
 window will close. 
 26. In the Step 2 box, use the following for the inputs:
 
-   +**Calibration results binary file**: browse to and select the calibration results binary file that is stored at `../SurfRCat_Tutorial2/
-						FPS_Jan2019/calibration_follypiersouthcam.2019-01-01_1600/_binaries/calibVals.pkl`.
-   + **Input image directory**: leave as is
-   + **Save directory**: browse to and select `../SurfRCat_Tutorial2/FPS_Jan2019`
-   + **xmin**: 0
-   + **xmax**: 200
-   + **dx**: 1
-   + **ymin**: -250
-   + **ymax**: -50
-   + **dy**: 1
-   + **z**: 0.5  
+    + **Calibration results binary file**: browse to and select the calibration results binary file that is stored at `../SurfRCat_Tutorial2/
+					FPS_Jan2019/calibration_follypiersouthcam.2019-01-01_1600/_binaries/calibVals.pkl`.
+    + **Input image directory**: leave as is
+    + **Save directory**: browse to and select `../SurfRCat_Tutorial2/FPS_Jan2019`
+    + **xmin**: 0
+    + **xmax**: 200
+    + **dx**: 1
+    + **ymin**: -250
+    + **ymax**: -50
+    + **dy**: 1
+    + **z**: 0.5  
 
-   > **Note**
-   >
-   > Images are typically rectified to an elevation (z) equal to the observed tidal elevation (see REFERENCE). The two videos used in this tutorial 
-   > were chosen because the closest NOAA water level station indicates that 0.5 m (NAVD88) was the approximate observed tide level during both.    
-   > The [NOAA site](https://tidesandcurrents.noaa.gov/) can help you determine tide level at the time of image collection at your site. See OVERVIEW OF PROCESSES AND ASSUMPTIONS for more    
-   > information.
+    > **Note**
+    >
+    > Images are typically rectified to an elevation (z) equal to the observed tidal elevation. The two videos used in this tutorial 
+    > were chosen because the closest NOAA water level station indicates that 0.5 m (NAVD88) was the approximate observed tide level during both. 
+    > The [NOAA site](https://tidesandcurrents.noaa.gov/) can help you determine tide level at the time of image collection at your site. See OVERVIEW OF PROCESSES AND ASSUMPTIONS for more    
+    > information.
 	
 27. Press continue, and the image will be rectified and saved. Then press 'Rectify more images'.
 28. Follow steps 22-25 for the April video to rectify a frame from that video as well. You should get results resembling those below. 
 
-<img src="images/rectif_Tutorial2_jan.png" class="img-responsive" alt=""> </div>
-<img src="images/rectif_Tutorial2_apr.png" class="img-responsive" alt=""> </div>
+    <img src="images/rectif_Tutorial2_jan.png" class="img-responsive" alt="">
+    <img src="images/rectif_Tutorial2_apr.png" class="img-responsive" alt="">
 
 27) Based on these products, there was shoreline advance between January 1 2019 and April 22 2019. While the tidal elevation was the same for both images,
 this apparant advance could be driven by morpholgoical changes and/or differences in wave setup, which has not been accounted for. Additionally, it is apparent than the view
 angle of the camera changed slightly, illustrating the importance of performing separate calibrations for both videos.
 
-   > **Note**
-   >
-   > The rectified images are given a coordinate system relative to the user-input camera location. The y-axis is in meters north of the input camera
-   > location and the x-axis is in meters east of the input camera location. Analyses of images for geophysical applications often require a 	   
-   > coordinate system transformation to one that is cross-shore distance (x) and long-shore distance (y). If you need to do this, simply add the 	   
-   > camera location back to the coordinates and perform your transformation. 	           
+    > **Note**
+    >
+    > The rectified images are given a coordinate system relative to the user-input camera location. The y-axis is in meters north of the input camera
+    > location and the x-axis is in meters east of the input camera location. Analyses of images for geophysical applications often require a 
+    > coordinate system transformation to one that is cross-shore distance (x) and long-shore distance (y). If you need to do this, simply add the 	   
+    > camera location back to the coordinates and perform your transformation. 	           
 
 
 
-   > **Note**
-   >
-   > The rectified products are also saved as Matlab and Python files. These  
-   > can be imported into Python or Matlab for more detailed/precise analyses. See the EXTENSIONS page for more info. 
+    > **Note**
+    >
+    > The rectified products are also saved as Matlab and Python files. These  
+    > can be imported into Python or Matlab for more detailed/precise analyses. See the [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html) page for more info. 
 
 
 
