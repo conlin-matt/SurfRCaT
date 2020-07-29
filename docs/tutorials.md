@@ -55,8 +55,7 @@ process, which is completed in three steps: sorting tiles, downloading data, and
 
    > **Note**
    >
-   > The lidar download process can be relatively time- and memory-intensive due to the large size of some datasets. See [Considerations for using SurfRCaT](https://conlin-matt.github.io/SurfRCaT/about.html) 
-   > for more information. This dataset was downloaded in <3 minutes with a relatively slow internet connection, however dataset 8950 required 20 minutes to download with the same connection. 
+   > The lidar download process can be relatively time- and memory-intensive due to the large size of some datasets. See [Considerations for using SurfRCaT](https://conlin-matt.github.io/SurfRCaT/about.html) for more information. This dataset was downloaded in <3 minutes with a relatively slow internet connection, however dataset 8950 required 20 minutes to download with the same connection. 
 
 
 10. You have now entered the GCP picking module, the heart of SurfRCaT. Here you will co-locate features in the camera image and lidar point cloud. First,
@@ -101,7 +100,6 @@ video, we can skip Step 1. In Step 2, use the following for the inputs:
    > indicates that -0.4 m (NAVD88) was the approximate observed tide level at the time of collection of these images (0850 LST). The [NOAA site](https://tidesandcurrents.noaa.gov/)
    > can help you determine tide level at the time of image collection at your site. See [Scientific Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) for more information.
 	
-
 16. Press Continue, and SurfRCaT will rectify the five images. Products will be saved to the `../SurfRCaT_Example1/calibration_StLucie_202005120849/frames` directory.
 The images should look similar to that shown below. `.pkl` (Python) and `.mat` (Matlab) files containing the image data will also be saved to this directory to
 facilitate further analysis (see [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html))
@@ -124,11 +122,11 @@ of ~4000 cubic meters, equivalent to approximately 440 standard dump trucks-wort
    >
    > The rectified products are also saved as Matlab and Python files. These  
    > can be imported into Python or Matlab for more detailed/precise analyses. See [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html) for more info.
-	
+
+18.
+
 # Tutorial 2- prepare to analyze shoreline change from a WebCAT surfcam #
-In this tutorial, we will obtain videos from a surfcam in the WebCAT array, calibrate the camera, and then rectify an image from each video  
-to analyze shoreline change over time. This tutorial is intended to illustrate the integration of WebCAT cameras within SurfRCaT and 
-how they can be exploited for geophysical applications (see [Integration with the WebCAT array](https://conlin-matt.github.io/SurfRCaT/about.html) for more information). No external files are needed 
+In this tutorial, we will obtain videos from a surfcam in the WebCAT array, calibrate the camera, and then rectify an image from each video to analyze shoreline change over time. This tutorial is intended to illustrate the integration of WebCAT cameras within SurfRCaT and how they can be exploited for geophysical applications (see [Integration with the WebCAT array](https://conlin-matt.github.io/SurfRCaT/about.html) for more information). No external files are needed 
 for this tutorial.
 
    > **Note**
