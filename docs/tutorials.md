@@ -118,12 +118,7 @@ left-most section of the bar as a triangle, and the right-most section as a rect
 Assuming an average elevation of the feature of 0.5 m (which is reasonable, from field observations), we can obtain a sediment volume within this feature
 of ~4000 cubic meters, equivalent to approximately 440 standard dump trucks-worth of sediment.
 
-   > **Note**
-   >
-   > The rectified products are also saved as Matlab and Python files. These  
-   > can be imported into Python or Matlab for more detailed/precise analyses. See [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html) for more info.
-
-18.
+---
 
 # Tutorial 2- prepare to analyze shoreline change from a WebCAT surfcam #
 In this tutorial, we will obtain videos from a surfcam in the WebCAT array, calibrate the camera, and then rectify an image from each video to analyze shoreline change over time. This tutorial is intended to illustrate the integration of WebCAT cameras within SurfRCaT and how they can be exploited for geophysical applications (see [Integration with the WebCAT array](https://conlin-matt.github.io/SurfRCaT/about.html) for more information). No external files are needed 
