@@ -136,7 +136,7 @@ for this tutorial.
    > you only need to download a point cloud for a camera once. 
 	
 1. Create a directory called `SurfRCaT_Tutorial2`. Within it, create two subdirectories, one called `FPS_Jan2019` and one called `FPS_Apr2019`.
-2. Download/install and invoke the tool (see DOWNLOAD).
+2. Download/install and invoke the tool (see [Download](https://conlin-matt.github.io/SurfRCaT/download.html)).
 3. In the Welcome screen, select "Download imagery from WebCAT camera." 
 4. We will download two videos from the Folly Beach Pier South camera. Select the Folly Beach Pier (south) camera as your desired camera. Then browse to and select the
 `../SurfRCat_Tutorial2` as the save directory. We will download videos for January 1, 2019 at 1600 LST and April 22, 2019 at 1200 LST. To do so, enter the following in 
