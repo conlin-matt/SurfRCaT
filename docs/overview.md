@@ -56,6 +56,10 @@ are presented below:
 
    SurfRCaT facilitates the remote extraction of GCPs by prompting the user to identify (by clicking) corresponding
    points in the lidar data and camera image.
+   
+   > **Note**
+   >
+   > In general, calibration accuracy is known to increase with increasing number of GCPs and increasing GCP distribution accross the image format. In other words, generally speaking, the more GCPs you identify and the more widely distributed they are, the better. Many other factors can confound this relationship, however, such as site orientation and GCP identification accuracy. There is no one-size-fits-all solution for this; site-specific testing may be beneficial. 
 
 4. Calibration
 	
