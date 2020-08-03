@@ -38,12 +38,13 @@ These processes also mean that:
    + The camera views structures that can be identified in airborne lidar observations (e.g. piers, buildings, lifeguard towers)
 
 2. SurfRCaT must be run on a Windows 10 machine.
-3. SurfRCaT requires a reliable internet connection during runtime. 
-4. Airborne lidar datasets can be extremely large. While SurfRCaT works to reduce the amount of lidar data that are
+3. You must run SurfRCaT as an Administrator on your machine.
+4. SurfRCaT requires a reliable internet connection during runtime. 
+5. Airborne lidar datasets can be extremely large. While SurfRCaT works to reduce the amount of lidar data that are
 downloaded and saved locally, this process can still be slow. Speed depends greatly on the lidar dataset being downloaded, though this 
 process could concievably take upwards of 30 minutes or more depending on the dataset and internet connection. 
-5. Using images from surfcams to study the coast requires a number of specific considerations. The TUTORIALS illustrate these. 
-6. SurfRCaT does not account/correct for lens distortion and makes a few *a priori* assumptions about the camera (see the [Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) page). 
+6. Using images from surfcams to study the coast requires a number of specific considerations. The TUTORIALS illustrate these. 
+7. SurfRCaT does not account/correct for lens distortion and makes a few *a priori* assumptions about the camera (see the [Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) page). 
 SurfRCaT may therefore not be applicable to surfcams with substantial lens distortion (e.g. fisheye lenses) or which deviate substantially from these
 assumptions. 
 
