@@ -8,7 +8,7 @@ nav_order: 5
 In this tutorial, we will calibrate a pre-existing surfcam on the east coast of Florida and rectify some of its imagery in order to determine the dimensions
 of a unique morphological feature. This tutorial is intended to get you familiar with the primary facilities and nuances of SurfRCaT in terms of calibrating 
 a camera and then rectifying its imagery for geophysical applications. It is also intented to illustrate many of the considerations for using imagery from
-recreational cameras for research-purposes. The video used in this example can be downloaded from [here](https://drive.google.com/file/d/1nAbfykMh85Qz5iQKPInggAhbdRAJ1opK/view?usp=sharing).
+recreational cameras for research-purposes. The video used in this example can be downloaded from [here](https://www.dropbox.com/s/hxsmi56io98ozxr/StLucie_202005120849.mp4?dl=1).
 
 > **NOTE**
 >
