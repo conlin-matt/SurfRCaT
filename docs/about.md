@@ -43,7 +43,7 @@ These processes also mean that:
 5. Airborne lidar datasets can be extremely large. While SurfRCaT works to reduce the amount of lidar data that are
 downloaded and saved locally, this process can still be slow. Speed depends greatly on the lidar dataset being downloaded, though this 
 process could concievably take upwards of 30 minutes or more depending on the dataset and internet connection. 
-6. Using images from surfcams to study the coast requires a number of specific considerations. The TUTORIALS illustrate these. 
+6. Using images from surfcams to study the coast requires a number of specific considerations. The [Tutorials](https://conlin-matt.github.io/SurfRCaT/tutorials.html) illustrate these. 
 7. SurfRCaT does not account/correct for lens distortion and makes a few *a priori* assumptions about the camera (see the [Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) page). 
 SurfRCaT may therefore not be applicable to surfcams with substantial lens distortion (e.g. fisheye lenses) or which deviate substantially from these
 assumptions. 
@@ -53,8 +53,7 @@ assumptions.
 ## Integration with the WebCAT array ##
 The [Webcamera Application Testbed](https://secoora.org/webcat/) is a network of 7 surfcams spanning the southeastern U.S. that have continuous video streams archived on servers made
 available to the public. SurfRCaT contains built-in options to download historical imagery from, calibrate, and rectify imagery from the 4 WebCAT cameras 
-that meet SurfRCaT's usage requirments (see item 1 above). [Tutorial 2](https://conlin-matt.github.io/SurfRCaT/tutorials.html) focuses on using a WebCAT camera to observe shoreline 
-change in South Carolina. 
+that meet SurfRCaT's usage requirments (see item 1 above). [Tutorial 2](https://conlin-matt.github.io/SurfRCaT/tutorials.html) focuses on using a WebCAT camera to observe shoreline change in South Carolina. 
 
 
 
