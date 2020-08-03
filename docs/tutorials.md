@@ -100,6 +100,10 @@ video, we can skip Step 1. In Step 2, use the following for the inputs:
     > Images are typically rectified to an elevation (z) equal to the observed tidal elevation. The closest NOAA water level station
     > indicates that -0.4 m (NAVD88) was the approximate observed tide level at the time of collection of these images (0850 LST). The [NOAA site](https://tidesandcurrents.noaa.gov/)
     > can help you determine tide level at the time of image collection at your site. See [Scientific Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) for more information.
+    
+    > **Note**
+    >
+    > You are asked to provide a real-world grid in coordinates relative to the input camera location. The x-direction is in meters east of the input camera location, the y-direction is in meters north of the input camera location. The image will be rectified in real-world coordinates.
 	
 
 16. Press Continue, and SurfRCaT will rectify the five images. Products will be saved to the `../SurfRCaT_Example1/calibration_StLucie_202005120849/frames` directory.
@@ -108,17 +112,15 @@ facilitate further analysis (see [Extensions](https://conlin-matt.github.io/Surf
 
     > **Note**
     >
-    > The rectified images are given a coordinate system relative to the user-input camera location. The y-axis is in meters north of the input camera 
-    > location and the x-axis is in meters east of the input camera location. Analyses of images for geophysical applications often require a 
-    > coordinate system transformation to one that is cross-shore distance (x) and long-shore distance (y). If you need to do this, add the 	   
-    > camera location back to the coordinates in Matlab/Python and perform your transformation. 	           
+    > The rectified images are given in real-world coordinates. Analyses of images for geophysical applications often require a 
+    > coordinate system transformation to one that is cross-shore distance (x) and long-shore distance (y). You can perform any coordinate system transformations you want in Matlab/Python using the `.pkl`/`.mat` image data files.	           
 
     <img src="images/rectif_Tutorial1.png" class="img-responsive" alt="">	
 
 17. Based on the rectified products, we will visually (and very roughly) estimate the dimensions of the sandbar in real-world space. By treating the 
-left-most section of the bar as a triangle, and the right-most section as a rectangle, an overall area of the feature can be estimated as ~8000 square meters. 
-Assuming an average elevation of the feature of 0.5 m (which is reasonable, from field observations), we can obtain a sediment volume within this feature
-of ~4000 cubic meters, equivalent to approximately 440 standard dump trucks-worth of sediment.
+left-most section of the bar as a triangle, and the right-most section as a rectangle, an overall area of the feature can be estimated as ~8500 square meters. 
+If we assume and average thickness of the feature of, say, 0.5 m, we can obtain a sediment volume within this feature
+of ~4250 cubic meters, equivalent to approximately 460 standard dump trucks-worth of sediment.
 
 ---
 
@@ -224,32 +226,27 @@ window will close.
     >
     > Images are typically rectified to an elevation (z) equal to the observed tidal elevation. The two videos used in this tutorial 
     > were chosen because the closest NOAA water level station indicates that 0.5 m (NAVD88) was the approximate observed tide level during both. 
-    > The [NOAA site](https://tidesandcurrents.noaa.gov/) can help you determine tide level at the time of image collection at your site. See OVERVIEW OF PROCESSES AND ASSUMPTIONS for more    
+    > The [NOAA site](https://tidesandcurrents.noaa.gov/) can help you determine tide level at the time of image collection at your site. See [Scientific Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) for more    
     > information.
+    
+    > **Note**
+    >
+    > You are asked to provide a real-world grid in coordinates relative to the input camera location. The x-direction is in meters east of the input camera location, the y-direction is in meters north of the input camera location. The image will be rectified in real-world coordinates.
 	
 27. Press continue, and the image will be rectified and saved. Then press 'Rectify more images'.
-28. Follow steps 22-25 for the April video to rectify a frame from that video as well. You should get results resembling those below. 
+28. Follow steps 22-25 for the April video to rectify a frame from that video as well. You should get results resembling those below. `.pkl` (Python) and `.mat` (Matlab) files containing the image data will also be saved to the same directory to facilitate further analysis (see [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html))
 
+    > **Note**
+    >
+    > The rectified images are given in real-world coordinates. Analyses of images for geophysical applications often require a 
+    > coordinate system transformation to one that is cross-shore distance (x) and long-shore distance (y). You can perform any coordinate system transformations you want in Matlab/Python using the `.pkl`/`.mat` image data files.
+    
     <img src="images/rectif_Tutorial2_jan.png" class="img-responsive" alt="">
     <img src="images/rectif_Tutorial2_apr.png" class="img-responsive" alt="">
 
 29. Based on these products, there was shoreline advance between January 1 2019 and April 22 2019. While the tidal elevation was the same for both images,
 this apparant advance could be driven by morpholgoical changes and/or differences in wave setup, which has not been accounted for. Additionally, it is apparent than the view
 angle of the camera changed slightly, illustrating the importance of performing separate calibrations for both videos.
-
-    > **Note**
-    >
-    > The rectified images are given a coordinate system relative to the user-input camera location. The y-axis is in meters north of the input camera
-    > location and the x-axis is in meters east of the input camera location. Analyses of images for geophysical applications often require a 
-    > coordinate system transformation to one that is cross-shore distance (x) and long-shore distance (y). If you need to do this, simply add the 	   
-    > camera location back to the coordinates and perform your transformation. 	           
-
-
-
-    > **Note**
-    >
-    > The rectified products are also saved as Matlab and Python files. These  
-    > can be imported into Python or Matlab for more detailed/precise analyses. See the [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html) page for more info. 
 
 
 
