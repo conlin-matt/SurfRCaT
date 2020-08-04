@@ -20,7 +20,7 @@ previously using this video, and will give you the options to use the same calib
 For the purposes of precise analyses (e.g. automatic shoreline extraction), SurfRCaT saves rectified images as `.mat` (Matlab) and `.pkl` (Python) files. These
 can be imported into your preferred programming language for analysis. 
 
-The `.mat` file is intended to be structured the same way as rectified products from the [Coastal Imaging Research Network (CIRN) routines](link). To import 
+The `.mat` file is intended to be structured the same way as rectified products from the [Coastal Imaging Research Network (CIRN) routines](https://github.com/Coastal-Imaging-Research-Network). To import 
 the `.mat` file into Matlab:
 
 ```matlab
