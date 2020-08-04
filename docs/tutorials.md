@@ -5,10 +5,9 @@ nav_order: 5
 ---
 
 # Tutorial 1- Quantify morphology with a pre-exisiting camera #
-In this tutorial, we will calibrate a pre-existing surfcam on the east coast of Florida and rectify some of its imagery in order to determine the dimensions
-of a unique morphological feature. This tutorial is intended to get you familiar with the primary facilities and nuances of SurfRCaT in terms of calibrating 
+In this tutorial, we will calibrate a pre-existing surfcam on the east coast of Florida and rectify some of its imagery in order to extract potentially useful geophysical information. This tutorial is intended to get you familiar with the primary facilities and nuances of SurfRCaT in terms of calibrating 
 a camera and then rectifying its imagery for geophysical applications. It is also intented to illustrate many of the considerations for using imagery from
-recreational cameras for research-purposes. The video used in this example can be downloaded from [here](https://www.dropbox.com/s/hxsmi56io98ozxr/StLucie_202005120849.mp4?dl=1).
+recreational cameras for research-purposes. The video used in this example, from a camera overlooking Jupiter Inlet, FL at approximately 5 pm on March 6 2020, can be downloaded from [here](https://www.dropbox.com/s/hxsmi56io98ozxr/StLucie_202005120849.mp4?dl=1).
 
 > **NOTE**
 >
@@ -22,11 +21,11 @@ recreational cameras for research-purposes. The video used in this example can b
 4. Browse to and select the `../SurfRCaT_Tutorial1` directory as the working directory. Press Continue.
 5. Input the values listed below within the "Any camera" box. Then use the "Browse" button to select the example video file in your
 `../SurfRCaT_Tutorial1` directory as the video to use. Leave the "Used saved lidar point cloud?" field as "No". Then press Continue.
-   + Name: StLucie_FL
-   + Camera latitude: 27.16945
-   + Camera longitude: -80.15834
-   + Elevation: 21.5
-   + Azimuth: 110
+   + Name: Jupiter Inlet
+   + Camera latitude: 26.93846
+   + Camera longitude: -80.07054
+   + Elevation: 49.5
+   + Azimuth: 350
 
    > **Note**
    > 
@@ -36,7 +35,7 @@ recreational cameras for research-purposes. The video used in this example can b
 
 6. The video decimation window will now open. This step allows you to extract frames from the video. We will use one of the frames to complete the remote
 GCP extraction. You can enter different decimation rates and click Update to see how many frames will be generated for a given rate. Enter '5' in the Number of Frames field 
-to generate 5 images, which will be saved to `../SurfRCaT_Tutorial1/calibration_StLucie_202005120849/frames`. 
+to generate 5 images, which will be saved to `../SurfRCaT_Tutorial1/calibration_JupiterTutorial1/frames`. 
 We will be able to choose our favorite frame of the 5 in the next window. Press Go.
 
    > **Note**
@@ -50,13 +49,12 @@ We will be able to choose our favorite frame of the 5 in the next window. Press 
 8. The tool will now automatically find airborne lidar datasets that cover the location of this camera. This is a two-step process; the tool will 
 first search for nearby datasets and then examine those to find covering datasets. Press Continue when the processes finish.
 9. The next window will display a table that shows all NOAA lidar datasets that cover the location of this camera, allowing you to select one to use
-in the remote-GCP extraction. Select dataset 6330 by checking its box, and then hit Continue. This will initiate the lidar download
+in the remote-GCP extraction. Select dataset 6330 from 2017 by checking its box and then hit Continue. This will initiate the lidar download
 process, which is completed in three steps: sorting tiles, downloading data, and formatting data. Press Continue when done. 
 
    > **Note**
    >
-   > The lidar download process can be relatively time- and memory-intensive due to the large size of some datasets. See [Considerations for using SurfRCaT](https://conlin-matt.github.io/SurfRCaT/about.html) 
-   > for more information. This dataset was downloaded in <3 minutes with a relatively slow internet connection, however dataset 8950 required 20 minutes to download with the same connection. 
+   > The lidar download process can be relatively time- and memory-intensive due to the large size of some datasets. See [Considerations for using SurfRCaT](https://conlin-matt.github.io/SurfRCaT/about.html) for more information. Dataset 6330 was downloaded in ~6 minutes with a relatively slow internet connection.
 
 
 10. You have now entered the GCP picking module, the heart of SurfRCaT. Here you will co-locate features in the camera image and lidar point cloud. First,
@@ -80,20 +78,20 @@ the Calibration by clicking the Retry button. Otherwise, press Continue.
 
     <img src="images/calibResults_Tutorial1.png" class="img-responsive" alt="">
 
-14. A summary of the calibration process and results can be found in the file `../SurfRCaT_Example1/calibration_StLucie_202005120849/results/calibrationSummary.csv`.
+14. A summary of the calibration process and results can be found in the file `../SurfRCaT_Tutorial1/calibration_StLucie_202005120849/results/calibrationSummary.csv`.
 15. The Rectification Module will now open. We will rectify the 5 frames that we extracted from the video. Since we have already extracted frames from this
 video, we can skip Step 1. In Step 2, use the following for the inputs:
 
-    + **Calibration results binary file**: browse to and select the calibration results binary file that is stored at `../SurfRCaT_Example1/calibration_StLucie_202005120849/_binaries/calibVals.pkl`
-    + **Input image directory**: browse to and select the frames subdirectory at `../SurfRCaT_Example1/calibration_StLucie_202005120849/frames`
-    + **Save directory**: browse to and select the frames subdirectory at `../SurfRCaT_Example1/calibration_StLucie_202005120849/frames`
-    + **xmin**: 100
-    + **xmax**: 350
+    + **Calibration results binary file**: browse to and select the calibration results binary file that is stored at `../SurfRCaT_Tutorial1/calibration_StLucie_202005120849/_binaries/calibVals.pkl`
+    + **Input image directory**: browse to and select the frames subdirectory at `../SurfRCaT_Tutorial1/calibration_StLucie_202005120849/frames`
+    + **Save directory**: browse to and select the frames subdirectory at `../SurfRCaT_Tutorial1/calibration_StLucie_202005120849/frames`
+    + **xmin**: -200
+    + **xmax**: 200
     + **dx**: 1
-    + **ymin**: -200
-    + **ymax**: -50
+    + **ymin**: 250
+    + **ymax**: 900
     + **dy**: 1
-    + **z**: -0.4,-0.4,-0.4,-0.4,-0.4
+    + **z**: 0.4,0.4,0.4,0.4,-0.4
 
     > **Note** 
     >
@@ -106,7 +104,7 @@ video, we can skip Step 1. In Step 2, use the following for the inputs:
     > You are asked to provide a real-world grid in coordinates relative to the input camera location. The x-direction is in meters east of the input camera location, the y-direction is in meters north of the input camera location. The image will be rectified in real-world coordinates.
 	
 
-16. Press Continue, and SurfRCaT will rectify the five images. Products will be saved to the `../SurfRCaT_Example1/calibration_StLucie_202005120849/frames` directory.
+16. Press Continue, and SurfRCaT will rectify the five images. Products will be saved to the `../SurfRCaT_Tutorial1/calibration_StLucie_202005120849/frames` directory.
 The images should look similar to that shown below. `.pkl` (Python) and `.mat` (Matlab) files containing the image data will also be saved to this directory to
 facilitate further analysis (see [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html))
 
@@ -119,7 +117,7 @@ facilitate further analysis (see [Extensions](https://conlin-matt.github.io/Surf
 
 17. Based on the rectified products, we will visually (and very roughly) estimate the dimensions of the sandbar in real-world space. By treating the 
 left-most section of the bar as a triangle, and the right-most section as a rectangle, an overall area of the feature can be estimated as ~8500 square meters. 
-If we assume and average thickness of the feature of, say, 0.5 m, we can obtain a sediment volume within this feature
+If we assume an average thickness of the feature of, say, 0.5 m, we can obtain a sediment volume within this feature
 of ~4250 cubic meters, equivalent to approximately 460 standard dump trucks-worth of sediment.
 
 ---
@@ -148,8 +146,7 @@ the remaining fields and press Download:
    + Day: 01,22
    + Hour: 1600,1200
 
-5. The videos will download to the `../SurfRCaT_Tutorial2` directory. When they are downloaded, click and drag the January video into the `../SurfRCaT_Tutorial2/
-FPS_Jan2019` folder and the April video into the `../SurfRCaT_Tutorial2/FPS_Apr2019 folder`.
+5. The videos will download to the `../SurfRCaT_Tutorial2` directory. When they are downloaded, click and drag the January video into the `../SurfRCaT_Tutorial2/FPS_Jan2019` folder and the April video into the `../SurfRCaT_Tutorial2/FPS_Apr2019` folder.
 6. Press "Back to start" to return to the welcome window. Now we need to obtain camera calibrations for each video.
 7. Select Calibrate a surfcam.
 8. Browse to the `../SurfRCaT_Tutorial2/FPS_Jan2019` directory and select it as your working directory. Press Continue.
@@ -202,7 +199,7 @@ to browse to and select the lidar point cloud that was downloaded for the last v
 calibration_follypiersouthcam.2020-01-01_1600/products/lidarPC.pkl.` Press Continue.
 22. Follow steps 9-16 again to calibrate the camera for this video, but this time the lidar download process (step 11) will not appear, and you'll have to select
 slightly different GCPs since the camera moved slightly relative to January. 
-23. The summary file for this calibration will be loacted at `../SurfRCaT_Tutorial1/FPS_Apr2019/calibration_follypiersouthcam.2020-04-22_1200/results/calibrationSummary.csv`.
+23. The summary file for this calibration will be loacted at `../SurfRCaT_Tutorial2/FPS_Apr2019/calibration_follypiersouthcam.2020-04-22_1200/results/calibrationSummary.csv`.
 24. Now we will rectify a frame from each video. We will first extract a single frame from each video to rectify. In the Step 1 box, browse to and 
 select the January video as the Video file. Browse to and select the `../SurfRCat_Tutorial2/FPS_Jan2019` folder as the save directory. Click the Extract
 Frames Button.
