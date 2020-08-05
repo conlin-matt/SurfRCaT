@@ -7,7 +7,7 @@ nav_order: 5
 # Tutorial 1- Quantify morphology with a pre-exisiting camera #
 In this tutorial, we will calibrate a pre-existing surfcam on the east coast of Florida and rectify some of its imagery in order to extract potentially useful geophysical information. This tutorial is intended to get you familiar with the primary facilities and nuances of SurfRCaT in terms of calibrating 
 a camera and then rectifying its imagery for geophysical applications. It is also intented to illustrate many of the considerations for using imagery from
-recreational cameras for research-purposes. The video used in this example, from a camera overlooking Jupiter Inlet, FL at approximately 5 pm on March 6 2020, can be downloaded from [here](https://www.dropbox.com/s/hxsmi56io98ozxr/StLucie_202005120849.mp4?dl=1).
+recreational cameras for research-purposes. The video used in this example, from a camera overlooking Jupiter Inlet, FL at approximately 5 pm on March 6 2020, can be downloaded from [here](https://www.dropbox.com/s/gd98xf4o3bhauhg/JupiterTutorial1.mp4?dl=1).
 
 > **NOTE**
 >
@@ -62,13 +62,13 @@ watch [this](https://drive.google.com/file/d/1Y9DurKn1-rCEjpYeeHunfawhGUBS1-xy/v
 this tutorial.
 11. Now, try it yourself. Press Go to begin the remote-GCP extraction. The lidar point cloud will open in a seperate window, though can take a couple
 minutes to do so- please be patient. The Help button, when clicked, will display the steps necessary for identifying GCPs in the lidar data. First, zoom out
-slightly, and then follow the steps in the Help menu to identify the five GCPs (in this order) shown in the video.
+slightly, and then follow the steps in the Help menu to identify the four GCPs (in this order) shown in the video.
 
     > **Note**
     >
     > There is a bug with the viewer window that causes the view to get thrown off if you attempt to rotate it before first zooming in/out. 
 	
-12. Close the lidar viewer window, and identify the five corresponding points in the image (in the same order, as in the video). You can zoom and pan
+12. Close the lidar viewer window, and identify the four corresponding points in the image (in the same order, as in the video). You can zoom and pan
 the image with the navigation bar at the top. Press Done when done. If something happened during the GCP picking process and you are unhappy with the
 GCPs you identified, you can re-do it using the Retry button. Otherwise, click Continue.
 
@@ -78,25 +78,25 @@ the Calibration by clicking the Retry button. Otherwise, press Continue.
 
     <img src="images/calibResults_Tutorial1.png" class="img-responsive" alt="">
 
-14. A summary of the calibration process and results can be found in the file `../SurfRCaT_Tutorial1/calibration_StLucie_202005120849/results/calibrationSummary.csv`.
+14. A summary of the calibration process and results can be found in the file `../SurfRCaT_Tutorial1/calibration_JupiterTutorial1/results/calibrationSummary.csv`.
 15. The Rectification Module will now open. We will rectify the 5 frames that we extracted from the video. Since we have already extracted frames from this
 video, we can skip Step 1. In Step 2, use the following for the inputs:
 
-    + **Calibration results binary file**: browse to and select the calibration results binary file that is stored at `../SurfRCaT_Tutorial1/calibration_StLucie_202005120849/_binaries/calibVals.pkl`
-    + **Input image directory**: browse to and select the frames subdirectory at `../SurfRCaT_Tutorial1/calibration_StLucie_202005120849/frames`
-    + **Save directory**: browse to and select the frames subdirectory at `../SurfRCaT_Tutorial1/calibration_StLucie_202005120849/frames`
+    + **Calibration results binary file**: browse to and select the calibration results binary file that is stored at `../SurfRCaT_Tutorial1/calibration_JupiterTutorial1/_binaries/calibVals.pkl`
+    + **Input image directory**: browse to and select the frames subdirectory at `../SurfRCaT_Tutorial1/calibration_JupiterTutorial1/frames`
+    + **Save directory**: browse to and select the frames subdirectory at `../SurfRCaT_Tutorial1/calibration_JupiterTutorial1/frames`
     + **xmin**: -200
     + **xmax**: 200
-    + **dx**: 1
+    + **dx**: 0.5
     + **ymin**: 250
     + **ymax**: 900
-    + **dy**: 1
-    + **z**: 0.4,0.4,0.4,0.4,-0.4
+    + **dy**: 0.5
+    + **z**: 0.1,0.1,0.1,0.1,-0.1
 
     > **Note** 
     >
     > Images are typically rectified to an elevation (z) equal to the observed tidal elevation. The closest NOAA water level station
-    > indicates that -0.4 m (NAVD88) was the approximate observed tide level at the time of collection of these images (0850 LST). The [NOAA site](https://tidesandcurrents.noaa.gov/)
+    > indicates that 0.1 m (NAVD88) was the approximate observed tide level at the time of collection of these images (1700 LST). The [NOAA site](https://tidesandcurrents.noaa.gov/)
     > can help you determine tide level at the time of image collection at your site. See [Scientific Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) for more information.
     
     > **Note**
@@ -104,7 +104,7 @@ video, we can skip Step 1. In Step 2, use the following for the inputs:
     > You are asked to provide a real-world grid in coordinates relative to the input camera location. The x-direction is in meters east of the input camera location, the y-direction is in meters north of the input camera location. The image will be rectified in real-world coordinates.
 	
 
-16. Press Continue, and SurfRCaT will rectify the five images. Products will be saved to the `../SurfRCaT_Tutorial1/calibration_StLucie_202005120849/frames` directory.
+16. Press Continue, and SurfRCaT will rectify the five images. Products will be saved to the `../SurfRCaT_Tutorial1/calibration_JupiterTutorial1/frames` directory.
 The images should look similar to that shown below. `.pkl` (Python) and `.mat` (Matlab) files containing the image data will also be saved to this directory to
 facilitate further analysis (see [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html))
 
@@ -115,10 +115,7 @@ facilitate further analysis (see [Extensions](https://conlin-matt.github.io/Surf
 
     <img src="images/rectif_Tutorial1.png" class="img-responsive" alt="">	
 
-17. Based on the rectified products, we will visually (and very roughly) estimate the dimensions of the sandbar in real-world space. By treating the 
-left-most section of the bar as a triangle, and the right-most section as a rectangle, an overall area of the feature can be estimated as ~8500 square meters. 
-If we assume an average thickness of the feature of, say, 0.5 m, we can obtain a sediment volume within this feature
-of ~4250 cubic meters, equivalent to approximately 460 standard dump trucks-worth of sediment.
+17. Based on the rectified products, we can (very roughly) estimate the position of the beach north of the inlet relative to that of the beach south of the inlet. It appears that the beach to the north of the inlet is prograded by ~30 m relative to the south, likely because of an interruption of predominately southward longshore sediment transport in this region caused by the jetties. We could import the image data into Matlab or Python (see [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html)) to perform more precise analyses.
 
 ---
 
