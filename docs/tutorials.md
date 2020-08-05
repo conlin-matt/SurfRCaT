@@ -191,10 +191,10 @@ resembling those shown below. You can retry the Calibration by clicking the Retr
 20. Like before, select Calibrate a surfcam, but this time browse to and select the `../SurfRCaT_Tutorial2/FPS_Apr2019` directory as your working
 directory.
 21. Like before, in the "WebCAT camera" box, select the Folly Pier South camera from the dropdown list. This time, though, browse to and select the 
-`video follypiersouthcam.2020-04-22_1200.mp4` as the video to use and change the "Use saved lidar point cloud?' field to "Yes". Use the new browse button
+video `follypiersouthcam.2020-04-22_1200.mp4` as the video to use and change the "Use saved lidar point cloud?' field to "Yes". Use the new browse button
 to browse to and select the lidar point cloud that was downloaded for the last video, located at `../SurfRCaT_Tutorial2/FPS_Jan2019/
 calibration_follypiersouthcam.2020-01-01_1600/products/lidarPC.pkl.` Press Continue.
-22. Follow steps 9-16 again to calibrate the camera for this video, but this time the lidar download process (step 11) will not appear, and you'll have to select
+22. Follow steps 9-16 again to calibrate the camera for this video, but this time the lidar download process (step 12) will not appear, and you'll have to select
 slightly different GCPs since the camera moved slightly relative to January. 
 23. The summary file for this calibration will be loacted at `../SurfRCaT_Tutorial2/FPS_Apr2019/calibration_follypiersouthcam.2020-04-22_1200/results/calibrationSummary.csv`.
 24. Now we will rectify a frame from each video. We will first extract a single frame from each video to rectify. In the Step 1 box, browse to and 
@@ -228,7 +228,7 @@ window will close.
     > You are asked to provide a real-world grid in coordinates relative to the input camera location. The x-direction is in meters east of the input camera location, the y-direction is in meters north of the input camera location. The image will be rectified in real-world coordinates.
 	
 27. Press continue, and the image will be rectified and saved. Then press 'Rectify more images'.
-28. Follow steps 22-25 for the April video to rectify a frame from that video as well. You should get results resembling those below. `.pkl` (Python) and `.mat` (Matlab) files containing the image data will also be saved to the same directory to facilitate further analysis (see [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html))
+28. Follow steps 24-26 for the April video to rectify a frame from that video as well. You should get results resembling those below. `.pkl` (Python) and `.mat` (Matlab) files containing the image data will also be saved to the same directory to facilitate further analysis (see [Extensions](https://conlin-matt.github.io/SurfRCaT/extensions.html))
 
     > **Note**
     >
