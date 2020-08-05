@@ -3,19 +3,6 @@ layout: default
 title: Extensions
 nav_order: 6
 ---
-# Re-calibration #
-You may have videos from many different times for a single camera, and wish to calibrate the camera for each video time. [Tutorial 2](https://conlin-matt.github.io/SurfRCaT/tutorials.html)
-provides an example of this situation. In this case, you can always load the lidar point cloud that was downloaded for the first camera calibration by 
-checking Yes in the "Used saved lidar point cloud?" field in the Imagery and Inputs window. This way, you only need to take the time to download
-a lidar point cloud once. 
-
-Alternatively, you may have completed a calibration for a camera, but you are unhappy with it. Maybe you want to try it with a different lidar dataset,
-or using a different image from your camera. SurfRCaT facilitates re-calibrations by allowing you to load products
-from when you previously calibrated the camera. If you want to begin the re-calibration with the same video as when you initially calibrated the camera, make
-sure you set your working directory as the directory in which the subdirectory `caibration_<video_name>` lives. Enter all the user inputs as you
-did during the initial calibration. When you click "Continue" in the Inputs and Imagery window, SurfRCaT will recognize that a calibration has been completed
-previously using this video, and will give you the options to use the same calibration image and/or lidar point cloud as the initial calibration.
- 
 # Exporting products to Python/Matlab #
 For the purposes of precise analyses (e.g. automatic shoreline extraction), SurfRCaT saves rectified images as `.mat` (Matlab) and `.pkl` (Python) files. These
 can be imported into your preferred programming language for analysis. 
