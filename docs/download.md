@@ -16,7 +16,7 @@ You can download and use the precompiled SurfRCaT application following the step
 
 3. Follow the prompts to install SurfRCaT. 
 
-4. Launch SurfRCaT the same way you launch any other application 
+4. Launch SurfRCaT the same way you launch any other application. You'll have to run it as an administrator.
 
 
 ## SurfRCaT from source ##
