@@ -9,18 +9,17 @@ Created by Matthew P. Conlin, University of Florida
 
 __copyright__ = 'Copyright (c) 2020, Matthew P. Conlin'
 __license__ = 'GPL-3.0'
-__version__ = '1.0'
+__version__ = '2.0'
 
 
 #============================================================================#
 # Get WebCAT video #
 #============================================================================#
-def getImagery_GetVideo(pth,camToInput,year=2019,month=11,day=1,hour=1000):
+def GetWebCATVideo(pth,camToInput,year,month,day,hour):
     
     """
-    Function to download a video clip from a specified WebCAT camera to local directory. The desired year, month, day, and time can be given, 
-    however for those not given the function will use default values. If you don't like the video from the default date, an examination of WebCAT
-    clips on the website can help determine the desired date/time to use. 
+    Function to download a video clip from a specified WebCAT camera to local directory. The desired year, month, day, and time must be given, 
+    An examination of WebCAT clips on the website can help determine the desired date/time to use. 
     
     Inputs:
         pth: (string) File location to save file to
@@ -34,7 +33,7 @@ def getImagery_GetVideo(pth,camToInput,year=2019,month=11,day=1,hour=1000):
         vidFile: (string) path to downloaded video file 
     
     """
-    
+
     import requests
     
     # Add zeros to day and month values if needed #
@@ -73,18 +72,31 @@ def getImagery_GetVideo(pth,camToInput,year=2019,month=11,day=1,hour=1000):
 
 
 #=============================================================================#
-# Get camera stills #
+# Get stills from video #
 #=============================================================================#
-def getImagery_GetStills(vid,secondsPerFrame,rate,vidLen,fps,saveDir):
+def GetStills(vid,secondsPerFrame,rate,vidLen,fps,saveDir):
+    '''
+    Function to extract and save frames from a video at a user-specified rate.
+
+    Inputs:
+        vid: (str) Path to video file to decimate
+        secondsPerFrame: (int) Number of seconds between each frame to extract. If this is 1, the function will ignore this
+                            parameter and will use a decimation rate instead.
+        rate: (int) Rate at which to decimate frames, per second (e.g. 2 for 2 frames/second).
+        vidLen: (int) Length of the input video (in seconds). Can be obtained with the cv2 package.
+        fps: (int) Frames per second from the input video. Can be obtained with the cv2 package.
+        saveDir: (str) Directory to save the frames to in a new subdirectory called frames
+    Outputs:
+        None, but saves all the frames to the user-specified save directory.
+        
+    '''
 
     import cv2
     import numpy as np
     import os
-
-
+    
     cap = cv2.VideoCapture(vid)
 
-    
     # If there was an input decimation rate (which means secondsPerFrame=1), determine the frame numbers to pull each second
     # by evenly spacing the frame rate in the known frames per second. If there was an input number of frames (which means
     # secondsPerFrame != 1), determine the middle frame for each second to be pulled based on the frames per second. #
@@ -103,24 +115,6 @@ def getImagery_GetStills(vid,secondsPerFrame,rate,vidLen,fps,saveDir):
             cv2.imwrite(saveDir+'/frame'+str(int(i))+'.png',im)
         totalFrames = totalFrames+(fps*secondsPerFrame)
 
-
-
-
-
-    
-
-    
-##    framesKeep = np.round(np.linspace(0,numFrames,50)) # 50 frames from the 10 minute video = 1 frame every 12 seconds #
-##
-##    for i in framesKeep:
-##        
-##        cap.set(1,int(i))
-##        test,im = cap.read()
-##        
-##        if test:
-##            cv2.imwrite(vid.split('.')[0]+vid.split('.')[1]+'_frames/frame'+str(int(i))+'.png',im)
-
-
 #=============================================================================#
 
 
@@ -133,7 +127,7 @@ def getLidar_FindPossibleIDs(cameraLoc_lat,cameraLoc_lon):
     '''
     First function in the lidar download process. Finds the dataset IDs of all lidar
     datasets that could be close to the camera based on its location (and derived state
-    and coast). Function searches through a NOAA-provided table fo datasets and extracts
+    and coast). Function searches through a NOAA-provided table for datasets and extracts
     only the IDs of datasets that may be close to the camera. 
     
     Inputs:
@@ -145,145 +139,133 @@ def getLidar_FindPossibleIDs(cameraLoc_lat,cameraLoc_lon):
         
     '''
 
-    
     import pandas as pd
     import requests
-    import reverse_geocoder as rg
 
-    # Find what state the camera is in based on its location #
-    placeDict = rg.search((cameraLoc_lat,cameraLoc_lon))
 
-    # Establish dictionaries for state abbreviation and coast based on state, and get this info for the state #
-    us_state_abbrev = {
-        'Alabama': 'AL',
-        'Alaska': 'AK',
-        'Arizona': 'AZ',
-        'Arkansas': 'AR',
-        'California': 'CA',
-        'Colorado': 'CO',
-        'Connecticut': 'CT',
-        'Delaware': 'DE',
-        'District of Columbia': 'DC',
-        'Florida': 'FL',
-        'Georgia': 'GA',
-        'Hawaii': 'HI',
-        'Idaho': 'ID',
-        'Illinois': 'IL',
-        'Indiana': 'IN',
-        'Iowa': 'IA',
-        'Kansas': 'KS',
-        'Kentucky': 'KY',
-        'Louisiana': 'LA',
-        'Maine': 'ME',
-        'Maryland': 'MD',
-        'Massachusetts': 'MA',
-        'Michigan': 'MI',
-        'Minnesota': 'MN',
-        'Mississippi': 'MS',
-        'Missouri': 'MO',
-        'Montana': 'MT',
-        'Nebraska': 'NE',
-        'Nevada': 'NV',
-        'New Hampshire': 'NH',
-        'New Jersey': 'NJ',
-        'New Mexico': 'NM',
-        'New York': 'NY',
-        'North Carolina': 'NC',
-        'North Dakota': 'ND',
-        'Northern Mariana Islands':'MP',
-        'Ohio': 'OH',
-        'Oklahoma': 'OK',
-        'Oregon': 'OR',
-        'Palau': 'PW',
-        'Pennsylvania': 'PA',
-        'Puerto Rico': 'PR',
-        'Rhode Island': 'RI',
-        'South Carolina': 'SC',
-        'South Dakota': 'SD',
-        'Tennessee': 'TN',
-        'Texas': 'TX',
-        'Utah': 'UT',
-        'Vermont': 'VT',
-        'Virgin Islands': 'VI',
-        'Virginia': 'VA',
-        'Washington': 'WA',
-        'West Virginia': 'WV',
-        'Wisconsin': 'WI',
-        'Wyoming': 'WY',
-    }
+    # Get the state and coast of the camera based on its location. I used to use the
+    # reverse_geocoder package to do this (see Release 1), but I had trouble packing
+    # that up into the compiled app so I decided to just hard-code in bounding boxes for
+    # each state. Some bounding boxes necessarily overlap, so an issue with this could be
+    # that if a given camera lies within two boxes it will be attributed to the state that comes
+    # first in the if/elif statements below, which may not be its correct state. The correct coast
+    # will still be pulled, though, and this is just a rough search before we do a thorough search
+    # in the next step so it should be ok. Might miss a couple available datasets in that situation
+    # but shouldn't be a deal-breaker.
+    lat = cameraLoc_lat
+    lon = cameraLoc_lon
 
-    coastDict = {
-        'Alabama': 'Gulf',
-        'Alaska': 'West',
-        'Arizona': '',
-        'Arkansas': '',
-        'California': 'West',
-        'Colorado': '',
-        'Connecticut': 'East',
-        'Delaware': 'East',
-        'Florida': '', # Special consideration, see below #
-        'Georgia': 'East',
-        'Hawaii': 'West',
-        'Idaho': '',
-        'Illinois': '',
-        'Indiana': '',
-        'Iowa': '',
-        'Kansas': '',
-        'Kentucky': '',
-        'Louisiana': 'Gulf',
-        'Maine': 'East',
-        'Maryland': 'East',
-        'Massachusetts': 'East',
-        'Michigan': '',
-        'Minnesota': '',
-        'Mississippi': 'Gulf',
-        'Missouri': '',
-        'Montana': '',
-        'Nebraska': '',
-        'Nevada': '',
-        'New Hampshire': 'East',
-        'New Jersey': 'East',
-        'New Mexico': '',
-        'New York': 'East',
-        'North Carolina': 'East',
-        'North Dakota': '',
-        'Ohio': '',
-        'Oklahoma': '',
-        'Oregon': 'West',
-        'Pennsylvania': '',
-        'Puerto Rico': 'East',
-        'Rhode Island': 'East',
-        'South Carolina': 'East',
-        'South Dakota': '',
-        'Tennessee': '',
-        'Texas': 'Gulf',
-        'Utah': '',
-        'Vermont': '',
-        'Virginia': 'East',
-        'Washington': 'West',
-        'West Virginia': '',
-        'Wisconsin': '',
-        'Wyoming': '',
-    }
-    
-    state = placeDict[0]['admin1']
-    try: # If not a US state, this will throw an error #
-        state_abbrev = us_state_abbrev[state]
-        # Get coast, and deal with determining coast for Florida #
-        if state == 'Florida':
-            if cameraLoc_lat>26:
-                if cameraLoc_lon<-81.5:
-                    coast = 'Gulf'
-                else:
-                    coast = 'East'
+    if lat>24.275907 and lat<31.195968 and lon<-79.891722 and lon>-87.622272:
+        state = 'Florida'
+        state_abbrev = 'FL'
+        coast = '' # special consideration #
+    elif lat>30.60385 and lat<32.189151 and lon<-80.779858 and lon>-84.777721:
+        state = 'Georgia'
+        state_abbrev = 'GA'
+        coast = 'East'
+    elif lat>31.913685 and lat<34.119119 and lon<-79.008914 and lon>-81.251852:
+        state = 'South Carolina'
+        state_abbrev = 'SC'
+        coast = 'East'
+    elif lat>33.799815 and lat<36.649215 and lon<-75.355960 and lon>-78.690729:
+        state = 'North Carolina'
+        state_abbrev = 'NC'
+        coast = 'East'
+    elif lat>36.461330 and lat<38.005212 and lon<-75.162775 and lon>-77.230202:
+        state = 'Virginia'
+        state_abbrev = 'VA'
+        coast = 'East'
+    elif lat>37.854105 and lat<39.725589 and lon<-74.990254 and lon>-76.694650:
+        state = 'Maryland'
+        state_abbrev = 'MD'
+        coast = 'East'
+    elif lat>38.345215 and lat<39.713371 and lon<-74.941400 and lon>-75.719053:
+        state = 'Delaware'
+        state_abbrev = 'DE'
+        coast = 'East'
+    elif lat>38.828721 and lat<41.122541 and lon<-73.858584 and lon>-75.615259:
+        state = 'New Jersey'
+        state_abbrev = 'NJ'
+        coast = 'East'
+    elif lat>40.501511 and lat<41.260527 and lon<-71.324446 and lon>-74.102280:
+        state = 'New York'
+        state_abbrev = 'NY'
+        coast = 'East'
+    elif lat>40.943313 and lat<41.442240 and lon<-71.753142 and lon>-73.743715:
+        state = 'Connecticut'
+        state_abbrev = 'CT'
+        coast = 'East'
+    elif lat>41.062154 and lat<41.828431 and lon<-71.027870 and lon>-71.931019:
+        state = 'Rhode Island'
+        state_abbrev = 'RI'
+        coast = 'East'
+    elif lat>41.087247 and lat<42.882485 and lon<-69.752698 and lon>-71.127900:
+        state = 'Massachusetts'
+        state_abbrev = 'MA'
+        coast = 'East'
+    elif lat>42.796142 and lat<43.142239 and lon<-70.673510 and lon>-70.884318:
+        state = 'New Hampshire'
+        state_abbrev = 'NH'
+        coast = 'East'
+    elif lat>42.990709 and lat<45.042139 and lon<-66.527251 and lon>-70.849254:
+        state = 'Maine'
+        state_abbrev = 'ME'
+        coast = 'East'
+    elif lat>30.140718 and lat<30.902751 and lon<-87.290608 and lon>-88.489034:
+        state = 'Alabama'
+        state_abbrev = 'AL'
+        coast = 'Gulf'
+    elif lat>30.144841 and lat<30.541500 and lon<-88.300976 and lon>-89.737766:
+        state = 'Mississippi'
+        state_abbrev = 'MS'
+        coast = 'Gulf'
+    elif lat>28.768302 and lat<30.597836 and lon<-88.716730 and lon>-93.981519:
+        state = 'Louisiana'
+        state_abbrev = 'LA'
+        coast = 'Gulf'
+    elif lat>25.856427 and lat<30.005953 and lon<-93.746036 and lon>-97.519522:
+        state = 'Texas'
+        state_abbrev = 'TX'
+        coast = 'Gulf'
+    elif lat>32.438882 and lat<42.053393 and lon<-117.217093 and lon>-124.728834:
+        state - 'California'
+        state_abbrev = 'CA'
+    elif lat>41.884303 and lat<46.322730 and lon<-123.398878 and lon>-124.751125:
+        state = 'Oregon'
+        state_abbrev = 'OR'
+        coast = 'West'
+    elif lat>46.149657 and lat<48.487194 and lon<-122.207593 and lon>-124.891854:
+        state = 'Washington'
+        state_abbrev = 'WA'
+        coast = 'West'
+    elif lat>18.630685 and lat<22.356551 and lon<-154.553955 and lat>-160.530336:
+        state = 'Hawaii'
+        state_abbrev = 'HI'
+        coast = 'Nonsense'
+    elif lat>53.329777 and lat<71.817486 and lon<-139.580116 and lon>-179.273746:
+        state = 'Alaska'
+        state_abbrev = 'AK'
+        coast = 'Nonsense'
+    else:
+        state = 'Nonsense'
+        state_abbrev = 'Nonsense'
+
+    # Get coast for Florida #
+    if state == 'Florida':
+        if lat>26:
+            if lon<-81.5:
+                coast = 'Gulf'
             else:
-                if cameraLoc_lon<80.5:
-                    coast = 'Gulf'
-                else:
-                    coast = 'East'
-        else: 
-            coast = coastDict[state]
+                coast = 'East'
+        else:
+            if lon<80.5:
+                coast = 'Gulf'
+            else:
+                coast = 'East'
 
+
+    # Find all lidar ids with the state and or coast in their name #
+    try:
         # Get the data table from NOAAs website #
         url = 'https://coast.noaa.gov/htdata/lidar1_z/'
         html = requests.get(url).content
@@ -327,7 +309,7 @@ def getLidar_TryID(ftp,alldirs,ID,cameraLoc_lat,cameraLoc_lon):
     import ftplib
     from io import StringIO
     from pandas import read_csv
-
+    
     # Get into the correct NOAA FTP site ##
     for i in alldirs:
         for ii in i:
@@ -384,7 +366,6 @@ def getLidar_GetDatasetNames(appropID):
         matchingTable: (DataFrame) A DataFrame giving each ID linked to metadata (name, date, etc.)
         
     '''
-    
     import pandas as pd
     import requests
     
@@ -416,6 +397,64 @@ def getLidar_GetDatasetNames(appropID):
 #=============================================================================#
 # Prepare and download the chosen dataset
 #=============================================================================#
+def getLidar_GetShapefile(IDToDownload):
+    
+    '''
+    Function to get the shapefile of a tile of the chosen lidar dataset. We will use the shapefile
+    to determine if the tile is near the camera, to avoid downloading a bunch of data not near the camera.
+    
+    Inputs:
+        IDToDownload: (int) ID of chosen lidar dataset, returned by the checkbox from user input.
+        
+    Outputs:
+        sf: (object) The shapefile of the tiles
+        
+    '''
+    import ftplib
+    import shapefile
+    
+    ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
+    ftp.login('anonymous','anonymous')
+    ftp.cwd('/pub/DigitalCoast')
+    dirs = [i for i in ftp.nlst() if 'lidar' in i]
+    alldirs = []
+    for ii in dirs:
+        ftp.cwd(ii)
+        alldirs.append([ii+'/'+i for i in ftp.nlst() if 'geoid' in i])
+        ftp.cwd('../')
+        
+    # Get into the correct NOAA FTP site ##
+    for i in alldirs:
+        for ii in i:
+            try:
+                ftp.cwd(ii+'/data/'+str(IDToDownload))
+            except:
+                pass
+            else:
+                break
+
+                    
+    files = ftp.nlst()
+
+    # Load the datset shapefile and dbf file from the ftp. These describe the tiles #
+    shpFile = str([s for s in files if "shp" in s])
+    shpFile = shpFile[2:len(shpFile)-2]
+    dbfFile = str([s for s in files if "dbf" in s])
+    dbfFile = dbfFile[2:len(dbfFile)-2]
+
+    # Write them locally so we can work with them #
+    gfile = open('shapefileCreate.shp','wb') # Create the local file #
+    ftp.retrbinary('RETR '+shpFile,gfile.write)
+
+    gfile = open('shapefileCreate.dbf','wb') # Create the local file #
+    ftp.retrbinary('RETR '+dbfFile,gfile.write)
+
+    # Load them into an object using the PyShp library #
+    sf = shapefile.Reader("shapefileCreate.shp")
+    
+    return sf
+
+
 def getLidar_CalcViewArea(az,window,dmax,lat,lon):
 
     '''
@@ -434,13 +473,12 @@ def getLidar_CalcViewArea(az,window,dmax,lat,lon):
         poly: (object) The polygon object
         
     '''
-    
     from math import sin,cos,tan,sqrt,radians
     import matplotlib.pyplot as plt
     import numpy as np
     from matplotlib import path
     import utm
-
+    
     # Convert lat lon of camera to UTM #
     camLoc_x = utm.from_latlon(lat,lon)[0]
     camLoc_y = utm.from_latlon(lat,lon)[1]
@@ -472,62 +510,6 @@ def getLidar_CalcViewArea(az,window,dmax,lat,lon):
     return poly   
 
 
-def getLidar_GetShapefile(IDToDownload):
-    
-    '''
-    Function to get the shapefile of a tile of the chosen lidar dataset. We will use the shapefile
-    to determine if the tile is near the camera, to avoid downloading a bunch of data not near the camera.
-    
-    Inputs:
-        IDToDownload: (int) ID of chosen lidar dataset, returned by the checkbox from user input.
-        
-    Outputs:
-        sf: (object) The shapefile of the tiles
-        
-    '''
-    
-    import ftplib
-    import shapefile
-
-    # Get to the correct FTP site and get all the files #
-    ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
-    ftp.login('anonymous','anonymous')
-
-    try:
-        ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12b/data/'+str(IDToDownload))
-    except:
-        try:
-            ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(IDToDownload))
-        except:
-            try:
-                ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid12b/data/'+str(IDToDownload))
-            except:
-                try:
-                    ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12a/data/'+str(IDToDownload))
-                except:
-                    ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid18/data/'+str(IDToDownload))
-                    
-    files = ftp.nlst()
-
-    # Load the datset shapefile and dbf file from the ftp. These describe the tiles #
-    shpFile = str([s for s in files if "shp" in s])
-    shpFile = shpFile[2:len(shpFile)-2]
-    dbfFile = str([s for s in files if "dbf" in s])
-    dbfFile = dbfFile[2:len(dbfFile)-2]
-
-    # Write them locally so we can work with them #
-    gfile = open('shapefileCreate.shp','wb') # Create the local file #
-    ftp.retrbinary('RETR '+shpFile,gfile.write)
-
-    gfile = open('shapefileCreate.dbf','wb') # Create the local file #
-    ftp.retrbinary('RETR '+dbfFile,gfile.write)
-
-    # Load them into an object using the PyShp library #
-    sf = shapefile.Reader("shapefileCreate.shp")
-    
-    return sf
-
-
 
 def getLidar_SearchTiles(sf,poly,shapeNum,cameraLoc_lat,cameraLoc_lon):
 
@@ -545,7 +527,6 @@ def getLidar_SearchTiles(sf,poly,shapeNum,cameraLoc_lat,cameraLoc_lon):
         rec['name']: (string) The name of the tile if any part of it is within the view polygon
         
     '''
-    
     import utm
     import math
     import numpy
@@ -563,23 +544,11 @@ def getLidar_SearchTiles(sf,poly,shapeNum,cameraLoc_lat,cameraLoc_lon):
     bx_tl = utm.from_latlon(bx[3],bx[0])
     
     # If any verticies of the bounding box are within the polygon, keep the tile #
-
-##    try:
-##        rec = sf.record(shapeNum)
-##        if poly.contains_points([(bx_bl[0],bx_bl[1])]) or poly.contains_points([(bx_br[0],bx_br[1])]) or poly.contains_points([(bx_tl[0],bx_tl[1])]) or poly.contains_points([(bx_tr[0],bx_tr[1])]):
-##            return rec['Name']
-##    except:
-##        pass
-    # If any of the tile edges intersect the bounding box, keep the tile #
-##    try:
-
     rec = sf.record(shapeNum)
     if poly.intersects_path(path.Path([(bx_bl[0],bx_bl[1]),(bx_br[0],bx_br[1])])) or poly.intersects_path(path.Path([(bx_tl[0],bx_tl[1]),(bx_tr[0],bx_tr[1])])) or poly.intersects_path(path.Path([(bx_bl[0],bx_bl[1]),(bx_tl[0],bx_tl[1])])) or poly.intersects_path(path.Path([(bx_br[0],bx_br[1]),(bx_tr[0],bx_tr[1])])):
         return(rec['Name'])
-        
-##    except:
-##        pass
-##                        
+                         
+
 
 def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
     
@@ -596,30 +565,33 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
         lidarXYZsmall: XYZ point cloud, as an nx3 array, of the lidar data
         
     '''
-            
     import ftplib
-    import numpy
+    import numpy as np
     import math
     import json    
     import pdal
-
+    import utm
+    
     # Get to the right FTP #      
     ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
     ftp.login('anonymous','anonymous')
-    
-    try:
-        ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12b/data/'+str(IDToDownload))
-    except:
-        try:
-            ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(IDToDownload))
-        except:
+    ftp.cwd('/pub/DigitalCoast')
+    dirs = [i for i in ftp.nlst() if 'lidar' in i]
+    alldirs = []
+    for ii in dirs:
+        ftp.cwd(ii)
+        alldirs.append([ii+'/'+i for i in ftp.nlst() if 'geoid' in i])
+        ftp.cwd('../')
+        
+    # Get into the correct NOAA FTP site ##
+    for i in alldirs:
+        for ii in i:
             try:
-                ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid12b/data/'+str(IDToDownload))
+                ftp.cwd(ii+'/data/'+str(IDToDownload))
             except:
-                try:
-                    ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12a/data/'+str(IDToDownload))
-                except:
-                    ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid18/data/'+str(IDToDownload))
+                pass
+            else:
+                break
  
            
     # Save the laz file locally #
@@ -628,13 +600,8 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
     gfile.close() # Close the remote file #
         
     # Construct the json PDAL pipeline to read the file and take only points within +-.5 degree x and y of the camera. Read the data in as an array #
-    utm_band = str((math.floor((cameraLoc_lon+180)/6)%60)+1)
-    if len(utm_band) == 1:
-        utm_band = '0'+utm_band
-    epsg = '326'+utm_band
-
     fullFileName = 'lazfile.laz'
-    pipeline=(json.dumps([{'type':'readers.las','filename':fullFileName},{'type':'filters.range','limits':'X['+str(cameraLoc_lon-.5)+':'+str(cameraLoc_lon+.5)+'],Y['+str(cameraLoc_lat-.5)+':'+str(cameraLoc_lat+.5)+']'},{'type':'filters.reprojection','in_srs':'EPSG:4326','out_srs':'EPSG:'+epsg}],sort_keys=False,indent=4))
+    pipeline=(json.dumps([{'type':'readers.las','filename':fullFileName},{'type':'filters.range','limits':'X['+str(cameraLoc_lon-.5)+':'+str(cameraLoc_lon+.5)+'],Y['+str(cameraLoc_lat-.5)+':'+str(cameraLoc_lat+.5)+']'}],sort_keys=False,indent=4))
         
     # Go through the pdal steps to use the pipeline
     r = pdal.Pipeline(pipeline)  
@@ -650,28 +617,16 @@ def getLidar_Download(thisFile,IDToDownload,cameraLoc_lat,cameraLoc_lon):
     lidarY = datArrays['Y']
     lidarZ = datArrays['Z']
 
-##    # Only take points within 500 m of the camera #
-##    R = 6373000 # ~radius of Earth in m #
-##    dist = list()
-##    for px,py in zip(lidarX,lidarY):
-##        dlon = math.radians(abs(px)) - math.radians(abs(cameraLoc_lon))
-##        dlat = math.radians(abs(py)) - math.radians(abs(cameraLoc_lat))
-##        a = math.sin(dlat/2)**2 + math.cos(math.radians(abs(py))) * math.cos(math.radians(abs(cameraLoc_lat))) * math.sin(dlon/2)**2
-##        c = 2*math.atan2(math.sqrt(a),math.sqrt(1-a))
-##        dist.append(R*c)
-##
-##    lidarXsmall = list()
-##    lidarYsmall = list()
-##    lidarZsmall = list()    
-##    for xi,yi,zi,di in zip(lidarX,lidarY,lidarZ,dist):
-##        if di<1000:
-##            lidarXsmall.append(xi)
-##            lidarYsmall.append(yi)
-##            lidarZsmall.append(zi)
-##    lidarXYZsmall = numpy.vstack((lidarXsmall,lidarYsmall,lidarZsmall))
-##    lidarXYZsmall = numpy.transpose(lidarXYZsmall)
-    lidarXYZsmall = numpy.vstack((lidarX,lidarY,lidarZ))
-    lidarXYZsmall = numpy.transpose(lidarXYZsmall)    
+    # Convert to UTM #
+    utmCoords = utm.from_latlon(lidarY,lidarX)
+    utmCoords = np.hstack([np.reshape(utmCoords[0],[np.size(utmCoords[0]),1]),np.reshape(utmCoords[1],[np.size(utmCoords[1]),1])])
+    lidarX = utmCoords[:,0]
+    lidarY = utmCoords[:,1]
+    
+    # Create and return the final product #
+    lidarXYZsmall = np.vstack((lidarX,lidarY,lidarZ))
+    lidarXYZsmall = np.transpose(lidarXYZsmall)    
+
     return lidarXYZsmall
 
 
@@ -691,30 +646,15 @@ def getLidar_CreatePC(lidarDat,cameraLoc_lat,cameraLoc_lon):
         pc: (array) The new point cloud, for use in future functions
         
     '''
-
     import utm
     import numpy  as np
     import pandas as pd
     
     pc = pd.DataFrame({'x':lidarDat[:,0],'y':lidarDat[:,1],'z':lidarDat[:,2]})
     
-    utmCam = utm.from_latlon(cameraLoc_lat,cameraLoc_lon)
-    pc['x'] = pc['x']-utmCam[0]
-    pc['y'] = pc['y']-utmCam[1]
-
-##    # Convert eveything to UTM and translate to camera at (0,0) #
-##    utmCoords = utm.from_latlon(np.array(pc['y']),np.array(pc['x']))
-##    utmCoords = np.hstack([np.reshape(utmCoords[0],[np.size(utmCoords[0]),1]),np.reshape(utmCoords[1],[np.size(utmCoords[1]),1])])
-##        
 ##    utmCam = utm.from_latlon(cameraLoc_lat,cameraLoc_lon)
-##
-##    # Translate to camera position #
-##    utmCoords[:,0] = utmCoords[:,0]-utmCam[0]
-##    utmCoords[:,1] = utmCoords[:,1]-utmCam[1]
-##    
-##    # Put these new coordinates into the point cloud %
-##    pc['x'] = utmCoords[:,0]
-##    pc['y'] = utmCoords[:,1]
+##    pc['x'] = pc['x']-utmCam[0]
+##    pc['y'] = pc['y']-utmCam[1]
     
     return pc
 
@@ -739,9 +679,9 @@ def calibrate_GetInitialApprox_IOPs(img):
         y0: (float) initial approximation for y principal point coordinate #
         
     '''
-    
-    import math
 
+    import math
+    
     # Estimare focal length using assumed FOV of 60 degrees and the measured width of the image #
     w = len(img[1,:,:]) # Get the sensor width as the image width #
     a = math.radians(60)
@@ -776,7 +716,7 @@ def calibrate_GetInitialApprox_ats2opk(a,t,s):
     
     '''
     import math
-
+    
     # Convert inputs in degrees to radians #
     a = math.radians(a)
     t = math.radians(t)
@@ -963,8 +903,6 @@ def calibrate_CalcReprojPos(gcps_lidar,calibVals):
         v: (array) The y image coordinates of the reprojected positions
     
     '''
-    
-    
     import math
     import numpy as np
     
@@ -1044,10 +982,9 @@ def rectify_RectifyImage(calibVals,img,grd):
         extents: (array) The geographic extents of the rectified image, for plotting purposes
 
     '''
-    
     import math
     import numpy as np
-    from scipy.interpolate import interp2d,griddata
+    from scipy.interpolate import RegularGridInterpolator as rgi
     
     # Define the calib params #
     omega = calibVals[0]
@@ -1082,31 +1019,32 @@ def rectify_RectifyImage(calibVals,img,grd):
     x = x0 - (f*(((m11*(xgrd-XL)) + (m12*(ygrd-YL)) + (m13*(zgrd-ZL))) / ((m31*(xgrd-XL)) + (m32*(ygrd-YL)) + (m33*(zgrd-ZL)))))
     y = y0 - (f*(((m21*(xgrd-XL)) + (m22*(ygrd-YL)) + (m23*(zgrd-ZL))) / ((m31*(xgrd-XL)) + (m32*(ygrd-YL)) + (m33*(zgrd-ZL)))))
 
-    # Create grid for the photo coordinates #
+    xx = x.flatten();yy = y.flatten()
+    pts = list(zip(xx,yy))
+    
+    # Create photo coordinate vectors #
     u = np.arange(len(img[0,:,1]))
     v = np.arange(len(img[:,0,1]))
-    ug,vg = np.meshgrid(u,v)
 
-    # Interpolate xy (image coordinates) of world points to photo coordinates to get color #
-    uInterp = np.reshape(ug,[np.size(ug)])
-    vInterp = np.reshape(vg,[np.size(vg)])
-    rInterp = np.reshape(img[:,:,0],[np.size(img[:,:,0])])
-    gInterp = np.reshape(img[:,:,1],[np.size(img[:,:,1])])
-    bInterp = np.reshape(img[:,:,2],[np.size(img[:,:,2])])
-    xInterp = np.reshape(x,[np.size(x)])
-    yInterp = np.reshape(y,[np.size(y)])
+    # Create the interpolation functions #
+    funcR = rgi((u,v),np.transpose(img[:,:,0]),bounds_error=False,fill_value=0)
+    funcG = rgi((u,v),np.transpose(img[:,:,1]),bounds_error=False,fill_value=0)
+    funcB = rgi((u,v),np.transpose(img[:,:,2]),bounds_error=False,fill_value=0)
 
-    col_r = griddata((uInterp,vInterp),rInterp,(xInterp,yInterp))
-    col_g = griddata((uInterp,vInterp),gInterp,(xInterp,yInterp))
-    col_b = griddata((uInterp,vInterp),bInterp,(xInterp,yInterp))
-    
-    col_r = np.reshape(col_r,[len(x[:,0]),len(x[0,:])])
-    col_g = np.reshape(col_g,[len(x[:,0]),len(x[0,:])])
-    col_b = np.reshape(col_b,[len(x[:,0]),len(x[0,:])])
+    # Interpolate the color values for each channel #
+    col_R = funcR(np.array(pts))
+    col_G = funcG(np.array(pts))
+    col_B = funcB(np.array(pts))
 
-    # Create the rectified image #
-    im_rectif = np.stack([col_r,col_g,col_b],axis=2)
+    # Reshape the color channel values to an image #
+    col_R = np.reshape(col_R,[len(x[:,0]),len(x[0,:])])
+    col_G = np.reshape(col_G,[len(x[:,0]),len(x[0,:])])
+    col_B = np.reshape(col_B,[len(x[:,0]),len(x[0,:])])
+
+    # Create therectified image #
+    im_rectif = np.stack([col_R,col_G,col_B],axis=2)
     im_rectif = np.flipud(im_rectif)
+    
     
     return im_rectif,extents
 
