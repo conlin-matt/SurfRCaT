@@ -46,7 +46,7 @@ We will be able to choose our favorite frame of the 5 in the next window. Press 
 
 
 7. Choose your favorite frame by using the arrow buttons. Press Continue when you have found your favorite.
-8. The tool will now automatically find airborne lidar datasets that cover the location of this camera. This is a two-step process; the tool will 
+8. The tool will now automatically find airborne lidar datasets that cover the location of this camera. This is a two-step process that takes some time; the tool will 
 first search for nearby datasets and then examine those to find covering datasets. Press Continue when the processes finish.
 9. The next window will display a table that shows all NOAA lidar datasets that cover the location of this camera, allowing you to select one to use
 in the remote-GCP extraction. Select dataset 6330 from 2017 by checking its box and then hit Continue. This will initiate the lidar download
