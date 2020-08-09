@@ -289,7 +289,7 @@ def getLidar_FindPossibleIDs(cameraLoc_lat,cameraLoc_lon):
 
 
         
-def getLidar_TryID(ftp,alldirs,ID,cameraLoc_lat,cameraLoc_lon):
+def getLidar_TryID(ftp,alldirs,ID,cameraLoc_lat,cameraLoc_lon,pathToSave):
     
     '''
     Function to go through a lidar dataset and determine if it covers the location of the camera. If
@@ -333,14 +333,14 @@ def getLidar_TryID(ftp,alldirs,ID,cameraLoc_lat,cameraLoc_lon):
 
 
             # Save the file locally #
-            gfile = open('minmax.csv','wb') # Create the local file #
+            gfile = open(pathToSave+'minmax.csv','wb') # Create the local file #
             ftp.retrbinary('RETR '+fileWant,gfile.write) # Copy the contents of the file on FTP into the local file #
             gfile.close() # Close the remote file #
         
         
             # See if the location of the camera is contained within any of the tiles in this dataset. If it is, save the ID #
 
-            dat = read_csv('minmax.csv')
+            dat = read_csv(pathToSave+'minmax.csv')
             minx = dat[' min_x']
             maxx = dat[' max_x']
             miny = dat[' min_y']
@@ -542,10 +542,14 @@ def getLidar_SearchTiles(sf,poly,shapeNum,cameraLoc_lat,cameraLoc_lon):
     bx_br = utm.from_latlon(bx[1],bx[2]) 
     bx_tr = utm.from_latlon(bx[3],bx[2]) 
     bx_tl = utm.from_latlon(bx[3],bx[0])
+
+    v = poly.vertices
     
-    # If any verticies of the bounding box are within the polygon, keep the tile #
+    # If any edges of the bounding box intersect the polygon, keep the tile. Or, if the entire polygon is within a tile, keep the tile #
     rec = sf.record(shapeNum)
     if poly.intersects_path(path.Path([(bx_bl[0],bx_bl[1]),(bx_br[0],bx_br[1])])) or poly.intersects_path(path.Path([(bx_tl[0],bx_tl[1]),(bx_tr[0],bx_tr[1])])) or poly.intersects_path(path.Path([(bx_bl[0],bx_bl[1]),(bx_tl[0],bx_tl[1])])) or poly.intersects_path(path.Path([(bx_br[0],bx_br[1]),(bx_tr[0],bx_tr[1])])):
+        return(rec['Name'])
+    elif bx_bl[0]<v[0][0]<bx_tr[0] and bx_bl[1]<v[0][1]<bx_tr[1] and bx_bl[0]<v[1][0]<bx_tr[0] and bx_bl[1]<v[1][1]<bx_tr[1] and bx_bl[0]<v[2][0]<bx_tr[0] and bx_bl[1]<v[2][1]<bx_tr[1] and bx_bl[0]<v[3][0]<bx_tr[0] and bx_bl[1]<v[3][1]<bx_tr[1] and bx_bl[0]<v[4][0]<bx_tr[0] and bx_bl[1]<v[4][1]<bx_tr[1]:
         return(rec['Name'])
                          
 

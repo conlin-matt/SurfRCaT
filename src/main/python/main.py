@@ -2610,7 +2610,8 @@ class calibrate_ShowCalibResultsWindow(QWidget):
         # Calculate the re-projection error of the GCPs #
         uv = np.hstack([uProj,vProj])
         allResid = np.subtract(GCPs_im,uv)
-        np.savetxt(pth+'results/calibResid.txt',allResid,fmt='%6f')
+        with open(pth+'_binaries/calibResid.pkl','wb') as f:
+            pickle.dump(allResid,f)
         RMSresid = np.sqrt(np.mean(np.reshape(np.subtract(GCPs_im,uv),[np.size(np.subtract(GCPs_im,uv)),1])**2))
         
         self.introLab = QLabel('The reprojection of each picked GCP based on the calibration is shown below. The Xs should align with the Os '+
@@ -2691,7 +2692,8 @@ class calibrate_ShowCalibResultsWindow(QWidget):
         gcps_lidar = pickle.load(f_gcps_im)
         f_calibVals = open(pth+'_binaries/calibVals.pkl','rb')
         calibVals = pickle.load(f_calibVals)
-        calibResid = np.loadtxt(pth+'results/calibResid.txt')
+        f_resid = open(pth+'_binaries/calibResid.pkl','rb')
+        calibResid = pickle.load(f_resid)
         rms = np.sqrt(np.sum(np.square(calibResid))/np.size(calibResid))
         
         Inputs_header = [['User inputs (all parameters with * are assumed by the tool)','','','','']]
@@ -3258,7 +3260,7 @@ class getLidar_FindCoveringDatasetsThread(QThread):
                 perDone = i/len(IDs)
                 self.threadSignal.emit(perDone)  
 
-                check = SurfRCaT.getLidar_TryID(ftp,alldirs,ID,self.cameraLoc_lat,self.cameraLoc_lon)
+                check = SurfRCaT.getLidar_TryID(ftp,alldirs,ID,self.cameraLoc_lat,self.cameraLoc_lon,pth+'_binaries/')
                 ftp.cwd('../../../../')
                 
                 if check:
@@ -3352,7 +3354,7 @@ class getLidar_PrepChosenSetThread(QThread):
         self.threadSignal.emit(0)
         
         sf = SurfRCaT.getLidar_GetShapefile(IDToDownload)
-        poly = SurfRCaT.getLidar_CalcViewArea(az,20,1000,self.cameraLoc_lat,self.cameraLoc_lon)
+        poly = SurfRCaT.getLidar_CalcViewArea(az,20,500,self.cameraLoc_lat,self.cameraLoc_lon)
         
         tilesKeep = list()
         i = 0
