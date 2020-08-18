@@ -72,6 +72,10 @@ slightly, and then follow the steps in the Help menu to identify the four GCPs (
 the image with the navigation bar at the top. Press Done when done. If something happened during the GCP picking process and you are unhappy with the
 GCPs you identified, you can re-do it using the Retry button. Otherwise, click Continue.
 
+   > **Note**
+   >
+   > The communication between the SurfRCaT app and the lidar viewer window can sometimes run into issues as it saves your points. Occassionally (~1 in 5 times by our testing), an error will occur while you are picking your GCPs, and the tool will catch this and direct you to re-do the process. 
+
 13. The Calibration Module window will now open. Press Calibrate and the tool will perform a least-squares camera calibration (see [Scientific Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) for more details). 
 SurfRCaT will show the reprojected positions of each GCP in the next window. You should get results resembling those shown below.  You can retry 
 the Calibration by clicking the Retry button. Otherwise, press Continue.
@@ -179,6 +183,11 @@ slightly, and then follow the steps in the Help menu to identify the four GCPs (
 15. Close the lidar viewer window, and identify the four corresponding points in the image (in the same order, as in the video) by clicking on
 them. You can zoom and pan the image with the navigation bar at the top. Press Done when done. If something happened during the GCP picking process 
 and you are unhappy with the GCPs you identified, you can re-do it using the Retry button. Otherwise, click Continue.
+
+   > **Note**
+   >
+   > The communication between the SurfRCaT app and the lidar viewer window can sometimes run into issues as it saves your points. Occassionally (~1 in 5 times by our testing), an error will occur while you are picking your GCPs, and the tool will catch this and direct you to re-do the process. 
+
 16. The Calibration Module window will now open. Press Calibrate and the tool will perform a least-squares camera calibration (see [Scientific Overview](https://conlin-matt.github.io/SurfRCaT/overview.html) for more details). 
 SurfRCaT will show the reprojected positions of each GCP in the next window. You should get results
 resembling those shown below. You can retry the Calibration by clicking the Retry button. Otherwise, press Continue. 
