@@ -59,7 +59,7 @@ are presented below:
    
    > **Note**
    >
-   > In general, calibration accuracy is known to increase with increasing number of GCPs and increasing GCP distribution accross the image format. In other words, generally speaking, the more GCPs you identify and the more widely distributed they are, the better. Many other factors can confound this relationship, however, such as site orientation and GCP identification accuracy. There is no one-size-fits-all solution for this; site-specific testing may be beneficial. 
+   > In general, calibration accuracy is known to increase with increasing number of GCPs and increasing GCP distribution accross the image format. In other words, generally speaking, the more GCPs you identify and the more widely distributed they are, the better. Many other factors can confound this relationship, however, such as site orientation, GCP identification accuracy, and user-input parameter accuracy. As an example, it may be possible to accurately identifiy relatively many GCPs at a site with a pier, however these points may cover only a small protion of the image format, potentially limiting accuracy. There is no one-size-fits-all solution for this; site-specific testing may be beneficial. 
 
 4. Calibration
 	
