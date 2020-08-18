@@ -17,11 +17,6 @@ recreational cameras for research-purposes. The video used in this example, from
 
 1. Create a directory called `SurfRCaT_Tutorial1`. Download the video into this directory.
 2. Download/install and invoke the tool (see [Download](https://conlin-matt.github.io/SurfRCaT/download.html)).
-
-   > **Note**
-   >
-   > If you're using the pre-compiled app, a window will open alongside the GUI and will show a lot of (mostly unimportant) output. However, this window will show any errors/exceptions that occur while you are using the tool, and so can be a valuable source of information for diagnosing and reporting issues. This output is printed to your command window if you are running the tool from source.
-
 3. In the Welcome screen, select "Calibrate a surfcam".
 4. Browse to and select the `../SurfRCaT_Tutorial1` directory as the working directory. Press Continue.
 5. Input the values listed below within the "Any camera" box. Then use the "Browse" button to select the example video file in your
@@ -143,11 +138,6 @@ for this tutorial.
 	
 1. Create a directory called `SurfRCaT_Tutorial2`. Within it, create two subdirectories, one called `FPS_Jan2019` and one called `FPS_Apr2019`.
 2. Download/install and invoke the tool (see [Download](https://conlin-matt.github.io/SurfRCaT/download.html)).
-
-   > **Note**
-   >
-   > If you're using the pre-compiled app, a window will open alongside the GUI and will show a lot of (mostly unimportant) output. However, this window will show any errors/exceptions that occur while you are using the tool, and so can be a valuable source of information for diagnosing and reporting issues. This output is printed to your command window if you are running the tool from source. 
-
 3. In the Welcome screen, select "Download imagery from WebCAT camera." 
 4. We will download two videos from the Folly Beach Pier South camera. Select the Folly Beach Pier (south) camera as your desired camera. Then browse to and select the
 `../SurfRCat_Tutorial2` as the save directory. We will download videos for January 1, 2019 at 1600 LST and April 22, 2019 at 1200 LST. To do so, enter the following in 
