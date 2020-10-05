@@ -10,6 +10,8 @@ to exploit imagery from an extensive network of recreational surfcams operating 
 It does this by facilitating the remote calibration of, and rectification of images from, any video camera on the U.S. coastline that views structures 
 identifiable in airborne lidar data.
 
+Full information can also be found in our software publication: https://doi.org/10.1016/j.softx.2020.100584
+
 
 # What can SurfRCaT do? #
  + SurfRCaT can help you remotely calibrate and rectify images from many pre-existing cameras on the U.S. coastline by facilitating the co-location
