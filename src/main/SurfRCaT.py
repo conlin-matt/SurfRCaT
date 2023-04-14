@@ -275,7 +275,7 @@ def getLidar_FindPossibleIDs(cameraLoc_lat,cameraLoc_lon):
                 else:
                     coast = 'East'
             else:
-                if cameraLoc_lon<80.5:
+                if cameraLoc_lon<-80.5:
                     coast = 'Gulf'
                 else:
                     coast = 'East'
