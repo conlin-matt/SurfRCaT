@@ -2356,6 +2356,7 @@ class getLidar_FindCoveringDatasetsThread(QThread):
                 self.threadSignal.emit(perDone)  
 
                 check = SurfRCaT.getLidar_TryID(ftp,alldirs,ID,self.cameraLoc_lat,self.cameraLoc_lon)
+                ftp.cwd('/pub/DigitalCoast')
                 
                 if check:
                     if len(check)>0:       
