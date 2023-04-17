@@ -3255,13 +3255,12 @@ class getLidar_FindCoveringDatasetsThread(QThread):
             appropID = list() # Initiate list of IDs which contain the camera location #
             i = 0
             for ID in IDs:
-                
                 i = i+1
                 perDone = i/len(IDs)
                 self.threadSignal.emit(perDone)  
 
                 check = SurfRCaT.getLidar_TryID(ftp,alldirs,ID,self.cameraLoc_lat,self.cameraLoc_lon,pth+'_binaries/')
-                ftp.cwd('../../../../')
+                ftp.cwd('/pub/DigitalCoast')
                 
                 if check:
                     if len(check)>0:       
