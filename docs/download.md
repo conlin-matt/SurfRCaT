@@ -36,7 +36,7 @@ and makes downloading and dealing with Python packages relatively painless.
 in the Anaconda prompt (with an 'Enter' press between the commands):
 
    ```bash
-   conda config --set channel-priority strict
+   conda config --set channel_priority strict
    conda create -n SurfRCaT_env -c conda-forge python=3.6 python-pdal pyqt numpy pandas matplotlib opencv requests pyshp utm lxml
    conda activate SurfRCaT_env
    ```
