@@ -1020,7 +1020,7 @@ def calibrate_CalcReprojPos(gcps_lidar,calibVals):
 #=============================================================================#
 # Perform Rectification #
 #=============================================================================#
-def rectify_RectifyImage(calibVals,img,xmin,xmax,dx,ymin,ymax,dy,z):
+def rectify_RectifyImage(calibVals,img,grd):
 
     '''
     Function to rectify an image using the resolved calibration parameters. User inputs a grid in real world space
@@ -1042,10 +1042,9 @@ def rectify_RectifyImage(calibVals,img,xmin,xmax,dx,ymin,ymax,dy,z):
         extents: (array) The geographic extents of the rectified image, for plotting purposes
 
     '''
-    
     import math
     import numpy as np
-    from scipy.interpolate import interp2d,griddata
+    from scipy.interpolate import RegularGridInterpolator as rgi
     
     # Define the calib params #
     omega = calibVals[0]
@@ -1070,41 +1069,42 @@ def rectify_RectifyImage(calibVals,img,xmin,xmax,dx,ymin,ymax,dy,z):
     m33 = math.cos(omega)*math.cos(phi)
     
     # Set up object-space grid #
-    xg = np.arange(xmin,xmax,dx)
-    yg = np.arange(ymin,ymax,dy)
+    xg = np.arange(grd[0],grd[1],grd[2])
+    yg = np.arange(grd[3],grd[4],grd[5])
     xgrd,ygrd = np.meshgrid(xg,yg)
-    zgrd = np.zeros([len(xgrd[:,1]),len(xgrd[1,:])])+z
-    extents = np.array([(-.5*dx)+min(xg),max(xg)+(.5*dx),min(yg)-(.5*dy),max(yg)+(.5*dy)])
+    zgrd = np.zeros([len(xgrd[:,1]),len(xgrd[1,:])])+grd[6]
+    extents = np.array([(-.5*grd[2])+min(xg),max(xg)+(.5*grd[2]),min(yg)-(.5*grd[5]),max(yg)+(.5*grd[5])])
 
     # Get image coordinates of each desired world coordinate based on calib vals #
     x = x0 - (f*(((m11*(xgrd-XL)) + (m12*(ygrd-YL)) + (m13*(zgrd-ZL))) / ((m31*(xgrd-XL)) + (m32*(ygrd-YL)) + (m33*(zgrd-ZL)))))
     y = y0 - (f*(((m21*(xgrd-XL)) + (m22*(ygrd-YL)) + (m23*(zgrd-ZL))) / ((m31*(xgrd-XL)) + (m32*(ygrd-YL)) + (m33*(zgrd-ZL)))))
 
-    # Create grid for the photo coordinates #
+    xx = x.flatten();yy = y.flatten()
+    pts = list(zip(xx,yy))
+    
+    # Create photo coordinate vectors #
     u = np.arange(len(img[0,:,1]))
     v = np.arange(len(img[:,0,1]))
-    ug,vg = np.meshgrid(u,v)
 
-    # Interpolate xy (image coordinates) of world points to photo coordinates to get color #
-    uInterp = np.reshape(ug,[np.size(ug)])
-    vInterp = np.reshape(vg,[np.size(vg)])
-    rInterp = np.reshape(img[:,:,0],[np.size(img[:,:,0])])
-    gInterp = np.reshape(img[:,:,1],[np.size(img[:,:,1])])
-    bInterp = np.reshape(img[:,:,2],[np.size(img[:,:,2])])
-    xInterp = np.reshape(x,[np.size(x)])
-    yInterp = np.reshape(y,[np.size(y)])
+    # Create the interpolation functions #
+    funcR = rgi((u,v),np.transpose(img[:,:,0]),bounds_error=False,fill_value=0)
+    funcG = rgi((u,v),np.transpose(img[:,:,1]),bounds_error=False,fill_value=0)
+    funcB = rgi((u,v),np.transpose(img[:,:,2]),bounds_error=False,fill_value=0)
 
-    col_r = griddata((uInterp,vInterp),rInterp,(xInterp,yInterp))
-    col_g = griddata((uInterp,vInterp),gInterp,(xInterp,yInterp))
-    col_b = griddata((uInterp,vInterp),bInterp,(xInterp,yInterp))
-    
-    col_r = np.reshape(col_r,[len(x[:,0]),len(x[0,:])])
-    col_g = np.reshape(col_g,[len(x[:,0]),len(x[0,:])])
-    col_b = np.reshape(col_b,[len(x[:,0]),len(x[0,:])])
+    # Interpolate the color values for each channel #
+    col_R = funcR(np.array(pts))
+    col_G = funcG(np.array(pts))
+    col_B = funcB(np.array(pts))
 
-    # Create the rectified image #
-    im_rectif = np.stack([col_r,col_g,col_b],axis=2)
+    # Reshape the color channel values to an image #
+    col_R = np.reshape(col_R,[len(x[:,0]),len(x[0,:])])
+    col_G = np.reshape(col_G,[len(x[:,0]),len(x[0,:])])
+    col_B = np.reshape(col_B,[len(x[:,0]),len(x[0,:])])
+
+    # Create therectified image #
+    im_rectif = np.stack([col_R,col_G,col_B],axis=2)
     im_rectif = np.flipud(im_rectif)
+    
     
     return im_rectif,extents
 
