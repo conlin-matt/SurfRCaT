@@ -483,27 +483,29 @@ def getLidar_GetShapefile(IDToDownload):
         sf: (object) The shapefile of the tiles
         
     '''
-    
     import ftplib
     import shapefile
-
-    # Get to the correct FTP site and get all the files #
+    
     ftp = ftplib.FTP('ftp.coast.noaa.gov',timeout=1000000)
     ftp.login('anonymous','anonymous')
-
-    try:
-        ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12b/data/'+str(IDToDownload))
-    except:
-        try:
-            ftp.cwd('/pub/DigitalCoast/lidar2_z/geoid12b/data/'+str(IDToDownload))
-        except:
+    ftp.cwd('/pub/DigitalCoast')
+    dirs = [i for i in ftp.nlst() if 'lidar' in i]
+    alldirs = []
+    for ii in dirs:
+        ftp.cwd(ii)
+        alldirs.append([ii+'/'+i for i in ftp.nlst() if 'geoid' in i])
+        ftp.cwd('../')
+        
+    # Get into the correct NOAA FTP site ##
+    for i in alldirs:
+        for ii in i:
             try:
-                ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid12b/data/'+str(IDToDownload))
+                ftp.cwd(ii+'/data/'+str(IDToDownload))
             except:
-                try:
-                    ftp.cwd('/pub/DigitalCoast/lidar1_z/geoid12a/data/'+str(IDToDownload))
-                except:
-                    ftp.cwd('/pub/DigitalCoast/lidar3_z/geoid18/data/'+str(IDToDownload))
+                pass
+            else:
+                break
+
                     
     files = ftp.nlst()
 
