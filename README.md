@@ -7,7 +7,7 @@ SurfRCaT helps you to transform pre-existing cameras on the U.S. coastline into 
 
 Check out the [website](https://conlin-matt.github.io/SurfRCaT/) for more information.
 
-Please check out and cite our software publication if you find SurfRCaT useful! https://doi.org/10.1016/j.softx.2020.100584
+If you find SurfRCaT useful, please check out and cite the [software publication](https://doi.org/10.1016/j.softx.2020.100584) and the [application publication](https://doi.org/10.3390/rs14071706).
 
 SurfRCaT was developed by Matthew Conlin at the University of Florida, in collaboration with some awesome folks at UF, the National Oceanic and Atmospheric Administration, the United States Geological Survey, and the Southeast Coastal Ocean Observing Regional Association.
 
